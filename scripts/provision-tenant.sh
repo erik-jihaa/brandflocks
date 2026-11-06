@@ -76,13 +76,7 @@ curl -sS -X POST "$BASE_URL/api/admin/reset-client-content" \
   -d "{\"clientId\":\"$TARGET_ID\",\"blankStrategy\":true,\"confirmEnvironment\":\"${CE_ENV:-production}\"}" \
   | python3 -m json.tool
 
-echo "==> Copy sources: $SOURCE_ID -> $TARGET_ID"
-curl -sS -X POST "$BASE_URL/api/admin/copy-client-sources" \
-  -H "Content-Type: application/json" \
-  -H "X-CE-Reset-Token: $TOKEN" \
-  -d "{\"fromClientId\":\"$SOURCE_ID\",\"toClientId\":\"$TARGET_ID\",\"replace\":true}" | python3 -m json.tool
-
-echo "==> Copy login password from source tenant"
+echo "==> Copy login password from source tenant (sources: kopieer handmatig of via CE-Cursor admin/copy-client-sources)"
 curl -sS -X POST "$BASE_URL/api/admin/update-client" \
   -H "Content-Type: application/json" \
   -H "X-CE-Reset-Token: $TOKEN" \

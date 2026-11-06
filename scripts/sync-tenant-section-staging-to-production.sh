@@ -3,8 +3,14 @@
 #
 #   ./scripts/sync-tenant-section-staging-to-production.sh
 #   ./scripts/sync-tenant-section-staging-to-production.sh agenda findability
+#
+# Brandflocks: admin/import-tenant-section verwijderd (ronde B) — gebruik CE-Cursor voor sectie-sync.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ ! -f "$ROOT/web/api/admin-import-tenant-section.php" ]]; then
+  echo "admin/import-tenant-section ontbreekt (Brandflocks ronde B). Gebruik CE-Cursor." >&2
+  exit 1
+fi
 source "$ROOT/scripts/ce-env.sh"
 
 SOURCE_ID="${CE_STAGING_IGISNEXT_CLIENT_ID:-016384af-b26e-4415-aa9c-abc46b804798}"

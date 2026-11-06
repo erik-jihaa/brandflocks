@@ -21,7 +21,7 @@ $path = preg_replace('#^/api#', '', $path) ?: '/';
 require_once __DIR__ . '/auth-guard.php';
 require_once __DIR__ . '/content-reset.php';
 
-$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/fix-slot-status' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/theme-source-backfill' || $path === '/admin/create-client' || $path === '/admin/provision-hba-testmerk' || $path === '/admin/import-hba-testposts' || $path === '/admin/hba-stroomtest-brandpunt' || $path === '/admin/hba-testmerken-matrix' || $path === '/admin/hba-testmerken-stability' || $path === '/admin/hba-pilot-weekly-report' || $path === '/admin/hba-pilot-negeer-alert-test' || $path === '/admin/hba-ijkrun' || $path === '/admin/hba-ce04-post3' || $path === '/admin/hba-hashtag-bewijs' || $path === '/admin/hba-constraint-breach-verificatie-test' || $path === '/admin/hba-v0-verleiding' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/hba-research-verdict-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/import-tenant-section' || $path === '/admin/copy-client-sources' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/wp-diagnose' || $path === '/admin/republish-wp' || $path === '/admin/debug-article' || $path === '/admin/debug-research' || $path === '/admin/hba-status' || $path === '/admin/hba-ensure-guardrail' || $path === '/admin/hba-phase1' || $path === '/admin/hba-phase3' || $path === '/admin/hba-baseline' || $path === '/admin/hba-wizard-document-refresh' || $path === '/admin/hba-kernformuleringen' || $path === '/admin/hba-woorden-patch' || $path === '/admin/hba-aanspreekvorm-patch' || $path === '/admin/hba-ce03-self-review-rerun' || $path === '/admin/hba-theme-verdict-slot' || $path === '/admin/hygiene' || $path === '/admin/hygiene-acceptance' || $path === '/admin/ce03-phase2-test' || $path === '/admin/testset-freeze' || $path === '/admin/list-slots' || $path === '/admin/campagne-preview-accept' || $path === '/admin/agenda-preview' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/hba-content-score-model-test' || $path === '/admin/hba-narrative-repair' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
+$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/create-client' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/wp-diagnose' || $path === '/admin/republish-wp' || $path === '/admin/debug-research' || $path === '/admin/hba-status' || $path === '/admin/hba-ensure-guardrail' || $path === '/admin/hygiene' || $path === '/admin/list-slots' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
     && in_array($method, ['GET', 'POST'], true)
     && ce_reset_token_valid();
 
@@ -931,10 +931,6 @@ if ($path === '/admin/set-platform-password' && $method === 'POST') {
     exit;
 }
 
-if ($path === '/admin/fix-slot-status' && $method === 'POST') {
-    require_once __DIR__ . '/admin-fix-slot-status.php';
-    exit;
-}
 
 if ($path === '/admin/wp-diagnose' && $method === 'GET') {
     require_once __DIR__ . '/admin-wp-diagnose.php';
@@ -946,10 +942,6 @@ if ($path === '/admin/republish-wp' && $method === 'POST') {
     exit;
 }
 
-if ($path === '/admin/debug-article' && $method === 'GET') {
-    require_once __DIR__ . '/admin-debug-article.php';
-    exit;
-}
 
 if ($path === '/admin/debug-research' && $method === 'GET') {
     require_once __DIR__ . '/admin-debug-research.php';
@@ -966,155 +958,47 @@ if ($path === '/admin/hba-ensure-guardrail' && $method === 'GET') {
     exit;
 }
 
-if ($path === '/admin/hba-phase1' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-phase1.php';
-    exit;
-}
 
-if ($path === '/admin/hba-phase3' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-phase3.php';
-    exit;
-}
 
-if ($path === '/admin/hba-baseline' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-baseline.php';
-    exit;
-}
 
-if ($path === '/admin/hba-wizard-document-refresh' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-wizard-document-refresh.php';
-    exit;
-}
 
-if ($path === '/admin/hba-kernformuleringen' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-kernformuleringen.php';
-    exit;
-}
 
-if ($path === '/admin/hba-woorden-patch' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-woorden-patch.php';
-    exit;
-}
 
-if ($path === '/admin/hba-aanspreekvorm-patch' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-aanspreekvorm-patch.php';
-    exit;
-}
 
-if ($path === '/admin/hba-ce03-self-review-rerun' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-ce03-self-review-rerun.php';
-    exit;
-}
 
-if ($path === '/admin/hba-theme-verdict-slot' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-theme-verdict-slot.php';
-    exit;
-}
 
-if ($path === '/admin/hba-research-verdict-slot' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-research-verdict-slot.php';
-    exit;
-}
 
 if ($path === '/admin/hygiene' && in_array($method, ['GET', 'POST'], true)) {
     require_once __DIR__ . '/admin-hygiene.php';
     exit;
 }
 
-if ($path === '/admin/hygiene-acceptance' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hygiene-acceptance.php';
-    exit;
-}
 
-if ($path === '/admin/ce03-phase2-test' && $method === 'GET') {
-    require_once __DIR__ . '/admin-ce03-phase2-test.php';
-    exit;
-}
 
-if ($path === '/admin/provision-hba-testmerk' && $method === 'POST') {
-    require_once __DIR__ . '/admin-provision-hba-testmerk.php';
-    exit;
-}
 
-if ($path === '/admin/import-hba-testposts' && $method === 'POST') {
-    require_once __DIR__ . '/admin-import-hba-testposts.php';
-    exit;
-}
 
-if ($path === '/admin/hba-stroomtest-brandpunt' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-stroomtest-brandpunt.php';
-    exit;
-}
 
-if ($path === '/admin/hba-testmerken-matrix' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-testmerken-matrix.php';
-    exit;
-}
 
-if ($path === '/admin/hba-testmerken-stability' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-testmerken-stability.php';
-    exit;
-}
 
-if ($path === '/admin/hba-pilot-weekly-report' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-pilot-weekly-report.php';
-    exit;
-}
 
-if ($path === '/admin/hba-pilot-negeer-alert-test' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-pilot-negeer-alert-test.php';
-    exit;
-}
 
-if ($path === '/admin/hba-ijkrun' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-ijkrun.php';
-    exit;
-}
 
-if ($path === '/admin/hba-ce04-post3' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-ce04-post3.php';
-    exit;
-}
 
-if ($path === '/admin/hba-hashtag-bewijs' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-hashtag-bewijs.php';
-    exit;
-}
 
-if ($path === '/admin/hba-constraint-breach-verificatie-test' && $method === 'GET') {
-    require_once __DIR__ . '/admin-hba-constraint-breach-verificatie-test.php';
-    exit;
-}
 
 if ($path === '/admin/hba-article-hint-slot' && in_array($method, ['GET', 'POST'], true)) {
     require_once __DIR__ . '/admin-hba-article-hint-slot.php';
     exit;
 }
 
-if ($path === '/admin/hba-v0-verleiding' && $method === 'POST') {
-    require_once __DIR__ . '/admin-hba-v0-verleiding.php';
-    exit;
-}
 
-if ($path === '/admin/testset-freeze' && $method === 'POST') {
-    require_once __DIR__ . '/admin-testset-freeze.php';
-    exit;
-}
 
 if ($path === '/admin/list-slots' && $method === 'GET') {
     require_once __DIR__ . '/admin-list-slots.php';
     exit;
 }
 
-if ($path === '/admin/campagne-preview-accept' && $method === 'POST') {
-    require_once __DIR__ . '/admin-campagne-preview-accept.php';
-    exit;
-}
 
-if ($path === '/admin/agenda-preview' && $method === 'GET') {
-    require_once __DIR__ . '/admin-agenda-preview.php';
-    exit;
-}
 
 if ($path === '/admin/schema-export' && $method === 'GET') {
     require_once __DIR__ . '/admin-schema-export.php';
@@ -1131,15 +1015,7 @@ if ($path === '/admin/run-migration' && in_array($method, ['GET', 'POST'], true)
     exit;
 }
 
-if ($path === '/admin/hba-content-score-model-test' && in_array($method, ['GET', 'POST'], true)) {
-    require_once __DIR__ . '/admin-hba-content-score-model-test.php';
-    exit;
-}
 
-if ($path === '/admin/hba-narrative-repair' && in_array($method, ['GET', 'POST'], true)) {
-    require_once __DIR__ . '/admin-hba-narrative-repair.php';
-    exit;
-}
 
 if ($path === '/admin/events' && in_array($method, ['GET', 'POST'], true)) {
     require_once __DIR__ . '/admin-events.php';
@@ -1181,10 +1057,6 @@ if ($path === '/admin/theme-refill' && $method === 'POST') {
     exit;
 }
 
-if ($path === '/admin/theme-source-backfill' && $method === 'POST') {
-    require_once __DIR__ . '/admin-theme-source-backfill.php';
-    exit;
-}
 
 if ($path === '/admin/create-client' && $method === 'POST') {
     require_once __DIR__ . '/admin-create-client.php';
@@ -1211,10 +1083,6 @@ if ($path === '/admin/import-tenant' && $method === 'POST') {
     exit;
 }
 
-if ($path === '/admin/import-tenant-section' && $method === 'POST') {
-    require_once __DIR__ . '/admin-import-tenant-section.php';
-    exit;
-}
 
 if ($path === '/admin/reset-client-content' && $method === 'POST') {
     require_once __DIR__ . '/admin-reset-client-content.php';
@@ -1226,10 +1094,6 @@ if ($path === '/admin/delete-client' && $method === 'POST') {
     exit;
 }
 
-if ($path === '/admin/copy-client-sources' && $method === 'POST') {
-    require_once __DIR__ . '/admin-copy-client-sources.php';
-    exit;
-}
 
 if ($path === '/admin/mailbox-sync' && in_array($method, ['GET', 'POST'], true)) {
     require_once __DIR__ . '/admin-mailbox-sync.php';

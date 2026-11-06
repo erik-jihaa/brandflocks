@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Kopieer sources + strategy (en optioneel wachtwoord) van bron- naar doel-tenant.
+# Brandflocks: admin/copy-client-sources is verwijderd (ronde B). Gebruik CE-Cursor of
+# update-client copyStrategyFromClientId + handmatige bronnen tot er een vervanger is.
 # Gebruik:
 #   ./scripts/copy-sources-strategy.sh "iGiSNext Sandbox 2"
 #   ./scripts/copy-sources-strategy.sh <targetClientId> [sourceCompanyOrId]
@@ -68,12 +70,6 @@ if [[ "$SOURCE_RAW" == *-*-*-*-* ]]; then
 else
   SOURCE_ID="$(resolve_client_id "$SOURCE_RAW")"
 fi
-
-echo "==> Sources: $SOURCE_ID -> $TARGET_ID"
-curl -sS -X POST "$BASE_URL/api/admin/copy-client-sources" \
-  -H "Content-Type: application/json" \
-  -H "X-CE-Reset-Token: $TOKEN" \
-  -d "{\"fromClientId\":\"$SOURCE_ID\",\"toClientId\":\"$TARGET_ID\",\"replace\":true}" | python3 -m json.tool
 
 echo "==> Strategy: $SOURCE_ID -> $TARGET_ID"
 curl -sS -X POST "$BASE_URL/api/admin/update-client" \

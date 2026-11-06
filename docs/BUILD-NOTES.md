@@ -22,3 +22,11 @@ Design tokens: `docs/igisnext-identity.md` (naam/huisstijl wordt Brandflocks-whi
 ### 2026-11-06 — Ronde A repo-vuil
 
 Pilotdocs, Rogier-pakketten en oude briefing verwijderd; actieve specs onder `briefing/spec/`. CE-geschiedenis blijft in CE-Cursor.
+
+### 2026-11-06 — Ronde B pilot/meet/patch-routes
+
+~35 `/admin/*`-routes uit het fork-plan verwijderd (v1.8–v1.13-pilot, testmerken, eenmalige patches, debug-slots, previews). **Behouden:** `hba-article-hint-slot` (CE-03 n8n), operationele routes voor ronde C.
+
+Repos alleen voor die routes weg: `hba-ijkrun-repository.php`, `hba-stroomtest-brandpunt-repository.php`. Pilot-alert/testmerken-PHP blijft zolang HBA-v2 het laadt.
+
+Scripts die `copy-client-sources` / `import-tenant-section` aanriepen: aangepast of exit — gebruik CE-Cursor voor tenant-sectie-sync tot er een Brandflocks-vervanger is.
