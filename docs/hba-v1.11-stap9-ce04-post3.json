@@ -1,0 +1,154 @@
+{
+  "ok": true,
+  "promptVersion": "v1.11",
+  "waitSeconds": 1,
+  "results": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Breekt de regel",
+      "slotId": "8c576c9a-49bb-45b4-81e2-4ec8a41c31b0",
+      "articleId": "d0e73a13-041a-4098-a08f-2687e6cbe534",
+      "feedbackCount": 5,
+      "regelFeedback": [
+        {
+          "id": "72f4f62d-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+          "status": "open"
+        }
+      ],
+      "regelFeedbackOk": true,
+      "ce04ParseErrors": [],
+      "feedbackSample": [
+        {
+          "id": "72f4f62d-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+          "status": "open"
+        },
+        {
+          "id": "72f4fc2a-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "De post is identiek aan de AI-tekst. Er is geen menselijke bewerking zichtbaar — overweeg of er inhoudelijk iets aangepast of toegevoegd had moeten worden voor publicatie.",
+          "actionLabel": "Verwijderen",
+          "excerpt": null,
+          "status": "open"
+        },
+        {
+          "id": "72f5002b-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit is inhoudelijk strijdig met de merkregel (zie regelbreuk). Los van de regelkwestie: de formulering 'van twee maanden geleden' is ook als verkoopargument zwak — het benoemt een nadeel zonder enige framing.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "alle zakken van twee maanden geleden",
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Breekt de regel",
+      "slotId": "90c4c9fb-162a-402f-b729-ff74d2db4202",
+      "articleId": "3d3123f8-1759-4b82-afbe-8cf803c7c024",
+      "feedbackCount": 5,
+      "regelFeedback": [
+        {
+          "id": "7c55db7d-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je wachtlijsten nooit wegwerkt door invalkrachten in te zetten, ook niet als dat betekent dat je een nieuwe cliënt moet doorverwijzen.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+          "status": "open"
+        }
+      ],
+      "regelFeedbackOk": true,
+      "ce04ParseErrors": [],
+      "feedbackSample": [
+        {
+          "id": "7c55db7d-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je wachtlijsten nooit wegwerkt door invalkrachten in te zetten, ook niet als dat betekent dat je een nieuwe cliënt moet doorverwijzen.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+          "status": "open"
+        },
+        {
+          "id": "7c55e4db-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit is de kern van de regelbreuk — zie regelbreuk-veld. Los van de merkregel beschrijft de tekst een werkwijze die het vertrouwen van cliënten ondermijnt: vreemde gezichten aan de deur is precies wat Duinroos wil voorkomen.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "door de inzet van invalkrachten uit het uitzendbureau",
+          "status": "open"
+        },
+        {
+          "id": "7c55e8b4-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "De tekst spreekt over zichzelf ('we') en over een operationeel resultaat. Dat is het tegenovergestelde van de schrijfwijzer: spreek over de cliënt, niet over de organisatie. Een wachtlijst is bovendien geen prestatie om mee te adverteren.",
+          "actionLabel": "Herschrijven",
+          "excerpt": "hebben we onze wachtlijst in een maand weggewerkt!",
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Breekt de regel",
+      "slotId": "8d849c19-b447-4b47-9ab9-8fa2aa047048",
+      "articleId": "5e95b384-3432-462d-a600-132da0384cd1",
+      "feedbackCount": 5,
+      "regelFeedback": [
+        {
+          "id": "849d76c3-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+          "status": "open"
+        }
+      ],
+      "regelFeedbackOk": true,
+      "ce04ParseErrors": [],
+      "feedbackSample": [
+        {
+          "id": "849d76c3-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+          "status": "open"
+        },
+        {
+          "id": "849d7eb5-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "Dit is niet alleen categorietaal — het beschrijft een concrete nieuwe status en werkwijze van het merk. Een resellerpartnerschap impliceert commerciële afhankelijkheid van een leverancier, wat de geloofwaardigheid van onafhankelijk advies direct ondergraaft.",
+          "actionLabel": "Verwijderen",
+          "excerpt": "officieel gecertificeerd resellerpartner",
+          "status": "open"
+        },
+        {
+          "id": "849d821a-cb44-11f1-84cf-9c6b00b7cd02",
+          "type": "text",
+          "name": "Hoofdredacteur",
+          "comment": "De toon is triomfantelijk en verkoopgericht, wat haaks staat op de rustige, afgewogen stem van Stelwerk. 'Trots' als opener past bij een merk dat successen uitroept — niet bij een merk dat eerst vragen stelt en dan een oordeel geeft.",
+          "actionLabel": "Herschrijven",
+          "excerpt": "Trots:",
+          "status": "open"
+        }
+      ]
+    }
+  ]
+}

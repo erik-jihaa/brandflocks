@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "archetype",
+    "doel",
+    "foe",
+    "spanning",
+    "mechanisme",
+    "geloofwaardigheidstest",
+    "bewijsvelden",
+    "verboden_logica",
+    "tone_of_behaviour",
+    "woorden_die_passen",
+    "woorden_die_niet_passen",
+    "goede_voorbeelden",
+    "zwakke_voorbeelden",
+    "contextprofiel"
+  ],
+  "properties": {
+    "archetype": {
+      "type": "string",
+      "enum": [
+        "Leider",
+        "Magiër",
+        "Wijze",
+        "Kampioen",
+        "Ontdekker",
+        "Maker",
+        "Rebel",
+        "Entertainer",
+        "Beminnaar",
+        "Verzorger",
+        "Buur",
+        "Optimist"
+      ]
+    },
+    "doel": { "type": "string", "minLength": 20, "maxLength": 200 },
+    "foe": { "type": "string", "minLength": 20, "maxLength": 200 },
+    "spanning": { "type": "string", "minLength": 20, "maxLength": 250 },
+    "mechanisme": { "type": "string", "minLength": 20, "maxLength": 300 },
+    "geloofwaardigheidstest": { "type": "string", "minLength": 20, "maxLength": 300 },
+    "verboden_logica": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "bewijsvelden": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "tone_of_behaviour": { "type": "string", "minLength": 20 },
+    "woorden_die_passen": { "type": "array", "items": { "type": "string" }, "minItems": 3 },
+    "woorden_die_niet_passen": { "type": "array", "items": { "type": "string" }, "minItems": 3 },
+    "goede_voorbeelden": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "zwakke_voorbeelden": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "contextprofiel": {
+      "type": "string",
+      "enum": [
+        "nieuw_merk",
+        "herpositionering",
+        "groeiend",
+        "volwassen",
+        "tijdelijke_salesdruk",
+        "b2b_complex_sale"
+      ]
+    },
+    "default_platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "linkedin",
+          "website_blog",
+          "newsletter",
+          "twitter_x",
+          "instagram",
+          "facebook",
+          "press_release",
+          "ad"
+        ]
+      }
+    },
+    "target_post_volume_per_month": { "type": "integer" }
+  }
+}

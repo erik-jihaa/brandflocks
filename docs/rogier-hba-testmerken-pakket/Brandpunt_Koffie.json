@@ -1,0 +1,120 @@
+{
+  "testmerk": {
+    "merknaam": "Brandpunt Koffie",
+    "branche": "Koffiebranderij met eigen winkel en webshop, Utrecht",
+    "type": "mkb, consument",
+    "toelichting": "Klein bedrijf, 6 medewerkers. Test of de app een concrete, kostbare regel herkent in een markt waar 'vers gebrand' en 'duurzaam' hygiëne zijn."
+  },
+  "brand_narrative": {
+    "archetype": "Maker",
+    "doel": "Dat mensen koffie drinken waarvan ze de smaak echt proeven, en weten waar die smaak vandaan komt.",
+    "foe": "De gewoonte om koffie als brandstof te behandelen: snel, overal hetzelfde, en smaak die er niet meer toe doet.",
+    "spanning": "Een maker die smaak terug wil brengen in een kopje dat de meeste mensen alleen nog drinken om wakker te worden.",
+    "mechanisme": "We branden in kleine partijen per herkomst, zetten op elke zak de branddatum en de boer, en leggen in de winkel bij elke koffie uit wat je proeft en waarom.",
+    "geloofwaardigheidstest": "Wij verkopen geen koffie die langer dan zes weken geleden is gebrand, ook niet met korting. Wat over is, gaat naar de buurtvoedselbank of wordt weggegooid.",
+    "verboden_logica": [
+      "vers gebrand als hoofdclaim zonder de zes-wekenregel",
+      "duurzaam of fairtrade als algemene belofte",
+      "koffie als energie of brandstof",
+      "aanbiedingen en stapelkorting op oudere voorraad",
+      "de lekkerste koffie van Utrecht"
+    ],
+    "bewijsvelden": [
+      "Branddatum en boer op elke zak",
+      "Proefochtend elke eerste donderdag van de maand",
+      "Overzicht per maand van niet verkochte en afgevoerde kilo's op de website",
+      "Vaste afnemers bij drie boeren in Huila, Colombia"
+    ],
+    "tone_of_behaviour": "Nauwkeurig en uitnodigend. Legt uit wat je proeft, zonder vakjargon of snobisme. Spreekt over het maakproces, niet over beleving.",
+    "goede_voorbeelden": [
+      "Vorige maand gooiden we 14 kilo koffie weg. Die was zeven weken oud. Nog prima te drinken, maar niet meer wat de boer erin heeft gelegd. Daarom staat op elke zak de branddatum.",
+      "Deze Huila proef je het best zwart: eerst rood fruit, dan iets van cacao. Proef het donderdag bij ons aan de bar, de branding is van maandag.",
+      "Waarom wij geen 'voordeelpak' verkopen: een kilo die je over twee maanden opdrinkt, smaakt aan het eind niet meer naar wat je kocht."
+    ],
+    "zwakke_voorbeelden": [
+      "Start je dag goed met onze heerlijke versgebrande koffie! Nu 20% korting op alle bonen.",
+      "Wij zijn een duurzame koffiebranderij met passie voor kwaliteit en oog voor mens en milieu.",
+      "Maandagochtend? Onze koffie geeft je de energie die je nodig hebt!"
+    ],
+    "contextprofiel": "groeiend",
+    "default_platforms": [
+      "instagram",
+      "website_blog",
+      "newsletter"
+    ],
+    "target_post_volume_per_month": 12
+  },
+  "markthygiene": {
+    "branche_id": "koffie",
+    "branche_naam": "Koffiebranderij / specialty coffee, consument",
+    "herkomst": "gecureerd",
+    "markt_archetype": "Maker",
+    "hygienefactoren": [
+      "vers gebrand",
+      "duurzaam",
+      "fairtrade",
+      "branddatum op de verpakking",
+      "lokaal gebrand"
+    ],
+    "categorietaal": [
+      "versgebrande koffie",
+      "passie voor kwaliteit",
+      "duurzame koffiebranderij",
+      "de lekkerste koffie"
+    ]
+  },
+  "testposts": [
+    {
+      "post_tekst": "Vandaag nieuwe oogst binnen uit Huila. Over twee weken in de winkel, zodra hij is uitgerust. Wat na zes weken niet verkocht is, gaat de winkel uit.",
+      "platform": "instagram",
+      "verwacht": "hoge brand_contribution, geen risk-flags",
+      "toegestane_flags": [],
+      "verwacht_hoofdoordeel": "op_merk"
+    },
+    {
+      "post_tekst": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt. Kom langs!",
+      "platform": "instagram",
+      "verwacht": "lage distinctiviteit, flag category_fallback",
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "verwacht_hoofdoordeel": "categorietaal"
+    },
+    {
+      "post_tekst": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+      "platform": "instagram",
+      "verwacht": "flag constraint_breach: breekt de zes-wekenregel",
+      "verwacht_hoofdoordeel": "regelbreuk"
+    },
+    {
+      "post_tekst": "Vijf tips om je koffiezetapparaat te ontkalken.",
+      "platform": "website_blog",
+      "verwacht": "contentrol educatie of service, neutraal, lage bijdrage aan de architectuur",
+      "verwacht_hoofdoordeel": "neutraal"
+    },
+    {
+      "post_tekst": "Geen Black Friday bij ons. Koffie van zeven weken prijzen we niet af, die gaat naar de voedselbank.",
+      "platform": "instagram",
+      "label": "Verdedigt de regel",
+      "verwacht": "hoge brand_contribution, geen constraint_breach: noemt het verboden onderwerp, maar verdedigt de regel",
+      "verwacht_flags": [],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "verwacht_niveau": "hoog",
+      "verwacht_hoofdoordeel": "op_merk"
+    },
+    {
+      "post_tekst": "Vandaag nieuwe oogst binnen uit Huila. Over twee weken in de winkel, zodra hij is uitgerust na het branden. Je ziet de branddatum op de zak.",
+      "platform": "instagram",
+      "label": "Mechanisme dat markthygiëne is",
+      "verwacht": "categorietaal of lage distinctiviteit: de branddatum op de zak is gangbaar bij specialty-branders; de zes-wekenregel staat er niet in",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "verwacht_niveau": "laag",
+      "ambigu": true
+    }
+  ]
+}

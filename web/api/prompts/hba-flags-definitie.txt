@@ -1,0 +1,80 @@
+FUNCTIONELE ONDERDELEN: een oproep tot contact of actie, een datum, een tijd, een
+link, een adres, een prijs zonder claim of andere praktische informatie beoordeel
+je niet. Ze krijgen geen flag en tellen niet mee in het hoofdoordeel. Beoordeel
+alleen wat de tekst over het merk beweert, belooft of laat zien.
+
+FLAGS: wanneer meld je wat?
+
+proof_gap: de tekst beweert iets over het merk (een kwaliteit, een resultaat, een
+cijfer) dat niet onderbouwd wordt door de tekst zelf of door de bewijsvelden. Een
+concreet voorval, een naam, een datum of een beschreven handeling is zelf bewijs.
+Dat geldt ook voor een beschreven werkwijze, timing of processtap van het merk,
+zoals "over twee weken in de winkel, zodra hij is uitgerust" of "dus komt het team
+om tien uur". Meld proof_gap alleen bij een bewering over een uitkomst, kwaliteit
+of cijfer die de tekst niet onderbouwt. Dat een tekst de geloofwaardigheidstest
+niet noemt, is geen bewijsgat; dat telt hoogstens mee in een lagere merkbijdrage.
+Meld proof_gap ook als de kernbewering van de tekst (meestal de kop of de
+openingszin) een resultaat over het merk claimt dat de rest van de tekst
+niet verklaart, of dat logisch niet kan volgen uit wat de tekst beschrijft.
+Meld proof_gap ook op een vroege samenwerkings-, ervarings- of resultaatclaim
+over het merk in de eerste alinea (bijvoorbeeld een samenwerking of jaren
+ervaring met een systeem) als die claim niet onderbouwd is in de tekst of
+bewijsvelden — ook wanneer kop of openingszin iets anders formuleren.
+Een cijfer of anekdote in een latere bijzin telt niet als kern als de post
+er verder een onderbouwd mechanisme of regel uitdraagt.
+
+category_fallback: meld dit alleen als de kern van de hele tekst categorietaal is:
+wat de tekst over het merk beweert, kan elke concurrent in de branche ongewijzigd
+zeggen. De kern is niet automatisch de kop of openingszin. Staat ergens in de
+tekst een concreet element van het mechanisme of de regel dat niet tot de
+gangbare praktijk van de branche hoort, dan geen category_fallback — ook als de
+kop of openingszin gangbare praktijk is (oogst binnen, rusttijd, herkomst,
+branddatum, traceability). De merkregel noemen is genoeg; je hoeft niet te eisen
+dat de tekst uitlegt wat die keuze kost. Voorbeeld: "wat na zes weken niet
+verkocht is, gaat de winkel uit" is de zes-wekenregel. Post over gangbare
+specialty-praktijk (branddatum op de zak, oogst binnen, traceability) zonder die
+merkregel in de tekst: category_fallback op die kern — markthygiëne is geen
+op_merk.
+
+foe_vervaging: alleen als de tekst doet, aanprijst of als eigen werkwijze
+presenteert wat de tegenkracht doet ({{foe}}). Er moet een citaat zijn waarin
+dat gedrag of die logica zelf staat. Noem de zin en leg in één zin uit welk
+gedrag van de tegenkracht die zin overneemt. Lukt dat alleen met de uitleg
+"omdat het merk hier zijn eigen verhaal niet vertelt", dan is het geen
+foe_vervaging.
+Geen foe_vervaging bij:
+- categorietaal op zichzelf (dat is category_fallback), ook als de belofte
+  algemeen of niet onderbouwd is (dan eventueel ook proof_gap);
+- een ontbrekende onderbouwing, een weggelaten mechanisme of een weggelaten
+  eigen regel — ontbreken is geen omarmen;
+- een vraag, een retorische opening of een aankondiging zonder merkbewering;
+- een tekst die de logica van de tegenkracht noemt om zich ertegen te keren.
+Wel foe_vervaging, geijkt op echte posts:
+- Duinroos: "Dankzij slimmere routes zijn onze zorgverleners elke dag een half
+  uur minder onderweg" — efficiëntie wordt als zorgwinst gepresenteerd.
+- Brandpunt: "Black Friday: alle zakken van twee maanden geleden voor de halve
+  prijs!" — prijs als argument, de tekst doet de korting.
+Geen foe_vervaging, geijkt op posts die in v1.12 onterecht tegenkracht kregen:
+- Brandpunt categorietaal: "versgebrande koffie van topkwaliteit, met liefde
+  gemaakt" — branchetaal, category_fallback.
+- Duinroos categorietaal: "warme, persoonlijke zorg van betrokken
+  professionals" — branchetaal, category_fallback.
+- Duinroos archetype: "Zo zien wij zorg." — toon zonder bewijs, geen gedrag
+  van de tegenkracht.
+- Stelwerk branchetaal: "Daarom kiezen steeds meer maakbedrijven voor
+  Stelwerk." — populariteit als argument, category_fallback en proof_gap,
+  niet de logica van een systeem verkopen op wat het kan.
+- Stelwerk aankondiging: "AI in de maakindustrie, wat kun je ermee?" — vraag
+  zonder merkbewering.
+- Duinroos: "Onze wachtlijst is in één maand opgelost. Maar niet zoals je
+  misschien denkt." — de kop noemt een resultaat, de tekst keert zich daarna
+  tegen die logica. Dat is proof_gap op het resultaat, geen foe_vervaging.
+
+constraint_breach: alleen volgens de definitie van regelbreuk. Zet de zin in
+flag_citaten.constraint_breach. Zet in flag_citaten.constraint_breach_uitleg
+één zin die antwoordt: "Welke handeling uit de regel doet het merk volgens deze
+zin toch?" Kun je die handeling niet noemen, meld constraint_breach dan niet.
+
+Voor elke flag geldt: noem de zin uit de tekst waarop de flag rust. Kun je geen
+zin aanwijzen, meld de flag dan niet. Bij foe_vervaging: zet die zin in
+flag_citaten.foe_vervaging en de uitleg in flag_citaten.foe_vervaging_uitleg.

@@ -1,0 +1,462 @@
+{
+  "generatedAt": "2026-10-18 11:59:39 UTC",
+  "promptVersion": "v1.11",
+  "runsPerTarget": 5,
+  "targets": [
+    {
+      "label": "Brandpunt artikel week 41",
+      "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+      "runs": [
+        {
+          "run": 1,
+          "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De zin over de zes weken zegt 'nadert' in plaats van de regel zoals die geldt — maar los daarvan is dit de plek waar de tekst het meest wegzakt: de regel wordt uitgelegd, maar het getal dat hem tastbaar maakt ontbreekt. Voeg een concreet cijfer toe — hoeveel kilo er vorige maand naar de voedselbank ging — zodat de lezer niet alleen de regel hoort maar ook ziet wat die kost.",
+          "regelOvertreden": null,
+          "passageNa": "Wij concurreren niet op prijs. Dat is geen hoogmoed; het is eerlijkheid over wat wij maken en voor wie. Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. Op de drukste kortingsdag van het jaar verandert er bij ons dus niets. Wat je koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand naar de voedselbank ging — dit getal staat al op de website en maakt de regel tastbaar: het laat zien wat de keuze concreet kost.",
+            "Hoeveel kilo er vorige maand naar de voedselbank ging."
+          ],
+          "error": null,
+          "ok": false,
+          "derivedBoundary": true,
+          "quoteNotInSource": true,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": true,
+          "literalZesWeken": true,
+          "reasons": [
+            "afgeleide grens (nadert/rond/bijna/grens van zes weken)",
+            "citaat niet in brontekst"
+          ]
+        },
+        {
+          "run": 2,
+          "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De zin over de zes weken zegt 'nadert' in plaats van de regel zoals die geldt — maar los daarvan is dit de plek waar de tekst het meest wegzakt: de regel wordt uitgelegd, maar het getal dat hem tastbaar maakt ontbreekt. Voeg een concreet cijfer toe — hoeveel kilo er vorige maand naar de voedselbank ging — zodat de lezer ziet dat de regel echt geld kost, niet alleen klinkt alsof hij dat doet.",
+          "regelOvertreden": null,
+          "passageNa": "Wij concurreren niet op prijs. Dat is geen hoogmoed; het is eerlijkheid over wat wij maken en voor wie. Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. Wat je koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo koffie er de afgelopen maand naar de voedselbank is gegaan — dit cijfer houden jullie al bij op de website, en het maakt zichtbaar dat de regel echt geld kost.",
+            "Hoeveel kilo er de afgelopen maand naar de voedselbank is gegaan — dit cijfer houden jullie al bij op de website."
+          ],
+          "error": null,
+          "ok": false,
+          "derivedBoundary": true,
+          "quoteNotInSource": true,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": true,
+          "literalZesWeken": true,
+          "reasons": [
+            "afgeleide grens (nadert/rond/bijna/grens van zes weken)",
+            "citaat niet in brontekst"
+          ]
+        },
+        {
+          "run": 3,
+          "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": null,
+          "regelOvertreden": null,
+          "passageNa": null,
+          "ctaNa": null,
+          "invulvelden": null,
+          "error": "Geen aanwijzing ontvangen — probeer opnieuw",
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 4,
+          "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie niet wordt verkocht die langer dan zes weken geleden is gebrand. Vervang die zin door de regel zoals hij werkelijk geldt, en voeg een concreet getal toe dat laat zien wat die keuze kost, bijvoorbeeld hoeveel kilo er vorige maand naar de voedselbank ging.",
+          "regelOvertreden": null,
+          "passageNa": "Wij concurreren niet op prijs. Dat is geen hoogmoed; het is eerlijkheid over wat wij maken en voor wie. Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. Wat je koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo er de afgelopen maand naar de voedselbank is gegaan — dit cijfer staat al op de website en maakt de regel tastbaar als een keuze die echt geld kost.",
+            "Hoeveel kilo er de afgelopen maand naar de voedselbank is gegaan — dit cijfer staat al op de website."
+          ],
+          "error": null,
+          "ok": false,
+          "derivedBoundary": true,
+          "quoteNotInSource": true,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": true,
+          "literalZesWeken": true,
+          "reasons": [
+            "afgeleide grens (nadert/rond/bijna/grens van zes weken)",
+            "citaat niet in brontekst"
+          ]
+        },
+        {
+          "run": 5,
+          "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie niet verkocht wordt die langer dan zes weken geleden is gebrand. Vervang die zin door de regel zoals hij werkelijk geldt, en voeg een concreet getal toe dat laat zien wat die keuze kost, zodat de lezer begrijpt dat dit een echte keuze is en geen marketingclaim.",
+          "regelOvertreden": null,
+          "passageNa": "Wij concurreren niet op prijs. Dat is geen hoogmoed; het is eerlijkheid over wat wij maken en voor wie. Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. Wat je koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo koffie er de afgelopen maand naar de voedselbank is gegaan — dit getal houden jullie al bij op de website en maakt de regel tastbaar als een echte keuze die geld kost.",
+            "Hoeveel kilo er de afgelopen maand naar de voedselbank is gegaan — dit getal staat al op de website."
+          ],
+          "error": null,
+          "ok": false,
+          "derivedBoundary": true,
+          "quoteNotInSource": true,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": true,
+          "literalZesWeken": true,
+          "reasons": [
+            "afgeleide grens (nadert/rond/bijna/grens van zes weken)",
+            "citaat niet in brontekst"
+          ]
+        }
+      ],
+      "okCount": 1,
+      "pass": false
+    },
+    {
+      "label": "V0 Brandpunt",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "runs": [
+        {
+          "run": 1,
+          "articleId": "af286d65-c8ab-11f1-84cf-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Geen kortingsfolder. Wel een open deur.' is een mooie afsluiting, maar laat de lezer met een open einde. Maak concreet wat die open deur inhoudt — bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en naar de voedselbank ging. Dat getal staat al op jullie website en maakt de regel tastbaar op precies de dag dat anderen hun oude voorraad opruimen.",
+          "regelOvertreden": null,
+          "passageNa": "Geen kortingsfolder. Wel een open deur.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand naar de buurtvoedselbank ging of werd afgevoerd — dit getal staat al op jullie website en maakt zichtbaar wat de regel in de praktijk kost."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 2,
+          "articleId": "af286d65-c8ab-11f1-84cf-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Geen kortingsfolder. Wel een open deur.' is te vaag om iets te bewijzen — voeg een concreet getal toe dat laat zien wat die open deur in de praktijk betekent, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en waar het naartoe ging.",
+          "regelOvertreden": null,
+          "passageNa": null,
+          "ctaNa": "Geen kortingsfolder. Wel een open deur.",
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand niet verkocht werd en wat ermee is gebeurd — naar de buurtvoedselbank of afgevoerd. Dit getal staat al op de website en maakt de regel tastbaar op precies het moment dat de tekst hem noemt.",
+            "Hoeveel kilo koffie er vorige maand naar de buurtvoedselbank ging of werd afgevoerd — dat getal staat al op jullie website."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 3,
+          "articleId": "af286d65-c8ab-11f1-84cf-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Geen kortingsfolder. Wel een open deur.' is te vaag om iets te bewijzen — voeg een concreet getal toe dat laat zien wat die open deur in de praktijk betekent, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en dus naar de voedselbank ging.",
+          "regelOvertreden": null,
+          "passageNa": "Geen kortingsfolder. Wel een open deur.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand naar de buurtvoedselbank ging of werd afgevoerd — dit getal staat al op de website en maakt de regel tastbaar op precies het moment dat de tekst hem verdedigt.",
+            "Hoeveel kilo koffie er vorige maand naar de buurtvoedselbank ging of werd afgevoerd, zoals jullie dat bijhouden op de website."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 4,
+          "articleId": "af286d65-c8ab-11f1-84cf-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Geen kortingsfolder. Wel een open deur.' is te vaag om iets te bewijzen — voeg een concreet getal toe dat laat zien wat die open deur in de praktijk betekent, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en waar die naartoe ging.",
+          "regelOvertreden": null,
+          "passageNa": null,
+          "ctaNa": "Geen kortingsfolder. Wel een open deur. [Hoeveel kilo er vorige maand niet verkocht werd en wat daarmee is gebeurd — naar de buurtvoedselbank of afgevoerd. Dit getal staat al op de website en maakt de regel tastbaar op precies de dag dat anderen hun oude voorraad opruimen met een actiesticker.]",
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand niet verkocht werd, en hoeveel daarvan naar de buurtvoedselbank ging en hoeveel werd afgevoerd. Dit getal staat al bij op de website en maakt de zes-wekenregel concreet op de dag dat anderen hun oude voorraad opruimen."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 5,
+          "articleId": "af286d65-c8ab-11f1-84cf-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Geen kortingsfolder. Wel een open deur.' is te vaag om iets te bewijzen — voeg een concreet getal toe dat laat zien wat die open deur in de praktijk betekent, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en waar die naartoe ging.",
+          "regelOvertreden": null,
+          "passageNa": null,
+          "ctaNa": "Geen kortingsfolder. Wel een open deur.",
+          "invulvelden": [
+            "Hoeveel kilo koffie er vorige maand niet verkocht werd en wat daarmee is gebeurd — naar de buurtvoedselbank of afgevoerd. Dit getal staat al bij op de website en maakt de zes-wekenregel concreet op de dag dat anderen juist oude voorraad opruimen.",
+            "Hoeveel kilo koffie er vorige maand naar de buurtvoedselbank ging of werd afgevoerd — dat getal staat al op de website en maakt de regel tastbaar op precies de dag dat anderen uitverkoop houden."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        }
+      ],
+      "okCount": 5,
+      "pass": true
+    },
+    {
+      "label": "V0 Stelwerk",
+      "slotId": "b5b00e3e-15e0-40a9-a5e5-518f0b6715a2",
+      "runs": [
+        {
+          "run": 1,
+          "articleId": "768ef8a7-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Dat is het verschil waarop het aankomt' is te abstract om te landen — voeg één concreet voorbeeld toe van een advies dat jullie omzet kostte, zodat de lezer ziet dat de redenering ook echt zo werkt in de praktijk.",
+          "regelOvertreden": null,
+          "passageNa": "Dat is het verschil waarop het aankomt.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, en wat dat de klant opleverde — of wat het jullie aan omzet kostte."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 2,
+          "articleId": "768ef8a7-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Dat is het verschil waarop het aankomt' is te abstract om te landen — voeg één concreet voorbeeld toe van een advies dat jullie omzet kostte, zodat de lezer ziet wat die onafhankelijkheid in de praktijk betekent.",
+          "regelOvertreden": null,
+          "passageNa": "Dat is het verschil waarop het aankomt.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, of niets te kopen — en wat dat de klant opleverde. Bijvoorbeeld: hoeveel trajecten het afgelopen jaar eindigden met het advies 'niet kopen', of één beschreven geval waarin dat advies de doorslag gaf.",
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, of niets te kopen — en wat dat de klant opleverde."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 3,
+          "articleId": "768ef8a7-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Dat is het verschil waarop het aankomt' is te abstract om te landen — voeg één concreet voorbeeld toe van een advies dat jullie omzet kostte, zodat de lezer begrijpt wat die onafhankelijkheid in de praktijk betekent.",
+          "regelOvertreden": null,
+          "passageNa": "Dat is het verschil waarop het aankomt.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, of helemaal niets te kopen — en wat dat de klant opleverde."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 4,
+          "articleId": "768ef8a7-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Dat is het verschil waarop het aankomt' is te abstract om te landen — voeg één concreet voorbeeld toe van een advies dat jullie omzet kostte, zodat de lezer begrijpt wat die onafhankelijkheid in de praktijk betekent.",
+          "regelOvertreden": null,
+          "passageNa": "Dat is het verschil waarop het aankomt.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, of niets te kopen — en wat dat de klant opleverde."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 5,
+          "articleId": "768ef8a7-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin 'Dat is het verschil waarop het aankomt' is te abstract om te landen — voeg één concreet voorbeeld toe van een advies dat jullie omzet kostte, zodat de lezer ziet dat de redenering ook echt zo werkt.",
+          "regelOvertreden": null,
+          "passageNa": "Dat is het verschil waarop het aankomt.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Een situatie waarin jullie adviseerden het bestaande systeem te houden, en wat dat de klant opleverde — of wat het jullie aan omzet kostte."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        }
+      ],
+      "okCount": 5,
+      "pass": true
+    },
+    {
+      "label": "V0 Duinroos",
+      "slotId": "06754e6b-eba1-4ac6-81a8-e116b07d29ba",
+      "runs": [
+        {
+          "run": 1,
+          "articleId": "a7b482f1-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin ('Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.') is de sterkste zin van de tekst, maar laat de lezer daarna los zonder te laten zien wat er met iemand gebeurt die jullie doorverwijzen — voeg één concreet gegeven toe over wat jullie doen op het moment van doorverwijzen, zodat de keuze niet alleen als weigering voelt maar als een handeling.",
+          "regelOvertreden": null,
+          "passageNa": "Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Wat jullie doen op het moment van doorverwijzen — leggen jullie zelf het contact met de andere aanbieder, of regelen jullie de overdracht anders? Dat laat zien dat de keuze een handeling is, geen weigering.",
+            "Wat jullie concreet doen op het moment dat jullie iemand doorverwijzen: leggen jullie zelf het contact met de andere aanbieder, of regelen jullie de overdracht op een andere manier?"
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 2,
+          "articleId": "a7b482f1-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin ('Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.') is de sterkste zin van de tekst, maar hij hangt in de lucht: de lezer weet niet wat er met iemand gebeurt die jullie doorverwijzen. Laat zien wat jullie doen op het moment van doorverwijzen — leggen jullie zelf het contact, of laten jullie iemand met een naam en een telefoonnummer achter? Dat maakt het verschil tussen een principe en een werkwijze.",
+          "regelOvertreden": null,
+          "passageNa": "Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Wat jullie doen op het moment dat jullie iemand doorverwijzen: leggen jullie zelf het eerste contact met de andere aanbieder, of regelen jullie de overdracht op een andere manier?",
+            "Wat jullie concreet doen op het moment van doorverwijzen: nemen jullie zelf contact op met de andere aanbieder, regelen jullie de overdracht, of begeleiden jullie de cliënt naar de volgende stap?"
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 3,
+          "articleId": "a7b482f1-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin ('Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.') is de sterkste zin van de tekst, maar laat de lezer daarna alleen achter. Voeg één concreet gegeven toe dat laat zien hoe vaak jullie deze keuze daadwerkelijk maken — dat maakt de belofte tastbaar in plaats van abstract.",
+          "regelOvertreden": null,
+          "passageNa": "Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.\n\nVorig jaar verwezen wij door omdat een team vol zat. Dat getal publiceren wij elke maand.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Het aantal aanvragen dat jullie hebben doorverwezen omdat een team vol zat — bijvoorbeeld in het afgelopen jaar of de afgelopen maand. Dit getal staat al in de bewijsvelden als iets wat jullie bijhouden; het maakt de keuze zichtbaar en concreet voor de lezer.",
+            "hoeveel aanvragen jullie hebben doorverwezen in het afgelopen jaar of kwartaal"
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 4,
+          "articleId": "a7b482f1-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin stelt twee dingen tegenover elkaar, maar laat in de lucht hangen wat er met iemand gebeurt die jullie doorverwijzen — daardoor eindigt de tekst op een abstracte bewering in plaats van op een concrete keuze die iets kost. Voeg toe wat jullie doen op het moment van doorverwijzen, zodat de lezer ziet dat 'nee' niet het einde van het gesprek is.",
+          "regelOvertreden": null,
+          "passageNa": "Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger. Daarom laten we het daar niet bij.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Wat jullie doen op het moment dat jullie iemand doorverwijzen — bijvoorbeeld of jullie zelf contact leggen met een andere aanbieder of de overdracht regelen. Dit maakt het verschil tussen 'nee zeggen' en 'iemand verder helpen' zichtbaar.",
+            "Hoe vaak een team vorige maand vol zat en jullie iemand hebben doorverwezen — een getal maakt de werkwijze tastbaar en laat zien dat jullie dit bijhouden."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        },
+        {
+          "run": 5,
+          "articleId": "a7b482f1-c72d-11f1-9456-9c6b00b7cd02",
+          "aanwijzing": "De slotzin ('Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.') is de sterkste zin van de tekst, maar laat daarna los wat er met iemand gebeurt die jullie doorverwijzen — voeg één concreet gegeven toe over wat jullie doen op het moment van doorverwijzen, zodat de lezer niet met een open einde achterblijft.",
+          "regelOvertreden": null,
+          "passageNa": "Een wachtlijst is vervelend. Een vreemde elke week aan de deur is erger.\n\nAls wij doorverwijzen, laten we iemand niet met een naam en een telefoonnummer achter. We houden bij hoe vaak dat is gebeurd — dat cijfer staat elke maand op onze website.",
+          "ctaNa": null,
+          "invulvelden": [
+            "Wat jullie concreet doen op het moment van doorverwijzen: bellen jullie zelf de andere aanbieder, regelen jullie de overdracht, of begeleiden jullie de cliënt op een andere manier op weg? Dit maakt het verschil zichtbaar tussen doorverwijzen als afwijzing en doorverwijzen als keuze voor de cliënt.",
+            "Hoeveel keer jullie vorige maand of dit kwartaal iemand hebben doorverwezen omdat een team vol zat — dit getal maakt de werkwijze tastbaar en laat zien dat jullie de regel ook echt hanteren."
+          ],
+          "error": null,
+          "ok": true,
+          "derivedBoundary": false,
+          "quoteNotInSource": false,
+          "wrongAddress": false,
+          "placeholder": false,
+          "mentionsZesWeken": false,
+          "literalZesWeken": false,
+          "reasons": []
+        }
+      ],
+      "okCount": 5,
+      "pass": true
+    }
+  ]
+}

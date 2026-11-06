@@ -1,0 +1,187 @@
+{
+  "ok": true,
+  "poging": 2,
+  "clientId": "9d414129-29ab-ee9c-95c7-dc5452f6a65f",
+  "verwacht": [
+    "Persoonlijkheidsvoorstel komt overeen met de maker uit stap 6",
+    "Tegenkrachtvoorstel komt overeen met 'koffie als brandstof'",
+    "Architectuurcheck: elke dimensie minstens voldoende (meetlat_klaar), status actief",
+    "De check mag opmerken dat de branddatum op zich in de branche gangbaar is; het onderscheid zit in de zes-wekenregel met de voedselbank. Dat mag een opmerking zijn, geen aanscherpen.",
+    "Geen methodische termen in wat de klant ziet"
+  ],
+  "narrativeMissing": [],
+  "architectureCheck": {
+    "ok": true,
+    "check": {
+      "id": "a19849f7-155d-4da8-b27d-01d07818d8d9",
+      "dimensies": {
+        "krachtTriangle": {
+          "oordeel": "sterk",
+          "toelichting": "De drie punten hangen stevig samen. Het doel (mensen laten proeven wat ze drinken en weten waar het vandaan komt) vraagt om een merk dat zelf maakt en begrijpt. De tegenkracht (koffie als anonieme brandstof) bedreigt precies dat doel. Verander je het doel naar 'de goedkoopste koffie van Utrecht', dan klopt de tegenkracht niet meer. Verander je de tegenkracht naar 'grote ketens', dan verlies je de inhoudelijke spanning. De drie punten staan dus niet los van elkaar.",
+          "verbetering": ""
+        },
+        "relevantieTegenkracht": {
+          "oordeel": "sterk",
+          "toelichting": "De tegenkracht (koffie als brandstof, overal hetzelfde, smaak doet er niet toe) is geen stropoppenargument. Dit is precies wat supermarkthuismerken, grote koffieketens en capsulemerken in de praktijk uitstralen, ook al zeggen ze het niet letterlijk. De tegenkracht bedreigt het doel direct: als mensen koffie als brandstof zien, zullen ze nooit stilstaan bij smaak of herkomst. De spanning is echt.",
+          "verbetering": ""
+        },
+        "relevantieRol": {
+          "oordeel": "sterk",
+          "toelichting": "Een merk dat zelf brandt, per herkomst werkt, de branddatum op de zak zet en maandelijkse proefochtenden organiseert, gedraagt zich als iemand die iets maakt en er trots op is. Dat past precies bij wie je moet zijn om mensen te leren proeven en begrijpen. Een servicegerichte of prijsvechtersrol zou hier wringen. Deze rol wringt niet.",
+          "verbetering": ""
+        },
+        "scherpteEnUniciteit": {
+          "oordeel": "sterk",
+          "toelichting": "De positie zit bewust buiten de branchestandaard. Vers gebrand, branddatum op de verpakking en duurzaamheid zijn in deze branche gewone verwachtingen — dat erkent het merk zelf en het kiest er expliciet voor die niet als hoofdboodschap te gebruiken. Wat overblijft is concreet en moeilijk te kopiëren: kleine partijen per herkomst, de naam van de boer op de zak, uitleg bij elke koffie in de winkel, en een vaste proefochtend. Geen concurrent kan dit zomaar claimen zonder het ook echt te doen.",
+          "verbetering": "",
+          "strawmanGedetecteerd": false,
+          "zitInHygienefactoren": false
+        }
+      },
+      "regelsOordeel": {
+        "oordeel": "sterk",
+        "toelichting": "De regels zijn concreet en commercieel pijnlijk. 'We verkopen geen koffie die langer dan zes weken geleden is gebrand, ook niet met korting en ook niet op Black Friday' is een grens die geld kost en dus iets betekent. De keuze om wat overblijft weg te geven of weg te gooien — en dat maandelijks openbaar te maken — maakt de regel controleerbaar van buitenaf. Dat is een zeldzame combinatie: een belofte die je kunt verliezen als je hem breekt.",
+        "verbetering": ""
+      },
+      "totaaloordeel": "meetlat_klaar",
+      "signalen": {
+        "tegenkrachtOntbreekt": false,
+        "regelOntbreekt": false,
+        "identityDoelWrongLevel": false,
+        "identityTegenkrachtWrongLevel": false
+      },
+      "signaalAdvies": {
+        "tegenkrachtOntbreekt": "Vul in waar jullie merk níet in gelooft: een overtuiging of aanname uit jullie branche waar jullie bewust tegenin gaan — geen concurrent of wet.",
+        "regelOntbreekt": "Formuleer minstens één regel waar jullie nee tegen zeggen, ook als een klant erom vraagt — bijvoorbeeld een type opdracht, korting of snelle shortcut die jullie bewust niet doen."
+      },
+      "meetlatStatus": "actief",
+      "premiumLaagAangeraden": false,
+      "toonSuggesties": [
+        "Gebruik getallen en data waar het kan: gewicht, datum, temperatuur, tijd. Niet als imponeertruc, maar omdat het laat zien dat je het bijhoudt. 'We branden op 204 graden, 11 minuten' zegt meer dan 'zorgvuldig gebrand'.",
+        "Spreek in de eerste persoon meervoud als het over keuzes gaat, en in de tweede persoon enkelvoud als het over de klant gaat. Dat houdt het persoonlijk zonder dat het opdringerig wordt."
+      ],
+      "voorbeeldSuggesties": [
+        {
+          "type": "goed",
+          "tekst": "Deze Ethiopia Yirgacheffe is gebrand op 3 april. De boer heet Tadesse Bekele. Hij droogt zijn kersen op verhoogde bedden, twaalf dagen lang. Dat is waarom je bloemen proeft, geen aarde."
+        },
+        {
+          "type": "zwak",
+          "tekst": "Onze koffie is met liefde gebrand door echte vakmannen, voor mensen die het beste willen. Proef het verschil."
+        }
+      ],
+      "identityGate": {
+        "goal": {
+          "level": "identity_valid",
+          "feedback": "Het doel beschrijft een gewenste verschuiving in bewustzijn en beleving bij mensen — smaakperceptie én herkomstbewustzijn. Dat vertelt iets wezenlijks over wie dit merk wil zijn en welke wereld het wil bewonen."
+        },
+        "foe": {
+          "level": "identity_valid",
+          "feedback": "De tegenkracht is een culturele reflex — koffie als functioneel, anoniem middel — geen specifieke concurrent. Als één aanbieder verdwijnt, blijft deze kracht bestaan. De formulering is scherp en concreet genoeg om als identiteitsbepalende Foe te dienen."
+        },
+        "pass": true
+      },
+      "identityGatePass": true,
+      "decision": "PASS",
+      "hardFailReason": "",
+      "returnAction": "",
+      "criterionScores": {
+        "hero_specificiteit": {
+          "score": 2,
+          "toelichting": "De Maker is hier concreet ingevuld: een ambachtelijke koffiebranderij die bewust kiest voor smaakbeleving en herkomstkennis, niet voor volume of gemak. De zes-wekenregel en de voedselbank-transparantie maken de Maker-identiteit operationeel en onderscheidend.",
+          "verbetering": "Geen aanpassing nodig. Eventueel versterken door de specifieke rol van de brander als 'vertaler van herkomst naar smaak' explicieter te benoemen."
+        },
+        "goal_betekenis": {
+          "score": 2,
+          "toelichting": "Het doel is betekenisvol en niet triviaal: mensen bewust laten proeven en begrijpen waar smaak vandaan komt. Dit raakt aan een culturele verschuiving (van consumeren naar ervaren) en heeft een duidelijke maatschappelijke lading.",
+          "verbetering": "Het doel mag nog iets scherper worden geformuleerd als actieve gedragsverandering: 'mensen die koffie drinken als brandstof, leren koffie te drinken als smaakervaring met een verhaal.'"
+        },
+        "foe_echtheid": {
+          "score": 2,
+          "toelichting": "De vijand is herkenbaar en reëel: de dominante marktlogica waarbij koffie een functioneel product is, uniform van smaak, en waarbij aanbiedingen op oudere voorraad de norm zijn. Dit is geen stroman maar een beschrijving van hoe het merendeel van de markt werkt.",
+          "verbetering": "Geen aanpassing nodig. De vijand is scherp en eerlijk benoemd zonder karikatuur te worden."
+        },
+        "hero_goal_foe_causaliteit": {
+          "score": 2,
+          "toelichting": "De causale keten klopt: de vijand (koffie als brandstof, smaak doet er niet toe) is precies wat het doel (mensen laten proeven en begrijpen) onmogelijk maakt. De zes-wekenregel en de transparantie over restanten zijn directe operationele weerleggingen van de vijand.",
+          "verbetering": "Geen aanpassing nodig. De architectuur is intern consistent."
+        },
+        "constraint_uitsluiting": {
+          "score": 2,
+          "toelichting": "De constraints zijn scherp en sluiten echte keuzes uit: geen vers-gebrand als hoofdboodschap (want dat is hygiëne), geen duurzaamheid als algemene belofte, geen energie/brandstof-framing, geen aanbiedingen op oude voorraad. De zes-wekenregel als gedragsregel is behouden maar niet als marketingclaim. Dit is een sterk onderscheid.",
+          "verbetering": "Overweeg expliciet vast te leggen dat 'passie voor kwaliteit' en 'de lekkerste koffie van Utrecht' ook geblokkeerd zijn als claims, zodat categorietaal niet sluipt in uitingen."
+        },
+        "deductieve_kracht": {
+          "score": 2,
+          "toelichting": "Uit de architectuur zijn concrete beslissingen af te leiden: geen Black Friday-actie, geen stapelkorting, geen energieframing in campagnes, wel transparantie over restanten, wel herkomstverhalen. De architectuur stuurt keuzes zonder dat er elke keer opnieuw over nagedacht hoeft te worden.",
+          "verbetering": "Geen aanpassing nodig. De deductieve kracht is hoog door de combinatie van positieve richting en harde uitsluitingen."
+        },
+        "marktcontrast": {
+          "score": 2,
+          "toelichting": "Het contrast met de markt is scherp en eerlijk: concurrenten verdienen aan aanbiedingen op oudere voorraad, deze branderij gooit weg of geeft weg en publiceert dat. Dit is een structureel ander businessmodel, niet alleen een andere tone of voice.",
+          "verbetering": "Het marktcontrast mag in communicatie nog explicieter worden gemaakt door de maandelijkse publicatie van restanten als bewijs te positioneren, niet als zelfkritiek maar als bewijs van de keuze."
+        },
+        "bewijsbaarheid": {
+          "score": 2,
+          "toelichting": "De zes-wekenregel is controleerbaar (branddatum op verpakking), de restanten worden maandelijks gepubliceerd, en de weigering van Black Friday-kortingen is een publiek waarneembaar gedrag. Dit zijn sterke bewijzen die de architectuur verankeren in werkelijkheid.",
+          "verbetering": "Geen aanpassing nodig. Eventueel aanvullen met herkomstdocumentatie per batch als extra bewijslaag voor het goal (weten waar de smaak vandaan komt)."
+        },
+        "overdraagbaarheid": {
+          "score": 2,
+          "toelichting": "De architectuur is overdraagbaar naar medewerkers, inkoopbeslissingen, klantenservice, verpakkingsontwerp en communicatie. De regels zijn eenvoudig genoeg om zonder interpretatie toe te passen, en de vijand is concreet genoeg om als toetssteen te dienen.",
+          "verbetering": "Overweeg een interne beslisboom te maken op basis van de vijand als toetsvraag: 'versterkt deze keuze de brandstof-logica of doorbreekt hij die?' Dat maakt overdracht naar nieuwe medewerkers nog eenvoudiger."
+        }
+      },
+      "totalScore": 18,
+      "guardrailActive": true,
+      "marktcontextOnvoldoende": false
+    }
+  },
+  "meetlatActief": true,
+  "guardrailGate": null,
+  "guardrailActive": true,
+  "latestArchitectuurRow": {
+    "decision": "PASS",
+    "total_score": 18,
+    "hard_fail_reason": "",
+    "totaaloordeel": "meetlat_klaar",
+    "created_at": "2026-10-18 22:18:12"
+  },
+  "progress": {
+    "ok": true,
+    "scoredPosts": 0,
+    "publishedPosts": 0,
+    "voiceActive": false,
+    "phase": "A",
+    "architectureComplete": true,
+    "themesChosen": 0,
+    "themesReinforcing": 0,
+    "hintsApplied": 0,
+    "pbsRevealed": false,
+    "showRevealMessage": false,
+    "targetPosts": 20,
+    "architectureFootnote": null,
+    "trackerDetails": {
+      "contentRoles": [],
+      "storyTriangle": [],
+      "averages": []
+    },
+    "guardrailActive": true,
+    "scoreDisplayMode": "band",
+    "determinismStatus": null,
+    "scoreAveraging": false,
+    "pbsScore": null,
+    "pbsDisplayScore": null,
+    "pbsLabel": "Indicatief",
+    "pbsTrend": null,
+    "pbsTrendDelta": null,
+    "pbsHistory": [],
+    "erosionAlert": null,
+    "idleMessage": null,
+    "pbsHeadline": null,
+    "baselineStatus": "pending",
+    "baselineScoredPosts": 0,
+    "baselinePreliminary": false,
+    "baselineMessage": "Nulmeting van eerdere LinkedIn-posts wordt uitgevoerd."
+  }
+}

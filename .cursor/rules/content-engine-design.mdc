@@ -1,0 +1,248 @@
+---
+description: iGiSNext Content Engine UI — design tokens, layout en componenten
+globs: "**/*.{css,scss,html,tsx,jsx,vue,php}"
+alwaysApply: false
+---
+
+# Content Engine — vormgeving
+
+## Bronbestanden (hiërarchie)
+
+| Bestand | Gebruik |
+|---|---|
+| `docs/igisnext-identity.md` + `docs/igisnext-identity.css` | **Goedgekeurde identity-beslissingen** — tokens, pills, fields, lijsten, notices (canonical voor agents + PHP-tools) |
+| `briefing/product-vision.md` | **Strategisch kompas** — tien basisvragen; raadplegen bij grote features/schermen/onboarding |
+| `briefing/stramien 1\|2\|3.png` | **Alleen layout**: kolombreedtes, marges, grid-structuur |
+| `briefing/stramien *Type+.png` | Layout + placeholder-posities ("main content" = kolomnaam, geen UI-label) |
+| `briefing/ContentEngine.pdf` (design-pagina's) | **Labels, knoppen, content**, scherm-specifieke UI |
+| `briefing/Artboard 20Type+.png` | **Component library**: kleuren, typografie, buttons, fields, pulldown, radio, status |
+| `SVG/` | Logo + `arrow.svg` voor accordions/pulldowns |
+
+**Laatste 4 PDF-pagina's = generieke stramienen** — geen content/labels overnemen.
+
+**Werkwijze:** layout uit stramien → content/labels uit design-pagina's → componenten uit Artboard 20.
+
+---
+
+## Grid (alle schermen)
+
+Totaal content-breedte: **1440px**, gecentreerd.
+
+```
+270px nav │ 30px │ 820px main │ 30px │ 290px meta
+```
+
+Verticaal:
+- 60px top margin
+- 63px header-rij (logo links, paginatitel in main-kolom)
+- 40px gap
+- content-rij (nav / main / meta)
+
+Drie grids:
+- **Grid #1** — Sources: main = statuslijst (volle 820px kolom), meta = leeg
+- **Grid #2** — Article / Fastlane: contentkolom **480px** (Fastlane-velden 500px), meta **290px** (incl. HBA-hint) **direct ernaast** (30px gap) — `metaAlign="flush"`
+- **Grid #3** — Feedback: artikel + **220px** feedbackkaarten naast de tekst; meta **290px terug op de 1440-rechterrand** (`metaAlign="grid"`)
+
+Implementatie: `frontend/src/layout/GridShell.tsx` + `grid.constants.ts`
+
+---
+
+## Kleuren
+
+```css
+:root {
+  --ce-blue: #033DFF;
+  --ce-green: #52FFA8;
+  --ce-offwhite: #EAE6DC;
+  --ce-red: #C17156;
+  --ce-pink: #F7EEF3;
+  --ce-beige: #ADA695;
+  --ce-grey: #89ADAA;
+  --ce-black: #2E2014;
+  --ce-white: #FFFFFF;
+}
+```
+
+- App-achtergrond: `--ce-offwhite`
+- Input-achtergrond: `--ce-pink`
+- Pulldown-achtergrond: `--ce-beige`
+- **Groen gebruik (belangrijk):**
+  - `--ce-green` / `bg-ce-green` / `border-ce-green` / `bg-ce-green-fill` — **fills**: pill-knoppen, check-dots, borders
+  - `text-ce-blue` op groene pill-knoppen (nooit groene tekst op groene bg)
+  - `text-ce-green-text` (`#1A7A4C`) — **leesbare groene tekst** op offwhite/beige (success, Published, gekoppeld)
+  - **Nooit** `text-ce-green` (#52FFA8) op `bg-ce-offwhite` — te licht, onleesbaar
+- Logo licht (beige/offwhite): `SVG/iGiSNext_Blue-main.svg` — **platform-logo** op alle iGiS-subdomeinen (zie Logo-tabel hieronder)
+- Logo **Account-dark** (Settings-hoofdstuk: Support, Account, Integrations): altijd `SVG/iGiSNext_Blue-dark.svg` (platform, geen klantlogo)
+- Logo wit op gekleurde vlakken: `SVG/iGiSNext_White.svg`
+- Pulldown/accordion-pijl: `SVG/arrow.svg` (gesloten ↑ = rotate -90°, open ↓ = rotate 90°)
+
+**Platform-logo (beige) — één bron, alle subdomeinen**
+
+| Context | Bestand | Implementatie |
+|---|---|---|
+| **Canonical bron** | `SVG/iGiSNext_Blue-main.svg` | Sync: `./scripts/sync-platform-logo.sh` |
+| ce.igisnext.com (ContentFlow) | `/svg/iGiSNext_Blue-main.svg` | `Logo.tsx` `variant="platform"` `tone="light"` |
+| linkedin-analyse.igisnext.com | `assets/iGiSNext_Blue-main.svg` | `li_brand_logo()` + class `.platform-logo` |
+| Legacy PHP (web/) | `/svg/iGiSNext_Blue-main.svg` | `web/includes/layout.php` |
+
+Styling: class `.platform-logo` in `docs/igisnext-identity.css` — max-height **32px**, max-width 200px, object-fit contain (zelfde als CE sidebar/login).
+
+---
+
+## Typografie (Figtree 400/600)
+
+| Element | Size / line-height |
+|---|---|
+| Paginatitel (general header) | 32 / 40 semibold, blauw |
+| Menu-item sidebar | **14 / 24** semibold, active = underline 1.5px |
+| Body copy / accordion / radio | **14 / 18** |
+| Actielinks / statusrijen | **18px** semibold, line-height ~32 |
+| Field header (in textarea) | **24px** blauw semibold |
+| Lijst-sectie header (Home, Agenda, …) | **24 / 32** semibold, zwart |
+| Lijst witruimte (`LIST_SECTION`) | Home/Agenda: **10px** boven header · **20px** header→regel · **20px** tussen regels · **20px** onder laatste regel. Sources: **20px** boven én onder elke bronregel (`sourcesItemClass`: `pt-[20px] pb-[20px]`) |
+| Lijst-rij titel + acties | `LIST_ROW`: **items-baseline** |
+| Lijst-sectie scheiding | Eén `border-b` op sectie-body (`bodyClass` / `itemClass`), niet per rij |
+| Overzicht / Rapport secties | `LIST_SECTION.dashboardSectionClass` — horizontale lijn (`border-ce-black/10`), **geen** roze vlakken of beige kaders; leestekst **zwart**; links blauw |
+| Signaalblok (Home) | `SignalBlock` — zelfde lijnpatroon als Agenda, geen `bg-ce-pink` |
+| Single-line field tekst | **21px** |
+| Pulldown | **14 / 21** |
+| Lijndikte borders/underline | **1.5px** |
+
+---
+
+## Componenten (Artboard 20 → `frontend/src/components/ui/`)
+
+**Pill-knoppen** — **40px** hoog, **radius 20px**, padding 30px:
+- `Button main` — bg groen, **tekst blauw**, 14px semibold
+- `Button second` — bg transparent, **border groen 1px**, tekst blauw, 14px semibold
+- **Hiërarchie per scherm:** precies **één** `main` (groen volvlak) = **gewenste actie** in die context; overige acties op dezelfde keuze = `second` (outline). Voorbeeld HBA-aanwijzing: zonder fout → **Pas toe** main; met **Opnieuw** (tekst verouderd) → **Opnieuw** main, **Pas toe** second.
+- **Not active (disabled)** — main én second: bg transparent, **border + tekst beige** (`--ce-beige`), geen groen, geen opacity
+- **Layout (hoofd + sub):**
+  - Knoppen zijn **content-breed** (`inline-flex` + **`self-start`**) — **nooit kolombreed**; in `flex-col` rekt de knop niet mee
+  - **Links uitlijnen** in de kolom (zelfde startlijn als fields)
+  - **Login-schermen** (`/login`, `/platform/login`): **Inloggen** (main) + **Forgot password** (second) op één rij — verplicht op elk login-scherm
+  - Extra second pills (bijv. *Tenant-login* op platform-login) op **dezelfde rij** — platform: `flex-nowrap` voor drie knoppen op één regel
+  - Sub-knop = `Button second` (outline groen); secundaire navigatie gebruikt `pillButtonClass('second')` op `<Link>`, geen underlined tekstlink
+  - **Copy/regel → afgerond beige kader:** **18px** (één witregel) — `frameLineGapBeforeClass` (`mt-[18px]`)
+  - **Max één witregel tussen design-items (18px).** Nooit gap + mt + mb stapelen. Formulieren: `designStackClass` (`gap-[18px]`, zet mt van de pill-rij op 0). Losse Button: `mb-[18px]`. Pill-rij: `pillActionsRowClass` (knoppen zonder extra mb; sectie-`pb-[18px]` is de witregel tot de lijn)
+  - **Lijn → sectie-header:** **18px** — wrapper `borderedSectionStackClass` (`[&>section+section]:pt-[18px]`), niet `pt` op elke sectie + flex-gap
+  - Referentie: `LoginPage.tsx`, `PlatformLoginPage.tsx`, `ForgotPasswordPage.tsx`, `PillButton.tsx`
+
+**Fields:**
+- `FieldSingle` — **40px** hoog, radius **20**, padding 30, **pink bg** (`bg-ce-pink`), focus ring **1.5px blauw**
+- Ingevoerde tekst **14px zwart** (default); title-variant = **21px blauw**
+- Placeholder **beige** — canonical: `docs/igisnext-identity.md` § Velden
+- **Login / auth-formulieren** (`LoginPage`, `PlatformLoginPage`, forgot-password):
+  - **Geen `label` prop** boven het veld — alleen `placeholder` + `aria-label` (zelfde als tenant-login)
+  - Placeholders: `Email`, `Password` (Engels, zoals design-pagina's)
+  - Velden **kolombreed** (pink pill 40px); knoppen **content-breed** op de rij eronder
+  - **Forgot password** verplicht op login-schermen (second pill → `/forgot-password` of `/platform/forgot-password`)
+  - Form stack: `designStackClass` (`gap-[18px]`), max-width `GRID2_REVIEW_MAIN_WIDTH`
+- `label` prop **alleen** bij strategy/editor-velden waar Artboard 20 dat voorschrijft
+- `FieldMulti` — radius **20**, padding 30, pink bg, **14/18**
+- `FieldStrategy` — strategyType+.png: pink pill, inline blauw label **21px** + `_` (top uitgelijnd), corps **18/21**
+
+**Pulldown** — transparent bg, border **1px beige**, radius **20**, **14/21**; selected underlined; **18px** spacing t.o.v. lijn/element (zie pill-spacing)
+
+**Radio / accordion** — **14/18**; selected = **volledig gevulde** cirkel, not selected = **outline only** (1.5px)
+
+**Roze keuze-kader** (`PinkChoiceFrame` + `PinkChoiceOption` in `ui/PinkChoice.tsx`):
+- **Altijd 1 kader** — `bg-ce-pink`, radius 12, padding 12/10. **Geen kader-in-kader** (geen wit vlak, geen schaduw, geen nested pink).
+- Copy **zwart** (`text-ce-black`); intro/leestekst ook zwart (geen beige voor instructie in dit kader).
+- Keuze-items: **geen extra inspringing** (flush met intro), onderling **14px** gap.
+- **Radio onderaan** elk item + label **`gebruik dit artikel`** (bron/artikel) of **`gebruik deze tekst`** (citaat/passage).
+- Actie daarna buiten het kader: één `Button main` (bijv. **Verwerk in artikel**).
+- Live: `/design` + Article Aandachtspunten (bronsuggestie / onderbouwing).
+
+**Actielinks** — 18px semibold beige, hover zwart + underline 1.5px
+
+**Bron-URL (Theme / Research)** — ingevulde artikel-URL: **14/18 semibold zwart**, pijl `→` achter de URL, **geen underline** (`sourceArticleUrlLinkClass`); placeholder in veld blijft beige
+
+**Statuskleuren (Agenda):**
+- Draft / Not Published — zwart
+- Approved — blauw
+- Feedback — rood
+- Published — groen
+
+**Sources statusrijen:** `Edit | Check • | Budget | Delete` — check-dot: leeg / rood / groen / grey (blauw)
+
+**Delete-bevestiging (Agenda, Sources, lijsten):** twee stappen inline — eerst zwarte **Delete**, daarna rode **Confirm delete**. Geen `window.confirm` of browser-popup. Component: `DeleteConfirmAction` (`frontend/src/components/ui/DeleteConfirmAction.tsx`).
+
+---
+
+## Article-scherm (Grid #2)
+
+Main-kolom volgorde:
+1. **Image upload** — max hoogte **270px**; kader **border 1.5px beige** (`#ADA695`); afmeting (**1080×1080** / **1200×644**) **in het kader** (beige tekst); knop **Upload image** gecentreerd
+2. Title = (FieldSingle title)
+3. Artikel-body (FieldMulti)
+4. **Hashtags** — corps **14/18**, **iGiSNext Black**, geen pink pill
+5. Knoppen: **Submit for approval** + **Save**
+6. Source article ↑ (gesloten accordion)
+
+Meta-kolom: Rationale open, Tone/Angle/Image ratio/Platform ingeklapt met geselecteerde waarde.
+
+---
+
+## Feedback-scherm (Grid #3)
+
+- Paginatitel: `Week 14 - Feedback`
+- Zelfde image + **Delete image**
+- Artikel links, feedbackkaarten rechts (220px): `name`, rode comment, `okay | delete`
+- Tekstwijzigingen rood gemarkeerd in body
+- Meta sidebar: alle accordions open
+
+---
+
+## Frontend (canonical UI)
+
+React + Tailwind in `frontend/` — **niet** `web/article.php` als design-referentie.
+
+```bash
+cd frontend && npm run dev   # http://localhost:5173
+```
+
+| Route | Scherm |
+|---|---|
+| `/` | Home |
+| `/sources` | Grid #1 Sources |
+| `/strategy` | Grid #1 Strategy (General copy + FieldStrategy) |
+| `/agenda` | Agenda (statuskleuren) |
+| `/article` | Grid #2 Article |
+| `/article/feedback` | Grid #3 Feedback |
+| `/design` | Artboard 20 showcase |
+| `/login` | Tenant-login |
+| `/forgot-password` | Tenant — wachtwoord vergeten |
+| `/platform` | Platform-beheer — Overview, Tenants (nav + status-dot), Finance, Settings |
+| `/platform/login` | Platform-beheerderslogin |
+| `/platform/forgot-password` | Platform — wachtwoord vergeten |
+
+**Platform status-dot** (nav + lijsten): `bg-ce-green-fill` gezond · `bg-ce-blue` aandacht · `bg-ce-red` probleem. Legenda op Overview.
+
+Design tokens: `frontend/src/index.css` (`@theme`)
+
+---
+
+## Regels bij implementatie
+
+- Match design-pagina's scherm-voor-scherm; geen generieke admin-UI
+- **Bij kleur/typografie/layout issues:** check in volgorde:
+  1. `briefing/*Type+.png` (scherm) + `Artboard 20Type+.png` (componenten)
+  2. Live referentie: `/design` (`DesignSystemPage.tsx`)
+  3. Tokens: `frontend/src/index.css` — geen ad-hoc hex in components
+  4. Deze rule + `components/ui/*` hergebruiken
+- Stramien-PNG's: nooit "main content" als zichtbaar label renderen
+- Knoppen/labels: altijd van design-pagina's, niet van lege pills in stramien
+- Gebruik tokens + `components/ui/*` boven ad-hoc styling
+- Diff/review (tweekleurig): bestaande lib (jsdiff), niet zelf bouwen
+- PHP `web/` = legacy/deploy; nieuwe UI in `frontend/`
+- Deploy-target productie: `ce.igisnext.com`
+
+## Checklist Article-scherm vóór commit
+
+- [ ] Tone/Angle/Image ratio/Platform zijn inklapbare accordeons, GEEN select of ul
+- [ ] Geselecteerd item toont gevuld bolletje, de rest outline only (1.5px)
+- [ ] "Feedback" als paginatitel staat ALLEEN op /article/feedback, NIET op /article
+- [ ] Image upload staat BOVEN de titel (volgorde: image → title → body → hashtags → knoppen)
+- [ ] Hashtags zijn corps 14/18, geen pink pill-achtergrond
+- [ ] Submit for approval = btn-main (groen), Save = btn-second (border groen)

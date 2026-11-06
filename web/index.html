@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ContentFlow</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon-blue.svg" />
+    <script>
+      (function () {
+        var path = location.pathname
+        var host = location.hostname
+        var isPlatform = path.indexOf('/platform') === 0
+        var isStaging = host.indexOf('staging') >= 0 || host === 'localhost' || host === '127.0.0.1'
+        var brand = isPlatform
+          ? { title: 'CF_Platform', icon: '/favicon-white.svg' }
+          : isStaging
+            ? { title: 'CF_Staging', icon: '/favicon-green.svg' }
+            : { title: 'ContentFlow', icon: '/favicon-blue.svg' }
+        document.title = brand.title
+        var link = document.querySelector('link[rel="icon"]')
+        if (!link) {
+          link = document.createElement('link')
+          link.rel = 'icon'
+          document.head.appendChild(link)
+        }
+        link.type = 'image/svg+xml'
+        link.href = brand.icon
+      })()
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/assets/index-B1QtVh1A.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C-m6LeOX.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

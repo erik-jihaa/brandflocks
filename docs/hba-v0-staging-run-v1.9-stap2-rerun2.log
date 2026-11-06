@@ -1,0 +1,349 @@
+==> V0.1 CE-04 overgeslagen (V0_SKIP_CE04); hergebruik ce04 uit /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot 7293e8ad-c089-4568-b776-d6e1f78a41dd, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Stelwerk (nieuw fastlane) slot 7293e8ad-c089-4568-b776-d6e1f78a41dd
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot ae736e08-a02a-4d03-9fc8-aaf38f4620dc, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot ae736e08-a02a-4d03-9fc8-aaf38f4620dc
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-13 10:26:52 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.8.1",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "c62d693b-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "cecdf1d5-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "d564acec-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 149,
+      "selfReview": {
+        "weakestClaim": "Black Friday draait voor veel merken om het wegruimen van wat blijft liggen.",
+        "unsupportedAssumption": "Er is geen research gekoppeld, dus alle feitelijke beweringen in het artikel zijn zonder externe onderbouwing. De meest uitgesproken aanname die het artikel zelf invult: dat Black Friday voor veel merken draait om het opruimen van oude voorraad. Dat wordt als feit gepresenteerd, maar is een redenering die het model zelf toevoegt — geen onderzoeksuitkomst.",
+        "missedCounterpoint": "Er zijn geen research-items gekoppeld, dus er is geen tegensprekend item dat gemist kon worden.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Een Black Friday-actie draait per definitie om kortingen en het wegwerken van voorraad. Beide zijn verboden: het merk geeft geen kortingen, en oudere voorraad gaat naar de voedselbank of wordt weggegooid — niet met korting verkocht. De schrijver wordt bijna automatisch verleid om een aanbieding of stapelkorting te beloven, wat de regel direct breekt."
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+        "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+        "articleId": "b0692de8-c6f0-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "d353b93f-0619-4bda-b3dd-04218f5ce67a",
+          "aanwijzing": "De slotzin 'Dat is precies het punt' is een gemiste kans: hij sluit af met een vage bewering in plaats van te laten zien wat de lezer wél krijgt als er niets verandert. Maak concreet wat die onveranderlijkheid voor de koffie in de zak betekent.",
+          "passageVoor": "Op de drukste kortingsdag van het jaar verandert er bij ons dus niets. Dat is precies het punt.",
+          "passageNa": "Op de drukste kortingsdag van het jaar verandert er bij ons dus niets. De koffie die je vandaag koopt, is gebrand op hetzelfde moment als op elke andere dag — en iemand heeft nagedacht over wanneer dat was.",
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": null,
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "d353b93f-0619-4bda-b3dd-04218f5ce67a",
+        "aanwijzing": "De slotzin 'Dat is precies het punt' is een gemiste kans: hij sluit af met een vage bewering in plaats van te laten zien wat de lezer wél krijgt als er niets verandert. Maak concreet wat die onveranderlijkheid voor de koffie in de zak betekent.",
+        "passageVoor": "Op de drukste kortingsdag van het jaar verandert er bij ons dus niets. Dat is precies het punt.",
+        "passageNa": "Op de drukste kortingsdag van het jaar verandert er bij ons dus niets. De koffie die je vandaag koopt, is gebrand op hetzelfde moment als op elke andere dag — en iemand heeft nagedacht over wanneer dat was.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Wij doen niet mee aan Black Friday. En dat is geen marketingtruc.\n\nKoffie die langer dan zes weken geleden is gebrand, zetten wij niet in de schappen. Niet voor de volle prijs, en ook niet met een vette korting erop. Dat is geen principe voor de bühne — het is gewoon hoe wij werken.\n\nWat er op een gegeven moment over is, gaat naar de buurtvoedselbank. Geen uitverkoop, geen oude voorraad opruimen onder het mom van een actie.\n\nBlack Friday draait voor veel merken om het wegruimen van wat blijft li",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": null,
+        "brandContribution": 8
+      }
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "7293e8ad-c089-4568-b776-d6e1f78a41dd",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 125,
+      "selfReview": {
+        "weakestClaim": "\"jaren ervaring met hoe dit systeem zich gedraagt als het echt wordt ingezet. Niet in een demo, maar in een maakbedrijf met legacy-data, wisselende orderstromen en een IT-afdeling van twee man.\" — De research bevat geen enkel item dat deze praktijkervaring of het genoemde type bedrijfscontext ondersteunt.",
+        "unsupportedAssumption": "Het artikel stelt als vanzelfsprekend dat \"verkooplogica het hardst trekt\" op het moment dat een opdrachtgever een beslissing neemt. Dat is een aanname over het gedrag van leveranciers en het beslissingsproces van opdrachtgevers die niet door de research wordt gestaafd.",
+        "missedCounterpoint": "De research bevat geen enkel relevant item (de gevonden bronnen gaan over de Consumentenbond en zorgwachttijden). Er is dus geen tegengeluid in de research aanwezig dat gemist is in het artikel.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Een post over een nieuw partnerschap met een ERP-leverancier verleidt de schrijver bijna onvermijdelijk tot verboden logica: het woord 'partnerschap' staat letterlijk op de verboden lijst (partnerschap en ontzorgen), en de context roept de suggestie op van een commerciële band met een softwareleverancier — wat direct botst met de regel dat het merk nooit commissie ontvangt en geen resellercontracten heeft. Zonder die context klinkt de post als precies het tegenovergestelde van wat het merk belooft."
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "7293e8ad-c089-4568-b776-d6e1f78a41dd",
+        "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+        "articleId": "e2b10b96-c6f0-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "da3b87b9-1b84-43f5-ada9-7e379d61f0f0",
+          "aanwijzing": "De slotzin ('Die afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt.') verdedigt de positie in abstracte termen die elke adviseur kan zeggen. De tekst laat nog niet zien wat die afstand in de praktijk betekent: dat je soms tegen een bedrijf zegt dat dit systeem niet past, ook als je de kennis hebt om de implementatie te begeleiden. Dat concrete moment — het advies dat geld kost — ontbreekt.",
+          "passageVoor": "Die afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt.",
+          "passageNa": "Die afstand heeft een prijs. Als dit systeem niet past bij hoe een bedrijf over tien jaar werkt, zeggen we dat — ook als we de implementatie hadden kunnen begeleiden. Dat is het moment waarop verkooplogica het hardst trekt, en waarop het verschil het meest telt.",
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": null,
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "da3b87b9-1b84-43f5-ada9-7e379d61f0f0",
+        "aanwijzing": "De slotzin ('Die afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt.') verdedigt de positie in abstracte termen die elke adviseur kan zeggen. De tekst laat nog niet zien wat die afstand in de praktijk betekent: dat je soms tegen een bedrijf zegt dat dit systeem niet past, ook als je de kennis hebt om de implementatie te begeleiden. Dat concrete moment — het advies dat geld kost — ontbreekt.",
+        "passageVoor": "Die afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt.",
+        "passageNa": "Die afstand heeft een prijs. Als dit systeem niet past bij hoe een bedrijf over tien jaar werkt, zeggen we dat — ook als we de implementatie hadden kunnen begeleiden. Dat is het moment waarop verkooplogica het hardst trekt, en waarop het verschil het meest telt.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Wij werken met een ERP-leverancier samen — en we hebben bewust geen resellercontract getekend. Geen commissie, geen verkoopquota, geen reden om iets aan te raden dat voor ons rendeert.\n\nWat we wél hebben: jaren ervaring met hoe dit systeem zich gedraagt als het echt wordt ingezet. Niet in een demo, maar in een maakbedrijf met legacy-data, wisselende orderstromen en een IT-afdeling van twee man.\n\nDat verschil is niet klein. Een leverancier verkoopt mogelijkheden. Wij stellen eerst de vraag wat ee",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": [
+          "proof_gap"
+        ],
+        "brandContribution": 7.5
+      }
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "ae736e08-a02a-4d03-9fc8-aaf38f4620dc",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 172,
+      "selfReview": {
+        "weakestClaim": "\"Want als een oudere elke week andere gezichten aan de deur krijgt, werkt de zorg gewoon slechter. Je kent iemands gewoonten niet. Je ziet niet wat er gisteren anders was.\" — De research (Rijksoverheid-pagina's over Wlz, wijkverpleging en wachttijden) onderbouwt dit causale verband niet. Er staat niets in de aangeleverde research over het effect van wisselende zorgverleners op zorgkwaliteit.",
+        "unsupportedAssumption": "Het artikel gaat ervan uit dat doorverwijzen naar een andere aanbieder automatisch betekent dat die andere aanbieder 'wél de ruimte had om goede zorg te bieden'. Dat wordt als feit gepresenteerd, maar de research levert daarvoor geen grondslag — en in de praktijk zijn wachtlijsten bij andere aanbieders eerder regel dan uitzondering.",
+        "missedCounterpoint": "De Rijksoverheid-pagina over wachttijden stelt expliciet dat wachten op niet-acute zorg 'normaal en in principe ook niet zorgelijk' is. Dit tegengeluid — dat een wachtlijst op zichzelf geen probleem hoeft te zijn — ontbreekt volledig in het artikel, terwijl het de toon ervan zou nuanceren.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Het thema 'wachtlijst in één maand weggewerkt' verleidt de schrijver bijna onvermijdelijk tot de verboden logica: een wachtlijst wegwerken klinkt als een prestatie van efficiëntie of productiviteit, en de meest voor de hand liggende verklaring is extra inzet van invalkrachten. Beide zijn expliciet verboden. Bovendien dreigt de vier-zorgverlenersregel in het gedrang te komen als snelheid het verhaal domineert. Er bestaat echter een geloofwaardige regelversie: de wachtlijst is weggewerkt doordat het merk een nieuwe cliënt heeft doorverwezen in plaats van een vijfde zorgverlener in te zetten — precies zoals de regel voorschrijft. Dat verhaal is eerlijk en verdedigt de regel."
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "ae736e08-a02a-4d03-9fc8-aaf38f4620dc",
+        "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+        "articleId": "1bf93079-c6f1-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "42f42c18-b26e-48ca-a5f1-61e5b8e979c8",
+          "aanwijzing": "De slotzin zegt wat jullie niet doen, maar de lezer weet daarna nog niet wat er wél gebeurt met de mensen die jullie doorverwijzen — voeg één concreet detail toe over hoe die doorverwijzing er in de praktijk uitziet, zodat de keuze voelbaar wordt in plaats van alleen principieel.",
+          "passageVoor": "Door één cliënt elders onder te brengen — bij een aanbieder die wél de ruimte had om goede zorg te bieden — konden de overige mensen op de wachtlijst terecht bij zorgverleners die ze al kenden.",
+          "passageNa": "Door één cliënt elders onder te brengen — bij een aanbieder die wél de ruimte had, en waar we zelf het eerste gesprek voor hebben geregeld — konden de overige mensen op de wachtlijst terecht bij zorgverleners die ze al kenden. Mensen die wisten hoe ze hun koffie drinken, en wanneer ze liever geen bezoek hebben.",
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": null,
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "42f42c18-b26e-48ca-a5f1-61e5b8e979c8",
+        "aanwijzing": "De slotzin zegt wat jullie niet doen, maar de lezer weet daarna nog niet wat er wél gebeurt met de mensen die jullie doorverwijzen — voeg één concreet detail toe over hoe die doorverwijzing er in de praktijk uitziet, zodat de keuze voelbaar wordt in plaats van alleen principieel.",
+        "passageVoor": "Door één cliënt elders onder te brengen — bij een aanbieder die wél de ruimte had om goede zorg te bieden — konden de overige mensen op de wachtlijst terecht bij zorgverleners die ze al kenden.",
+        "passageNa": "Door één cliënt elders onder te brengen — bij een aanbieder die wél de ruimte had, en waar we zelf het eerste gesprek voor hebben geregeld — konden de overige mensen op de wachtlijst terecht bij zorgverleners die ze al kenden. Mensen die wisten hoe ze hun koffie drinken, en wanneer ze liever geen bezoek hebben.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Onze wachtlijst is in één maand opgelost. Maar niet zoals je misschien denkt.\n\nWe hebben geen extra mensen aangenomen. We hebben niemand harder laten werken. We hebben één cliënt bewust doorverwezen naar een andere aanbieder.\n\nDat klinkt misschien koud. Maar de reden is precies het tegenovergestelde.\n\nBij Duinroos werken maximaal vier vaste zorgverleners bij één cliënt. Niet als ambitie, maar als harde grens. Want als een oudere elke week andere gezichten aan de deur krijgt, werkt de zorg gewoon",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": null,
+        "brandContribution": 8
+      }
+    }
+  ]
+}

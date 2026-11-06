@@ -1,0 +1,211 @@
+{
+  "ok": true,
+  "poging": 1,
+  "clientId": "9d414129-29ab-ee9c-95c7-dc5452f6a65f",
+  "verwacht": [
+    "Check draait inhoudelijk en geeft zwak",
+    "Hygiëne op doel en wat_anders (vers gebrand, duurzaam, passie voor kwaliteit staan in de markthygiëne van de branche)",
+    "tegenkracht_ontbreekt en regel_ontbreekt, elk met advies welk soort",
+    "Status geblokkeerd: geen content, geen meetlat",
+    "Geen kale melding 'vul eerst tegenkracht in'",
+    "Geen methodische termen in wat de klant ziet"
+  ],
+  "narrativeMissing": [
+    "archetype",
+    "foe",
+    "geloofwaardigheidstest",
+    "bewijsvelden",
+    "verboden_logica",
+    "tone_of_behaviour",
+    "woorden_die_passen",
+    "woorden_die_niet_passen",
+    "goede_voorbeelden",
+    "zwakke_voorbeelden"
+  ],
+  "architectureCheck": {
+    "ok": true,
+    "check": {
+      "id": "5fd88c15-ee07-4c9c-bbaa-fa1f1a69cd8b",
+      "dimensies": {
+        "krachtTriangle": {
+          "oordeel": "aanscherpen",
+          "toelichting": "Zonder tegenkracht is de samenhang tussen persoonlijkheid, doel en keuze niet te toetsen.",
+          "verbetering": "Vul in waar jullie merk níet in gelooft: een overtuiging of aanname uit jullie branche waar jullie bewust tegenin gaan — geen concurrent of wet."
+        },
+        "relevantieTegenkracht": {
+          "oordeel": "aanscherpen",
+          "toelichting": "Je hebt nog geen tegenkracht ingevuld.",
+          "verbetering": "Vul in waar jullie merk níet in gelooft: een overtuiging of aanname uit jullie branche waar jullie bewust tegenin gaan — geen concurrent of wet."
+        },
+        "relevantieRol": {
+          "oordeel": "aanscherpen",
+          "toelichting": "Zonder ingevulde persoonlijkheid is niet te beoordelen of de rol past bij het doel en de tegenkracht. Er is geen karakter beschreven dat beoordeeld kan worden.",
+          "verbetering": "Vul de persoonlijkheid in en beschrijf daarna of dat karakter logisch past bij het doel en bij wat het merk bestrijdt. Pas dan is deze dimensie te beoordelen."
+        },
+        "scherpteEnUniciteit": {
+          "oordeel": "aanscherpen",
+          "toelichting": "De ingevulde distinctiviteit ('versgebrand en duurzaam ingekocht, passie voor kwaliteit') is precies wat elke andere koffiebranderij ook zegt. Versgebrand, duurzaam en passie voor kwaliteit zijn de standaard in deze branche — elke concurrent gebruikt deze woorden. Dit is geen onderscheid, dit is het minimale instapticket. Er is geen enkel punt waarop dit merk een echte keuze maakt die anderen niet maken.",
+          "verbetering": "Beschrijf wat dit merk doet of gelooft dat andere koffiebranderijen juist níet doen. Dat kan een specifieke keuze zijn in inkoop, branding, doelgroep, smaakprofiel of werkwijze. Zolang de formulering ook op tien andere merken past, is er geen onderscheid.",
+          "strawmanGedetecteerd": false,
+          "zitInHygienefactoren": true
+        }
+      },
+      "regelsOordeel": {
+        "oordeel": "aanscherpen",
+        "toelichting": "Je hebt nog geen regel ingevuld.",
+        "verbetering": "Formuleer minstens één regel waar jullie nee tegen zeggen, ook als een klant erom vraagt — bijvoorbeeld een type opdracht, korting of snelle shortcut die jullie bewust niet doen."
+      },
+      "totaaloordeel": "meetlat_te_zwak",
+      "signalen": {
+        "tegenkrachtOntbreekt": true,
+        "regelOntbreekt": true,
+        "identityDoelWrongLevel": false,
+        "identityTegenkrachtWrongLevel": false
+      },
+      "signaalAdvies": {
+        "tegenkrachtOntbreekt": "Vul in waar jullie merk níet in gelooft: een overtuiging of aanname uit jullie branche waar jullie bewust tegenin gaan — geen concurrent of wet.",
+        "regelOntbreekt": "Formuleer minstens één regel waar jullie nee tegen zeggen, ook als een klant erom vraagt — bijvoorbeeld een type opdracht, korting of snelle shortcut die jullie bewust niet doen."
+      },
+      "meetlatStatus": "geblokkeerd",
+      "premiumLaagAangeraden": true,
+      "toonSuggesties": [
+        "Warm en uitnodigend: schrijf alsof je iemand thuis verwelkomt met een vers gezette kop koffie — geen afstand, geen verkooppraatje.",
+        "Eerlijk en concreet: benoem wat je doet en waarom het verschil maakt, zonder overdrijving — 'versgebrand' betekent iets, leg dat gewoon uit."
+      ],
+      "voorbeeldSuggesties": [
+        {
+          "type": "goed",
+          "tekst": "Onze koffie wordt gebrand op de dag dat je bestelt. Zo proef je wat koffie echt kan smaken."
+        },
+        {
+          "type": "goed",
+          "tekst": "We kennen de boeren achter onze bonen. Dat maakt elke kop koffie een beetje bijzonderder."
+        },
+        {
+          "type": "zwak",
+          "tekst": "Wij bieden u een premium koffie-ervaring van de hoogste kwaliteit met een uitzonderlijk smaakprofiel."
+        },
+        {
+          "type": "zwak",
+          "tekst": "Onze state-of-the-art branderij garandeert een optimale extractie voor de veeleisende koffieliefhebber."
+        }
+      ],
+      "identityGate": {
+        "goal": {
+          "level": "identity_weak",
+          "feedback": "Het denkniveau klopt: dit gaat over een ervaring die het merk wil brengen, niet over een KPI. Maar 'echt goede koffie' is nog te breed — bijna elk koffiemerk zou dit kunnen zeggen. Wat maakt jouw versie van genieten of 'echt goed' onderscheidend? Scherp aan wat dit merk specifiek gelooft over hoe mensen koffie zouden moeten beleven."
+        },
+        "foe": {
+          "level": "missing",
+          "feedback": "Je hebt nog geen tegenkracht ingevuld — dat beoordelen we apart in de check."
+        },
+        "pass": true
+      },
+      "identityGatePass": true,
+      "decision": "FAIL",
+      "hardFailReason": "De meetlat staat nog niet aan: vul ontbrekende velden aan of scherp de architectuur verder aan.",
+      "returnAction": "Terug naar merkarchitectuur-intake: vul verplicht in — (1) Foe: de concrete kracht of gewoonte die het goal blokkeert, (2) Constraint: wat de hero weigert te doen, en (3) verfijn het Hero-archetype. Herstart de scoring na aanvulling.",
+      "criterionScores": {
+        "hero_specificiteit": {
+          "score": 1,
+          "toelichting": "Er is geen hero/archetype ingevuld. Het goal impliceert een rol (plezier-enabler, gids), maar de hero is niet gedefinieerd. Enige richting is af te leiden uit de branche.",
+          "verbetering": "Definieer expliciet wie de hero is: bijv. 'de ambachtelijke vakman die koffiecultuur democratiseert' of 'de ontdekkingsreiziger die verborgen koffieparels naar de consument brengt'."
+        },
+        "goal_betekenis": {
+          "score": 1,
+          "toelichting": "'Mensen laten genieten van echt goede koffie' is een begin, maar 'echt goede koffie' is vaag en het diepere waarom ontbreekt. Wat verandert er in iemands leven als ze dit genieten? Het goal raakt aan plezier maar niet aan een hogere betekenis.",
+          "verbetering": "Verdiep het goal: bijv. 'Mensen dagelijks een moment van echte smaakbeleving geven in een wereld vol haast en middelmatigheid' — zodat er een emotionele en maatschappelijke laag ontstaat."
+        },
+        "foe_echtheid": {
+          "score": 0,
+          "toelichting": "Er is geen foe ingevuld. Zonder vijand is er geen spanning, geen reden voor het bestaan van de hero, en geen verhaal. Dit is een hard fail.",
+          "verbetering": "Benoem een concrete, echte vijand: bijv. 'de koffieindustrie die smaak opoffert voor schaalgrootte en marge' of 'de consument die gewend is geraakt aan slechte koffie als norm'."
+        },
+        "hero_goal_foe_causaliteit": {
+          "score": 0,
+          "toelichting": "Zonder foe is er geen causale keten mogelijk. Hero, goal en foe zijn niet verbonden in een logisch narratief. Hard fail.",
+          "verbetering": "Zodra de foe is gedefinieerd, formuleer de causaliteit: de foe veroorzaakt het probleem → de hero heeft het goal om dat te doorbreken → de constraint bepaalt hoe."
+        },
+        "constraint_uitsluiting": {
+          "score": 0,
+          "toelichting": "Er is geen constraint ingevuld. Zonder constraint sluit de architectuur niets uit en is alles toegestaan — waardoor de positionering grenzeloos en dus betekenisloos is. Hard fail.",
+          "verbetering": "Formuleer een echte uitsluiting: bijv. 'Wij verkopen nooit via supermarkten' of 'Wij werken nooit met blends die smaak verbergen' — iets wat de hero weigert te doen, ook als het commercieel aantrekkelijk is."
+        },
+        "deductieve_kracht": {
+          "score": 0,
+          "toelichting": "Met een leeg hero-archetype, een vage foe en geen constraint is er geen deductieve kracht. Er kunnen geen merkbeslissingen uit worden afgeleid.",
+          "verbetering": "Vul eerst hero, foe en constraint in. Dan kan getoetst worden of campagnes, producten en partnerships logisch uit de architectuur volgen."
+        },
+        "marktcontrast": {
+          "score": 1,
+          "toelichting": "Het marktframe is bruikbaar verklaard en de branche (specialty coffee) biedt contrast met mainstream koffie. Maar de architectuur zelf levert nog geen onderscheidend verhaal op — het blijft categorietaal.",
+          "verbetering": "Vertaal het marktframe naar een scherpe tegenstelling: wie zijn de gevestigde spelers en wat doen zij fout? Maak dat de basis van het foe-verhaal."
+        },
+        "bewijsbaarheid": {
+          "score": 1,
+          "toelichting": "Branddatum op verpakking en lokaal branden zijn potentieel bewijsbare claims. Maar ze staan nu als hygiëne genoteerd, niet als bewijs van een merkbelofte. Er is geen belofte om te bewijzen.",
+          "verbetering": "Koppel bewijselementen aan een expliciete belofte die voortkomt uit het goal. Bijv. als de belofte is 'de versste koffie die je kunt kopen', dan is de branddatum het bewijs — maar dat moet zo worden geframed."
+        },
+        "overdraagbaarheid": {
+          "score": 1,
+          "toelichting": "Het goal is begrijpelijk genoeg om globaal over te dragen, maar zonder hero-archetype en foe is er geen verhaal dat medewerkers, partners of klanten kunnen internaliseren en reproduceren.",
+          "verbetering": "Zodra de volledige architectuur staat, toets of een nieuwe medewerker op basis hiervan zelfstandig merkbeslissingen kan nemen. Nu is dat niet mogelijk."
+        }
+      },
+      "totalScore": 5,
+      "guardrailActive": false,
+      "marktcontextOnvoldoende": false
+    }
+  },
+  "meetlatActief": false,
+  "guardrailGate": {
+    "ok": false,
+    "error": "Vul eerst je merkarchitectuur in",
+    "code": "architecture_incomplete"
+  },
+  "guardrailActive": true,
+  "latestArchitectuurRow": {
+    "decision": "FAIL",
+    "total_score": 5,
+    "hard_fail_reason": "Meetlat geblokkeerd — architectuur nog niet volledig of scherp genoeg.",
+    "totaaloordeel": "meetlat_te_zwak",
+    "created_at": "2026-10-18 22:17:06"
+  },
+  "progress": {
+    "ok": true,
+    "scoredPosts": 0,
+    "publishedPosts": 0,
+    "voiceActive": false,
+    "phase": "A",
+    "architectureComplete": true,
+    "themesChosen": 0,
+    "themesReinforcing": 0,
+    "hintsApplied": 0,
+    "pbsRevealed": false,
+    "showRevealMessage": false,
+    "targetPosts": 20,
+    "architectureFootnote": null,
+    "trackerDetails": {
+      "contentRoles": [],
+      "storyTriangle": [],
+      "averages": []
+    },
+    "guardrailActive": true,
+    "scoreDisplayMode": "band",
+    "determinismStatus": null,
+    "scoreAveraging": false,
+    "pbsScore": null,
+    "pbsDisplayScore": null,
+    "pbsLabel": "Indicatief",
+    "pbsTrend": null,
+    "pbsTrendDelta": null,
+    "pbsHistory": [],
+    "erosionAlert": null,
+    "idleMessage": null,
+    "pbsHeadline": null,
+    "baselineStatus": "pending",
+    "baselineScoredPosts": 0,
+    "baselinePreliminary": false,
+    "baselineMessage": "Nulmeting van eerdere LinkedIn-posts wordt uitgevoerd."
+  }
+}

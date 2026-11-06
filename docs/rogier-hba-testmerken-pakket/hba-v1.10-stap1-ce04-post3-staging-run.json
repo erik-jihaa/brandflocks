@@ -1,0 +1,156 @@
+==> CE-04 post 3: https://staging.igisnext.com/api/admin/hba-ce04-post3?wait=90
+==> wacht 90s op regel-feedback (client-side poll)…
+{
+    "ok": true,
+    "promptVersion": "v1.9",
+    "waitSeconds": 1,
+    "results": [
+        {
+            "merk": "Brandpunt Koffie",
+            "label": "Breekt de regel",
+            "slotId": "3624b102-2fc8-4312-8b7f-80d572c6246c",
+            "articleId": "c6b87e2c-e8c1-4343-8445-739cb5142691",
+            "feedbackCount": 3,
+            "regelFeedback": [
+                {
+                    "id": "2e9962a8-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je oude voorraad niet met korting verkoopt, ook niet op actiemomenten zoals Black Friday \u2014 wat overblijft gaat naar de voedselbank of wordt weggegooid.",
+                    "actionLabel": "Remove",
+                    "excerpt": "Black Friday: alle zakken van vorige maand voor de halve prijs!",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "2e9962a8-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je oude voorraad niet met korting verkoopt, ook niet op actiemomenten zoals Black Friday \u2014 wat overblijft gaat naar de voedselbank of wordt weggegooid.",
+                    "actionLabel": "Remove",
+                    "excerpt": "Black Friday: alle zakken van vorige maand voor de halve prijs!",
+                    "status": "open"
+                },
+                {
+                    "id": "2e997b65-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit is geen taalprobleem maar een merkprobleem: koffie van vorige maand mag niet met korting worden aangeboden. Wat over is, gaat naar de voedselbank of wordt weggegooid. Deze zin kan niet worden bijgeschaafd \u2014 hij moet worden vervangen of de post mag niet worden gepubliceerd.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "alle zakken van vorige maand voor de halve prijs",
+                    "status": "open"
+                },
+                {
+                    "id": "2e99976d-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Black Friday als kapstok voor een kortingsactie past niet bij dit merk. Als je Black Friday wilt benoemen, kan dat alleen in de tegenstelling: dit is precies wat wij niet doen, en waarom.",
+                    "actionLabel": "Herformuleren",
+                    "excerpt": "Black Friday",
+                    "status": "open"
+                }
+            ]
+        },
+        {
+            "merk": "Duinroos Thuiszorg",
+            "label": "Breekt de regel",
+            "slotId": "7201efa6-c981-4c54-bb6d-bb88ee77ea46",
+            "articleId": "f641dc67-c2b1-4079-bea7-b82d476fa033",
+            "feedbackCount": 4,
+            "regelFeedback": [
+                {
+                    "id": "36564459-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je een wachtlijst nooit wegwerkt door invalkrachten in te zetten.",
+                    "actionLabel": "Remove",
+                    "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "36564459-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je een wachtlijst nooit wegwerkt door invalkrachten in te zetten.",
+                    "actionLabel": "Remove",
+                    "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+                    "status": "open"
+                },
+                {
+                    "id": "365648bb-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit is precies de werkwijze die Duinroos Thuiszorg uitsluit. Invalkrachten inzetten om een wachtlijst weg te werken ondermijnt de belofte dat cli\u00ebnten nooit meer dan vier vaste zorgverleners per maand zien. Dit stuk kan niet worden gepubliceerd.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "door de inzet van invalkrachten uit het uitzendbureau",
+                    "status": "open"
+                },
+                {
+                    "id": "36564b07-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "De post spreekt volledig over de organisatie ('we', 'onze wachtlijst') en presenteert operationele effici\u00ebntie als prestatie. Dat is precies de redenering van de tegenstander: de klok en het rooster boven de mens. Herschrijf vanuit de cli\u00ebnt.",
+                    "actionLabel": "Herschrijven",
+                    "excerpt": "Goed nieuws: \u2026 hebben we onze wachtlijst in een maand weggewerkt!",
+                    "status": "open"
+                }
+            ]
+        },
+        {
+            "merk": "Stelwerk",
+            "label": "Breekt de regel",
+            "slotId": "e116e033-9c25-40b6-b48d-8da1cca1af20",
+            "articleId": "f1400f7a-8804-451a-986a-03deed1c56c8",
+            "feedbackCount": 3,
+            "regelFeedback": [
+                {
+                    "id": "3c39164f-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+                    "actionLabel": "Remove",
+                    "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "3c39164f-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+                    "actionLabel": "Remove",
+                    "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+                    "status": "open"
+                },
+                {
+                    "id": "3c391c15-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit is de kern van de regelbreuk. Een resellerpartnerschap is precies wat Stelwerk aantoonbaar niet doet \u2014 het ondermijnt de onafhankelijkheid waarop het merk gebouwd is. Zie regelbreuk.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "officieel gecertificeerd resellerpartner van een groot ERP-merk",
+                    "status": "open"
+                },
+                {
+                    "id": "3c391f89-c72b-11f1-9456-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "De emotionele toon versterkt het probleem: Stelwerk presenteert iets als een prestatie dat lijnrecht tegen de merkidentiteit ingaat. Trots hoort hier niet bij een resellerschap.",
+                    "actionLabel": "Aanpassen",
+                    "excerpt": "Trots:",
+                    "status": "open"
+                }
+            ]
+        }
+    ]
+}

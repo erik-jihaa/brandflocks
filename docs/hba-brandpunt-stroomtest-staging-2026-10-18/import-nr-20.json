@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "clientId": "9d414129-29ab-ee9c-95c7-dc5452f6a65f",
+  "throughNr": 20,
+  "importedCount": 1,
+  "scoredCount": 1,
+  "totalPostsNow": 20,
+  "scoreErrors": [],
+  "imported": [
+    {
+      "nr": 20,
+      "articleId": "12dcb98a-aa92-4247-84c4-5e0d165878a2",
+      "datum": "2026-10-15",
+      "scored": true
+    }
+  ]
+}

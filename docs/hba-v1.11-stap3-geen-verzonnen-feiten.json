@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-10-18 12:22:43 UTC",
+  "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+  "articleId": "9e73e3fd-caee-11f1-84cf-9c6b00b7cd02",
+  "headline": "Geen Black Friday-korting. Wel een eerlijke uitleg.",
+  "contentHashBefore": "a628b32f4050758ae712f99298bb9023",
+  "contentHashAfter": "3073a61a3a162c99171d1b4aff73a334",
+  "selfReview": {
+    "weakestClaim": "Kortingen op koffie die ergens vandaan komt, zorgvuldig gebrand is en gewoon goed smaakt — daar is geen reden voor.",
+    "unsupportedAssumption": "De zin 'koffie die ergens vandaan komt' impliceert traceerbaarheid tot een specifieke boer of origine. Er is geen research gekoppeld die deze herkomstclaim onderbouwt — de aanname dat de koffie aantoonbaar ergens zorgvuldig vandaan komt, vult het artikel zelf in.",
+    "missedCounterpoint": "Er is geen research gekoppeld aan dit artikel, dus er zijn geen items met stance = spreekt_tegen die gemist konden worden.",
+    "regelbreuk": null,
+    "themeConflict": true,
+    "themeConflictResolution": "a",
+    "themeConflictWhy": "Black Friday draait om kortingen op (oudere) voorraad. Dat is precies wat de merkregel verbiedt: aanbiedingen en stapelkorting op oudere voorraad. Bovendien neemt het thema aan dat het merk meedoet aan een kortingsactie — een premisse die niet in de bewijsvelden staat en alleen te realiseren is door de regel te breken. Wat niet verkocht wordt, gaat naar de voedselbank of wordt afgevoerd. Er is dus geen voorraad om op te korting te geven, en een Black Friday-aanbieding zou die regel direct schenden.",
+    "themePremisse": true,
+    "themePremisseWat": "Het thema neemt aan dat het merk een Black Friday-korting aanbiedt op (resterende) voorraad — maar dat doet het merk nooit: wat over is gaat naar de voedselbank of wordt afgevoerd, niet in de aanbieding.",
+    "themePremisseActie": "Niet overnemen; schrijven waarom het merk niet meedoet aan Black Friday, wat er in plaats daarvan met resterende voorraad gebeurt, en wat dat zegt over hoe het merk met koffie omgaat.",
+    "merkBeweringen": [
+      {
+        "citaat": "Koffie die niet binnen zes weken na de branddatum de deur uit is, gaat naar de buurtvoedselbank — niet in de aanbieding.",
+        "bron": "merkarchitectuur"
+      },
+      {
+        "citaat": "Er is hier geen oude voorraad die we moeten kwijtraken.",
+        "bron": "merkarchitectuur"
+      },
+      {
+        "citaat": "Elke zak die je bij ons koopt is vers, niet omdat wij dat beloven, maar omdat de regel het onmogelijk maakt om iets anders te verkopen.",
+        "bron": "merkarchitectuur"
+      },
+      {
+        "citaat": "check de branddatum op de zak als je bestelt. Die staat er op.",
+        "bron": "bewijsveld"
+      },
+      {
+        "citaat": "Of kom langs op de proefochtend, elke eerste donderdag van de maand.",
+        "bron": "bewijsveld"
+      },
+      {
+        "citaat": "Dan zetten wij een vers gezette kop voor je neer en leg je uit wat je proeft.",
+        "bron": "geen_bron"
+      },
+      {
+        "citaat": "Kortingen op koffie die ergens vandaan komt, zorgvuldig gebrand is en gewoon goed smaakt — daar is geen reden voor.",
+        "bron": "geen_bron"
+      }
+    ]
+  },
+  "article": "Geen Black Friday-korting. Wel een eerlijke uitleg.\n\nWij doen niet mee aan Black Friday. Niet als statement, maar omdat het simpelweg niet werkt met de manier waarop wij koffie verkopen.\n\nKoffie die niet binnen zes weken na de branddatum de deur uit is, gaat naar de buurtvoedselbank — niet in de aanbieding. Dat is de regel. Dat betekent ook: er is hier geen oude voorraad die we moeten kwijtraken. Elke zak die je bij ons koopt is vers, niet omdat wij dat beloven, maar omdat de regel het onmogelijk maakt om iets anders te verkopen.\n\nKortingen op slechte koffie zijn makkelijk. Kortingen op koffie die ergens vandaan komt, zorgvuldig gebrand is en gewoon goed smaakt — daar is geen reden voor.\n\nWat je wél kunt doen: check de branddatum op de zak als je bestelt. Die staat er op. Of kom langs op de proefochtend, elke eerste donderdag van de maand. Dan zetten wij een vers gezette kop voor je neer en leg je uit wat je proeft.",
+  "ok": false,
+  "inventedPhrases": [],
+  "usesU": false,
+  "claimCount": 7,
+  "unsourcedCount": 2,
+  "reasons": [
+    "2 merkbewering(en) zonder bron"
+  ]
+}

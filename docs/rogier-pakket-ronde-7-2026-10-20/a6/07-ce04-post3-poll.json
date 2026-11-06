@@ -1,0 +1,154 @@
+{
+    "ok": true,
+    "promptVersion": "v1.13",
+    "waitSeconds": 1,
+    "results": [
+        {
+            "merk": "Brandpunt Koffie",
+            "label": "Breekt de regel",
+            "slotId": "b9f67061-c2e5-43db-8951-823decb25c78",
+            "articleId": "a36b5ffa-dfc8-4503-8c4f-021fa5bf8b1a",
+            "feedbackCount": 3,
+            "regelFeedback": [
+                {
+                    "id": "aa76e4de-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Wij verkopen geen koffie die langer dan zes weken geleden is gebrand, ook niet met korting. Wat over is, gaat naar de buurtvoedselbank of wordt weggegooid.\" In je tekst staat: «Black Friday: alle zakken van twee maanden geleden voor de halve prijs!».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "aa76e4de-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Wij verkopen geen koffie die langer dan zes weken geleden is gebrand, ook niet met korting. Wat over is, gaat naar de buurtvoedselbank of wordt weggegooid.\" In je tekst staat: «Black Friday: alle zakken van twee maanden geleden voor de halve prijs!».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+                    "status": "open"
+                },
+                {
+                    "id": "aa76eec6-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit is inhoudelijk een testcase voor de geloofwaardigheidstest, en hij slaagt er volledig in die te breken. Twee maanden is ruim het dubbele van de toegestane zes weken. De regelbreuk wordt apart gemeld.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+                    "status": "open"
+                },
+                {
+                    "id": "aa76f122-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "De post is identiek aan de AI-versie. Er is geen menselijke redactionele bewerking zichtbaar. Bij indiening wordt minimale eigen input verwacht.",
+                    "actionLabel": "Aanpassen",
+                    "excerpt": null,
+                    "status": "open"
+                }
+            ]
+        },
+        {
+            "merk": "Duinroos Thuiszorg",
+            "label": "Breekt de regel",
+            "slotId": "248f3a0c-d57b-443c-a4a6-028054928385",
+            "articleId": "1edcd881-4652-464f-be22-7dd42c12d700",
+            "feedbackCount": 4,
+            "regelFeedback": [
+                {
+                    "id": "b16cb2c5-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Een cliënt krijgt nooit meer dan vier verschillende zorgverleners per maand over de vloer, ook als we daarvoor een nieuwe cliënt moeten doorverwijzen.\" In je tekst staat: «door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "b16cb2c5-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Een cliënt krijgt nooit meer dan vier verschillende zorgverleners per maand over de vloer, ook als we daarvoor een nieuwe cliënt moeten doorverwijzen.\" In je tekst staat: «door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+                    "status": "open"
+                },
+                {
+                    "id": "b16cb883-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Deze zin beschrijft exact wat het merk volgens de geloofwaardigheidstest niet doet. Dit is een regelbreuk — zie het regelbreuk-veld.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Goed nieuws: door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+                    "status": "open"
+                },
+                {
+                    "id": "b16cbb22-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "De tekst spreekt over zichzelf en eigen prestaties, niet over de cliënt. De schrijfwijzer vraagt om te vertellen wat er gebeurt op een gewone dag bij een cliënt, niet om eigen successen te claimen.",
+                    "actionLabel": "Herschrijven",
+                    "excerpt": "hebben we onze wachtlijst in een maand weggewerkt",
+                    "status": "open"
+                }
+            ]
+        },
+        {
+            "merk": "Stelwerk",
+            "label": "Breekt de regel",
+            "slotId": "1f2be521-ddbd-4eae-bb80-57c31c3699b9",
+            "articleId": "a50cd707-9921-424f-b30c-dd4d3c111e6c",
+            "feedbackCount": 3,
+            "regelFeedback": [
+                {
+                    "id": "b82f32e0-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Wij hebben geen resellercontracten en ontvangen nooit commissie van softwareleveranciers, ook al verdienen concurrenten daar de helft van hun marge mee.\" In je tekst staat: «Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+                    "status": "open"
+                }
+            ],
+            "regelFeedbackOk": true,
+            "ce04ParseErrors": [],
+            "feedbackSample": [
+                {
+                    "id": "b82f32e0-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit stuk gaat in tegen je regel: \"Wij hebben geen resellercontracten en ontvangen nooit commissie van softwareleveranciers, ook al verdienen concurrenten daar de helft van hun marge mee.\" In je tekst staat: «Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!».",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+                    "status": "open"
+                },
+                {
+                    "id": "b82f3b88-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "Dit is het hart van de regelbreuk. Stelwerk presenteert zichzelf hier als resellerpartner — een rol die de geloofwaardigheidstest expliciet uitsluit. De tekst is niet te repareren met een kleine aanpassing; de propositie zelf klopt niet met wat het merk is.",
+                    "actionLabel": "Verwijderen",
+                    "excerpt": "officieel gecertificeerd resellerpartner van een groot ERP-merk",
+                    "status": "open"
+                },
+                {
+                    "id": "b82f41bd-cd2e-11f1-84cf-9c6b00b7cd02",
+                    "type": "text",
+                    "name": "Hoofdredacteur",
+                    "comment": "De trots-opening versterkt het probleem: het merk toont enthousiasme over iets wat het per definitie niet doet. Zelfs als de rest herschreven wordt, past deze opener niet bij de rustige, preciezere toon van Stelwerk.",
+                    "actionLabel": "Herschrijven",
+                    "excerpt": "Trots:",
+                    "status": "open"
+                }
+            ]
+        }
+    ]
+}

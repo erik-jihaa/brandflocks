@@ -1,0 +1,58 @@
+[
+  {
+    "code": "3B",
+    "slotIndex": 1,
+    "run": 1,
+    "content_words": 922,
+    "headline": "De bestuurskamer die zichzelf gelooft"
+  },
+  {
+    "code": "5G",
+    "slotIndex": 2,
+    "run": 1,
+    "content_words": 852,
+    "headline": "Zeventig procent mislukt — en toch herhaalt de bestuurskamer dezelfde beweging"
+  },
+  {
+    "code": "62",
+    "slotIndex": 3,
+    "run": 1,
+    "content_words": 1052,
+    "headline": "De oprichter als flessenhals: wat er gebeurt als de kennis maar één uitgang heeft"
+  },
+  {
+    "code": "7N",
+    "slotIndex": 4,
+    "run": 1,
+    "content_words": 898,
+    "headline": "De kennis die nergens staat, is de kennis die je kwijtraakt"
+  },
+  {
+    "code": "BU",
+    "slotIndex": 5,
+    "run": 1,
+    "content_words": 995,
+    "headline": "Wat een nieuwe medewerker in week één leert, bepaalt wat de organisatie over vijf jaar nog weet"
+  },
+  {
+    "code": "CM",
+    "slotIndex": 6,
+    "run": 1,
+    "content_words": 1067,
+    "headline": "Voordat je AI inzet: de drie vragen die je organisatie moet kunnen beantwoorden"
+  },
+  {
+    "code": "GJ",
+    "slotIndex": 2,
+    "run": 2,
+    "content_words": 852,
+    "headline": "Zeventig procent mislukt — en toch herhaalt de bestuurskamer dezelfde beweging"
+  },
+  {
+    "code": "HO",
+    "slotIndex": 3,
+    "run": 2,
+    "content_words": 1052,
+    "headline": "De oprichter als flessenhals: wat er gebeurt als de kennis maar één uitgang heeft"
+  }
+]

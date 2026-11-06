@@ -1,0 +1,20 @@
+{
+  "bron": "briefing/hba-input/hba-a6-restpunten-ronde-2-2026-10-20.md punt C",
+  "promptVersion": "v1.13",
+  "voorbeeld_app_week41": {
+    "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+    "articleId": "9e73e3fd-caee-11f1-84cf-9c6b00b7cd02",
+    "hashtags": "#blackfriday, #specialtycoffee, #versgebrand, #koffie, #ambacht",
+    "citaat_in_gescoorde_posttekst": "#versgebrand"
+  },
+  "voorbeeld_score_merk_claim": {
+    "slotId": "e21d66d8-2bc3-4336-81fd-bbe07ff42e7d",
+    "articleId": "33faa6f5-daae-47b8-9c13-e7499e6600e7",
+    "hashtags": "#versgebrand, #koffie",
+    "flag_citaten": {
+      "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt.",
+      "proof_gap": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt."
+    }
+  },
+  "ce03_prompt_regel": "Geen hashtag die woorden_die_niet_passen of verboden_logica schendt (bijv. geen #versgebrand als hoofdclaim zonder de zes-wekenregel). Hashtags tellen mee als onderdeel van de post."
+}

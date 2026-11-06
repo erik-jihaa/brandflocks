@@ -1,0 +1,19 @@
+NEDERLANDS — VERMIJD CALQUE-WOORDEN
+
+Schrijf natuurlijk, spreektalig Nederlands. Let specifiek op woorden die grammaticaal correct
+zijn maar ontstaan zijn als letterlijke vertaling van een Engels begrip, en daardoor net anders
+klinken dan hoe een Nederlandse schrijver het zou zeggen. Herken dit patroon zelf en kies het
+alledaagse alternatief, ook als het gevraagde woord niet op onderstaande lijst staat.
+
+Bekende voorbeelden (vermijd, tenzij het vaktaal in de tekst zelf is):
+- "expliciteren / geëxpliciteerd" (van "make explicit") → gebruik "vastleggen", "opschrijven",
+  "onder woorden brengen", "duidelijk maken"
+- "additioneel" (van "additional") → "extra"
+- "faciliteren" (van "facilitate") → "mogelijk maken", "helpen"
+- "actioneren" (van "action" als werkwoord) → "oppakken", "uitvoeren"
+- "leveren" als vertaling van "deliver" in abstracte zin ("waarde leveren") → concreter maken:
+  wat gebeurt er dan precies
+
+Vuistregel: als een woord vaker in een vertaald Engels rapport voorkomt dan in een gesprek aan de
+keukentafel, kies dan het keukentafel-woord — tenzij het een vakterm is die in deze tekst bewust
+wordt gebruikt (zoals HBA-begrippen: Hero, Foe, hygiënefactor — die blijven staan).

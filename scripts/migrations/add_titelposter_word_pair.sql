@@ -1,0 +1,2 @@
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS poster_word_main VARCHAR(20) NULL;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS poster_word_struck VARCHAR(20) NULL;

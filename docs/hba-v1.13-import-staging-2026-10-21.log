@@ -1,0 +1,26 @@
+==> Import testposts from Brandpunt_Koffie.json
+  geïmporteerd: 6 (verwijderd: {'slots': ['6c0fe947-9ed6-4096-8c57-82f9f937d432', '861f8581-b441-4447-a096-1f18d986657a', 'b9f67061-c2e5-43db-8951-823decb25c78', 'e21d66d8-2bc3-4336-81fd-bbe07ff42e7d', 'f156c2fd-1d06-44fd-b64f-13dde4517291', 'f7712948-e792-4e5c-a6fd-38458fecb37b'], 'linkedinPosts': 6, 'scores': 6})
+  post 1 gescoord (v1.13)
+  post 2 gescoord (v1.13)
+  post 3 gescoord (v1.13)
+  post 4 gescoord (v1.13)
+  post 5 gescoord (v1.13)
+  post 6 gescoord (v1.13)
+==> Import testposts from Stelwerk.json
+  geïmporteerd: 6 (verwijderd: {'slots': ['00faf917-4d8c-4b25-b9df-7d1d7f36f921', '1f2be521-ddbd-4eae-bb80-57c31c3699b9', '35664248-9005-4c3d-993d-1d7a70cbd58f', '652d2fc6-b438-48cc-a255-bd36ecd6be26', 'eceddf6b-16e7-47d4-b73a-29a40820e9b1', 'ef3c68cd-8d02-4633-a3e2-93b5ec9e8e4f'], 'linkedinPosts': 6, 'scores': 6})
+  post 1 gescoord (v1.13)
+  post 2 gescoord (v1.13)
+  post 3 gescoord (v1.13)
+  post 4 gescoord (v1.13)
+  post 5 gescoord (v1.13)
+  post 6 gescoord (v1.13)
+==> Import testposts from Duinroos_Thuiszorg.json
+  geïmporteerd: 7 (verwijderd: {'slots': ['1f435b15-d53e-41da-9cfc-3ba95eceff2b', '248f3a0c-d57b-443c-a4a6-028054928385', '5d167930-5a31-4579-bab4-4195ac70c1f4', '662a4f49-a661-4caa-ac22-00a0c26792bc', '950bf021-e3e6-4c27-a28d-6fe1bcdff662', 'a02a0ca8-d3bd-415b-86c0-71ea280f947f', 'b8e67bf1-69f8-4e56-a3a5-a8c4dea4437b'], 'linkedinPosts': 7, 'scores': 7})
+  post 1 gescoord (v1.13)
+  post 2 gescoord (v1.13)
+  post 3 gescoord (v1.13)
+  post 4 gescoord (v1.13)
+  post 5 gescoord (v1.13)
+  post 6 gescoord (v1.13)
+  post 7 gescoord (v1.13)
+==> Klaar. Posts = nulmeting (gescoord) + Archief. Agenda toont ze niet.

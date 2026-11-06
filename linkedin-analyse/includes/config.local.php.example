@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Kopieer naar config.local.php en vul in.
+ * config.local.php staat in .gitignore.
+ */
+
+if (
+    PHP_SAPI !== 'cli'
+    && isset($_SERVER['SCRIPT_FILENAME'])
+    && realpath((string) $_SERVER['SCRIPT_FILENAME']) === realpath(__FILE__)
+) {
+    http_response_code(404);
+    exit;
+}
+
+return [
+    // MySQL (aparte database, niet CE-tenant)
+    'db_host' => '127.0.0.1',
+    'db_name' => 'linkedin_analyse',
+    'db_user' => 'linkedin_analyse',
+    'db_pass' => 'CHANGE_ME',
+
+    // Apify platform token (zelfde als CE)
+    'apify_api_token' => 'apify_api_...',
+
+    // Gebruikers voor tool-login (email => bcrypt hash).
+    // Genereer hash: php -r "echo password_hash('jouw-wachtwoord', PASSWORD_DEFAULT);"
+    'app_users' => [
+        'erik@igisnext.com' => '',
+        'eva@igisnext.com' => '',
+    ],
+
+    // Publieke URL van deze tool (voor logo in e-mail)
+    'base_url' => 'https://linkedin-analyse.igisnext.com',
+    'report_logo_url' => 'https://linkedin-analyse.igisnext.com/assets/iGiSNext_Blue.png',
+
+    // Kosten & limieten
+    'usd_to_eur' => 0.92,
+    'max_posts' => 30,
+    'cache_days' => 7,
+    'daily_scan_limit' => 20,
+    'daily_cost_limit_usd' => 5.0,
+    'apify_timeout_sec' => 120,
+    // Optioneel: override Apify-actor voor schoolpagina's (default = zelfde als bedrijven).
+    // 'school_actor_id' => 'apimaestro/linkedin-company-posts-batch-scraper-no-cookies',
+    'raw_data_retention_days' => 90,
+
+    // Narratief-analyse (Claude Haiku) — merkverhaal & consistentie
+    'anthropic_api_key' => '',
+    'ai_summary_enabled' => false,
+    'anthropic_model' => 'claude-haiku-4-5-20251001',
+    'narrative_max_cost_usd_per_scan' => 0.02,
+
+    // Wachtwoord-reset mail (zelfde afzender als CE indien CE_MAIL_FROM in .env)
+    'mail_from' => 'LinkedIn Scan <support@igisnext.com>',
+];

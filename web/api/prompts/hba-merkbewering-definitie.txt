@@ -1,0 +1,21 @@
+MERKBEWERING — wat telt voor stap D (self_review.merk_beweringen)?
+
+Beoordeel de hele passage in context, niet losse zinnen. Geef per bewering het citaat en de bron. Als een zin voortbouwt op een eerdere onderbouwde bewering in dezelfde passage, zet bron op die eerdere bewering (steunt_op: citaat van die eerdere zin) en gebruik dezelfde bron — geen geen_bron.
+
+Telt als merkbewering (controleerbaar over dit merk):
+- wat het merk doet, heeft, levert, belooft, of een concreet getal noemt;
+- voorbeelden: "wij branden in kleine batches", "de branddatum staat op de zak", "elke eerste donderdag van de maand", "koffie ouder dan zes weken gaat naar de voedselbank".
+
+Telt niet — neem deze niet op in merk_beweringen:
+- mening, standpunt of argument zonder feitelijke claim ("daar is geen reden voor", "kortingen op slechte koffie zijn makkelijk");
+- uitspraak over de categorie, branche of anderen, niet over dit merk;
+- aanspreking van de lezer, vraag, oproep of instructie ("check de branddatum", "kom langs");
+- retoriek of vergelijking zonder nieuw merkfeit.
+
+Bronnen (precies één per bewering):
+- merkarchitectuur — regel, werkwijze of geloofwaardigheidstest uit de merkarchitectuur;
+- bewijsveld — expliciet bewijsveld van het merk;
+- research — onderliggend research-item;
+- geen_bron — alleen als het wél een merkbewering is maar nergens te herleiden valt (zeldzaam na bovenstaande filters).
+
+Als je twijfelt of iets een merkbewering is: laat het weg in plaats van geen_bron te gebruiken.

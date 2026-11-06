@@ -1,0 +1,1541 @@
+{
+  "ijkset_versie": "0.3",
+  "datum": "2026-10-16",
+  "status": "Bevestigd door Rogier, 16 oktober 2026. 46 ijkgevallen. Nieuw in 0.3: architectuurpoort, verwacht_meetlat, volgorde hoofdoordeel, klantlabel positiebreuk, contentrollen in app-namen, T04 aangescherpt.",
+  "eigendom": "© Rogier Heijning, Hero Brands. Onderdeel van de HBA-laag, niet delen buiten Rogier en Erik.",
+  "toelichting_signalen": "Signaalnamen zijn voorstellen. Koppel ze aan de velden die de HBA-laag in de output teruggeeft; waar een veld nog niet bestaat, controleert de kalibratierun het via de redenering.",
+  "ijkgevallen": [
+    {
+      "id": "A01",
+      "naam": "Veldwerk Installatie: isolatie eerst",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Veldwerk Installatie",
+        "branche": "installatietechniek, warmtepompen, particulieren",
+        "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+        "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+        "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+        "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+        "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 75,
+      "score_max": 90,
+      "verplichte_signalen": [
+        "onderscheid_herkend",
+        "regel_met_commerciele_prijs_herkend"
+      ],
+      "verboden_signalen": [
+        "hygienefactor_gedetecteerd op wat_anders of regels",
+        "strawman_gedetecteerd",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geblokkeerd"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Referentiegeval voor sterk. De regel kost aantoonbaar omzet en breekt met de gangbare praktijk in de branche (snel installeren zolang de subsidie loopt).",
+      "verwacht_meetlat": "actief"
+    },
+    {
+      "id": "A02",
+      "naam": "Brink Administratie: geen losse aangifte",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Brink Administratie",
+        "branche": "boekhouding en administratie, zzp en mkb",
+        "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+        "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+        "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+        "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+        "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 70,
+      "score_max": 85,
+      "verplichte_signalen": [
+        "onderscheid_herkend",
+        "regel_met_commerciele_prijs_herkend"
+      ],
+      "verboden_signalen": [
+        "strawman_gedetecteerd op niet_in_geloven",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geblokkeerd"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Niet_in_geloven is geen strawman: veel kantoren werken echt alleen achteraf. De app moet het verschil zien met een tegenstelling die niemand claimt.",
+      "verwacht_meetlat": "actief"
+    },
+    {
+      "id": "A03",
+      "naam": "Hoeve Stil: geen groepen, geen wifi",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Hoeve Stil",
+        "branche": "kleinschalige verblijfsrecreatie, bed and breakfast",
+        "wie": "Bed and breakfast met 8 kamers op het Drentse platteland.",
+        "doel": "Een plek waar mensen een paar dagen echt niets hoeven.",
+        "wat_anders": "Geen wifi op de kamers, geen kinderen onder 12, geen evenementen.",
+        "niet_in_geloven": "Dat gasten altijd meer faciliteiten willen.",
+        "regels": "We nemen geen bruiloften of groepsboekingen aan, ook niet in het laagseizoen als we ze goed kunnen gebruiken."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 70,
+      "score_max": 85,
+      "verplichte_signalen": [
+        "onderscheid_herkend",
+        "regel_met_commerciele_prijs_herkend"
+      ],
+      "verboden_signalen": [
+        "hygienefactor_gedetecteerd",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geblokkeerd"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Sterk ondanks eenvoudige taal. Test of de app keuzes herkent die ook zonder vakjargon onderscheidend zijn.",
+      "verwacht_meetlat": "actief"
+    },
+    {
+      "id": "A04",
+      "naam": "Doornvogel aangescherpt (hypothetisch)",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Doornvogel",
+        "branche": "loyaliteitsmarketing, bureau",
+        "wie": "Bureau voor loyaliteitsprogramma's voor consumentenmerken.",
+        "doel": "Merken die klanten houden omdat ze erover vertellen, niet omdat ze punten sparen.",
+        "wat_anders": "We meten loyaliteit niet in retentiecijfers maar in hoe vaak klanten het merk aanbevelen.",
+        "niet_in_geloven": "Dat kortingen en punten loyaliteit opbouwen.",
+        "regels": "We werken alleen met merken die bereid zijn hun kortetermijnpromoties af te bouwen."
+      },
+      "verwacht_oordeel": "aanscherpen",
+      "score_min": 50,
+      "score_max": 65,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd op wat_anders en niet_in_geloven",
+        "regel_met_commerciele_prijs_herkend",
+        "advies_wijst_regel_aan_als_onderscheid",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "oordeel zwak",
+        "noemt aanbevelingsmeting onderscheidend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Aanbevelingsmeting (NPS, referral rate) en afstand van punten en kortingen zijn gangbaar in de loyaliteitsbranche, ook bij Nederlandse bureaus (o.a. Dunck, Livewall, Touch Incentive). Het mogelijke onderscheid zit in de regel: alleen werken voor merken die kortetermijnpromoties afbouwen. Tegenhanger van A09: het verschil tussen de twee zit in de consequentie, niet in de taal. Hypothetisch geval, wijkt af van het huidige openbare aanbod van Doornvogel.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A05",
+      "naam": "Studio Kade: toolkeuze als onderscheid",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Studio Kade",
+        "branche": "webdesign en websitebouw",
+        "wie": "Webdesignstudio met 3 mensen.",
+        "doel": "Mooie websites die werken.",
+        "wat_anders": "We bouwen alleen in Webflow, zodat klanten zelf alles kunnen aanpassen.",
+        "niet_in_geloven": "Dat je voor elke tekstwijziging een developer nodig hebt.",
+        "regels": "We zeggen nee tegen klanten zonder budget."
+      },
+      "verwacht_oordeel": "aanscherpen",
+      "score_min": 45,
+      "score_max": 60,
+      "verplichte_signalen": [
+        "doel_generiek",
+        "regel_zonder_commerciele_prijs",
+        "deels_onderscheid_herkend",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Echte keuze (een tool), maar het doel is categorietaal en de regel kost niets: iedereen weigert klanten zonder budget.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A06",
+      "naam": "Fysio Loop: niche zonder richting",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Fysio Loop",
+        "branche": "fysiotherapie, sportfysiotherapie",
+        "wie": "Fysiotherapiepraktijk met 5 therapeuten.",
+        "doel": "Mensen gezond laten bewegen.",
+        "wat_anders": "We zijn gespecialiseerd in hardlopers.",
+        "niet_in_geloven": "Dat rust het beste medicijn is.",
+        "regels": "We behandelen niet zonder oefenschema voor thuis."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 20,
+      "score_max": 40,
+      "verplichte_signalen": [
+        "doel_generiek",
+        "hygienefactor_gedetecteerd",
+        "regel_zonder_commerciele_prijs",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "noemt de positionering uniek of onderscheidend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Doel is categorietaal, de hardloopniche hebben veel sportfysio's, en de regel is gangbare praktijk. Geen van de drie draagt onderscheid.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A07",
+      "naam": "Makelaardij Vos: echte grens, strawman ernaast",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Makelaardij Vos",
+        "branche": "makelaardij, woningverkoop",
+        "wie": "Makelaarskantoor met 2 makelaars in Haarlem.",
+        "doel": "Verkopers die zich tijdens de verkoop gehoord voelen.",
+        "wat_anders": "We verkopen maximaal 40 huizen per jaar, zodat de makelaar zelf elke bezichtiging doet.",
+        "niet_in_geloven": "In onpersoonlijke ketens die je als nummer behandelen.",
+        "regels": "Is ons jaarquotum vol, dan verwijzen we door, ook als de opdracht groot is."
+      },
+      "verwacht_oordeel": "aanscherpen",
+      "score_min": 50,
+      "score_max": 65,
+      "verplichte_signalen": [
+        "onderscheid_herkend",
+        "regel_met_commerciele_prijs_herkend",
+        "strawman_gedetecteerd",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel zwak",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Gemengd geval. Het quotum is sterk, de tegenstelling met ketens die je als nummer behandelen is een strawman. De app moet beide tegelijk zien.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A08",
+      "naam": "Brander Oost: regel spreekt wat_anders tegen",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Brander Oost",
+        "branche": "koffiebranderij, specialty coffee",
+        "wie": "Koffiebranderij in Enschede met eigen winkel en groothandel.",
+        "doel": "Koffie waarvan je weet wie hem geteeld heeft.",
+        "wat_anders": "We kopen alleen direct bij boeren die we zelf bezocht hebben.",
+        "niet_in_geloven": "Dat certificaten genoeg zeggen over hoe koffie gemaakt wordt.",
+        "regels": "We leveren ook aan supermarkten, mits het volume groot genoeg is om de boeren een vaste afname te garanderen."
+      },
+      "verwacht_oordeel": "aanscherpen",
+      "score_min": 40,
+      "score_max": 55,
+      "verplichte_signalen": [
+        "regel_is_geen_grens",
+        "advies_herformuleer_regel_als_grens",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "regel_met_commerciele_prijs_herkend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "De regel beschrijft wat het merk wel doet (leveren aan supermarkten, mits) in plaats van wat het nooit doet. Het advies hoort te vragen om een regel in de vorm \"wij leveren nooit ..., ook niet als ...\", en te laten kiezen of de supermarkt erbinnen of erbuiten valt.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A09",
+      "naam": "Doornvogel origineel",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Doornvogel",
+        "branche": "loyaliteitsmarketing, bureau",
+        "wie": "Bureau voor loyaliteitsprogramma's.",
+        "doel": "Duurzame klantrelaties voor onze klanten.",
+        "wat_anders": "Alleen voor loyale klanten. Geen snelle verkoop, maar echt samen bouwen aan relaties.",
+        "niet_in_geloven": "In snelle verkoop.",
+        "regels": ""
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 15,
+      "score_max": 35,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "strawman_gedetecteerd",
+        "regel_ontbreekt",
+        "regel_ontbreekt met advies welk soort regel",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Het oorspronkelijke geval uit augustus 2026. Lange relaties zijn de definitie van de loyaliteitsbranche, en niemand claimt snelle verkoop. Moet altijd goed gaan.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A10",
+      "naam": "Meijer Accountants: hygiene in drievoud",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Meijer Accountants",
+        "branche": "accountancy, mkb",
+        "wie": "Accountantskantoor met 20 mensen.",
+        "doel": "Ondernemers ontzorgen.",
+        "wat_anders": "Betrouwbaar, persoonlijk en deskundig. Korte lijnen.",
+        "niet_in_geloven": "In onpersoonlijke dienstverlening.",
+        "regels": "We leveren altijd kwaliteit."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "strawman_gedetecteerd",
+        "regel_zonder_commerciele_prijs",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "oordeel aanscherpen",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Schoolvoorbeeld van hygienefactoren. Elke term is de vloer van de branche.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A11",
+      "naam": "Nexa IT: partner in plaats van leverancier",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Nexa IT",
+        "branche": "IT-dienstverlening, managed services mkb",
+        "wie": "IT-bedrijf met 25 mensen.",
+        "doel": "Wij ontzorgen ondernemers op IT-gebied.",
+        "wat_anders": "Wij zijn een partner, geen leverancier. Geen standaardoplossingen maar maatwerk.",
+        "niet_in_geloven": "In one-size-fits-all.",
+        "regels": "We zijn altijd bereikbaar."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "strawman_gedetecteerd",
+        "regel_zonder_commerciele_prijs",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Dubbele strawman (leverancier, standaardoplossing) plus categorietaal (ontzorgen, partner).",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A12",
+      "naam": "Installatiebedrijf De Boer: generieke vakman",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Installatiebedrijf De Boer",
+        "branche": "installatietechniek, warmtepompen, particulieren",
+        "wie": "Installatiebedrijf met 10 mensen.",
+        "doel": "Tevreden klanten.",
+        "wat_anders": "Kwaliteit, service en vakmanschap. Afspraak is afspraak.",
+        "niet_in_geloven": "In beunhazen.",
+        "regels": ""
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "strawman_gedetecteerd",
+        "regel_ontbreekt",
+        "regel_ontbreekt met advies welk soort regel",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Zelfde branche als A01. Laat zien of de branche-bibliotheek installatie goed genoeg kent om beide uit elkaar te houden.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A13",
+      "naam": "Bureau Vonk: geen loze beloftes",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Bureau Vonk",
+        "branche": "marketingbureau, online marketing",
+        "wie": "Marketingbureau met 8 mensen.",
+        "doel": "Groei voor onze klanten.",
+        "wat_anders": "Geen loze beloftes en geen one-size-fits-all. Resultaatgericht en data-driven.",
+        "niet_in_geloven": "In kortetermijndenken.",
+        "regels": "We zijn eerlijk tegen klanten."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "strawman_gedetecteerd",
+        "regel_zonder_commerciele_prijs",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Drie strawmen achter elkaar. Test ook of de app data-driven als categorietaal van marketingbureaus herkent.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A14",
+      "naam": "Bakkerij Kruim: keuze die branchevloer is",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Bakkerij Kruim",
+        "branche": "ambachtelijke bakkerij",
+        "wie": "Ambachtelijke bakker met twee winkels in Utrecht.",
+        "doel": "Brood zoals het vroeger smaakte.",
+        "wat_anders": "We bakken alleen op desem, met 48 uur rijstijd.",
+        "niet_in_geloven": "In broodverbeteraars.",
+        "regels": "We zeggen nee tegen onbeleefde klanten en tegen fraude."
+      },
+      "verwacht_oordeel": "aanscherpen",
+      "score_min": 35,
+      "score_max": 50,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "regel_zonder_commerciele_prijs",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Subtiel geval. Desem en lange rijs zijn onderscheidend tegenover de supermarkt, maar hygiene binnen de ambachtelijke bakkerij. De vergelijkingsgroep moet de branche zijn, niet de hele markt.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A15",
+      "naam": "Kinderopvang Zonnig: wettelijke plicht als regel",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Kinderopvang Zonnig",
+        "branche": "kinderopvang",
+        "wie": "Kinderdagverblijf met 3 locaties.",
+        "doel": "Een veilige en warme plek voor ieder kind.",
+        "wat_anders": "Veiligheid staat bij ons voorop.",
+        "niet_in_geloven": "",
+        "regels": "We houden ons altijd aan de beroepskracht-kindratio."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd op wat_anders en regels",
+        "regel_is_wettelijke_plicht (als hygiënefactor op regels)",
+        "tegenkracht_ontbreekt met advies welk soort tegenkracht",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "regel_met_commerciele_prijs_herkend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Een wettelijke verplichting is geen keuze, en veiligheid is de vloer van de branche. Niet_in_geloven is leeg. De app moet het merk inhoudelijk beoordelen (zwak) en tegelijk de meetlat en de contentgeneratie blokkeren tot de architectuur volledig en goed is. Een kale melding \"vul eerst tegenkracht in\" is fout: dan vult een klant een strawman in om door de poort te komen.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A16",
+      "naam": "Draad: duurzaamheid in duurzame niche",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Draad",
+        "branche": "duurzame mode, kledingmerk",
+        "wie": "Klein kledingmerk, verkoopt online.",
+        "doel": "Mode die de wereld niet kapotmaakt.",
+        "wat_anders": "Duurzaam, eerlijk geproduceerd en transparant over onze keten.",
+        "niet_in_geloven": "In fast fashion.",
+        "regels": "We gebruiken alleen biologisch katoen."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 20,
+      "score_max": 35,
+      "verplichte_signalen": [
+        "hygienefactor_gedetecteerd",
+        "meetlat_geblokkeerd met oordeel en advies"
+      ],
+      "verboden_signalen": [
+        "noemt de positionering uniek of onderscheidend",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geactiveerd of content gegenereerd",
+        "alleen een melding zonder inhoudelijk oordeel"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Duurzaamheid is binnen duurzame mode de toegangsprijs. Fast fashion is hier geen strawman (bestaat echt), maar ook geen onderscheid binnen de eigen categorie.",
+      "verwacht_meetlat": "geblokkeerd"
+    },
+    {
+      "id": "A17",
+      "naam": "Uitvaartzorg Ter Horst: breuk met prijsconventie",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Uitvaartzorg Ter Horst",
+        "branche": "uitvaartzorg",
+        "wie": "Uitvaartondernemer met 4 mensen.",
+        "doel": "Een afscheid waar nabestaanden achteraf niet over twijfelen.",
+        "wat_anders": "Geen pakketten. We rekenen per uur en per gemaakte kosten, vooraf begroot.",
+        "niet_in_geloven": "Dat een pakket nabestaanden rust geeft.",
+        "regels": "We verkopen geen uitvaartpakketten, ook niet als nabestaanden erom vragen."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 60,
+      "score_max": 75,
+      "verplichte_signalen": [
+        "onderscheid_herkend",
+        "methodische_breuk_met_branche_herkend",
+        "regel_met_commerciele_prijs_herkend"
+      ],
+      "verboden_signalen": [
+        "hygienefactor_gedetecteerd",
+        "oordeel zwak",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geblokkeerd"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Onderscheid zit in een breuk met een brancheconventie (pakketprijzen), niet in woorden. Test of de branche-afleider die conventie kent.",
+      "verwacht_meetlat": "actief"
+    },
+    {
+      "id": "T01",
+      "naam": "Veldwerk: het nee aan een klant",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Vorige week zeiden we nee tegen een klant. Huis uit 1962, subsidie al toegekend, warmtepomp al uitgezocht. Wij kwamen meten en zagen een lege spouwmuur. Geen warmtepomp dus. Eerst isoleren. Hij was er niet blij mee. Twee maanden later belde hij terug: de muur is gevuld, nu mag het. Dat is de volgorde."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 75,
+      "score_max": 90,
+      "verplichte_signalen": [
+        "contentrol=positionering",
+        "draagt_regel_uit"
+      ],
+      "verboden_signalen": [
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Maakt de regel concreet met een verhaal waarin het nee iets kost."
+    },
+    {
+      "id": "T02",
+      "naam": "Veldwerk: meting zonder claim",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Warmteverliesmeting in Zeist vandaag. Resultaat: 38 procent van de warmte gaat via het dak. Advies aan de bewoners: eerst dakisolatie, dan pas praten over de installatie. Zo ziet een eerste bezoek bij ons er meestal uit."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 65,
+      "score_max": 85,
+      "verplichte_signalen": [
+        "contentrol=bewijs",
+        "herkent_impliciet_bewijs_van_werkwijze"
+      ],
+      "verboden_signalen": [
+        "straft ontbreken van expliciete claim",
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Impliciet sterk. Geen slogan, wel de werkwijze in actie. De app mag niet belonen dat iets expliciet gezegd wordt."
+    },
+    {
+      "id": "T03",
+      "naam": "Veldwerk: teamuitje",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Teamuitje! We gingen karten in Nieuwegein. Winnaar van de dag: Sanne van planning. Volgend jaar revanche."
+      },
+      "verwacht_oordeel": "neutraal",
+      "score_min": 20,
+      "score_max": 45,
+      "verplichte_signalen": [
+        "contentrol=employer_culture",
+        "lage_bijdrage_zonder_alarm"
+      ],
+      "verboden_signalen": [
+        "risico_flag op de kernbewering",
+        "erosion_alert op basis van alleen deze post",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Engagement mag. Eén zo'n post is geen afglijden. Test of de app per stroom denkt en niet per post straft."
+    },
+    {
+      "id": "T04",
+      "naam": "Veldwerk: actiepost die de regel breekt",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "ACTIE: nu een warmtepomp binnen 2 weken geinstalleerd, ook bij energielabel D of E! Wij regelen de subsidie, geen gedoe met isoleren. Bel vandaag nog."
+      },
+      "verwacht_oordeel": "regelbreuk",
+      "score_min": 0,
+      "score_max": 20,
+      "verplichte_signalen": [
+        "contentrol=activatie",
+        "risico_flag_tegenspraak_met_regel",
+        "advies_verwijst_naar_regel"
+      ],
+      "verboden_signalen": [
+        "oordeel neutraal",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Biedt precies aan wat de regel verbiedt: een warmtepomp in een huis met label slechter dan C. Moet altijd regelbreuk zijn. (v0.3: energielabel toegevoegd, zodat de regelbreuk niet van interpretatie afhangt.)"
+    },
+    {
+      "id": "T05",
+      "naam": "Veldwerk: generieke branchetaal",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "website",
+        "tekst": "Veldwerk Installatie is uw betrouwbare partner voor duurzame installaties. Kwaliteit en service staan bij ons voorop."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 10,
+      "score_max": 30,
+      "verplichte_signalen": [
+        "contentrol=positionering",
+        "hygienefactor_gedetecteerd"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Merk met sterke architectuur dat toch in categorietaal schrijft. Had net zo goed van A12 kunnen zijn."
+    },
+    {
+      "id": "T06",
+      "naam": "Veldwerk: generieke bespaartips",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "5 tips om energie te besparen deze winter: 1. Zet de thermostaat een graad lager. 2. Plak tochtstrips. 3. Sluit de gordijnen 's avonds. 4. Ontlucht je radiatoren. 5. Douche korter."
+      },
+      "verwacht_oordeel": "neutraal",
+      "score_min": 25,
+      "score_max": 45,
+      "verplichte_signalen": [
+        "contentrol=educatie",
+        "lage_bijdrage_zonder_alarm",
+        "advies_koppelt_aan_merkstandpunt"
+      ],
+      "verboden_signalen": [
+        "oordeel zwak",
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Nuttig maar inwisselbaar. Breekt niets af, dus neutraal. Het advies wijst op de kans om de isolatie-eerst-gedachte erin te leggen."
+    },
+    {
+      "id": "T07",
+      "naam": "Brink: waarom we nee zeggen",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Van de tien ondernemers die ons bellen, wijzen we er vier af. Ze willen alleen hun aangifte laten doen. Prima, maar dat doen wij niet. Wij willen elke maand met je aan tafel over je cijfers. Wie dat wil, blijft meestal jaren."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 75,
+      "score_max": 90,
+      "verplichte_signalen": [
+        "contentrol=positionering",
+        "draagt_regel_uit"
+      ],
+      "verboden_signalen": [
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Referentie voor sterk bij A02."
+    },
+    {
+      "id": "T08",
+      "naam": "Brink: btw-deadline",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Denk aan de deadline voor de btw-aangifte over het derde kwartaal: 31 oktober."
+      },
+      "verwacht_oordeel": "neutraal",
+      "score_min": 20,
+      "score_max": 40,
+      "verplichte_signalen": [
+        "contentrol=service",
+        "lage_bijdrage_zonder_alarm"
+      ],
+      "verboden_signalen": [
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Servicepost. Weinig bijdrage, geen schade. Mag niet als probleem gemeld worden."
+    },
+    {
+      "id": "T09",
+      "naam": "Brink: kortingsactie losse aangifte",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Alleen je jaarrekening laten doen? Deze maand 20 procent korting! Snel en zonder gedoe."
+      },
+      "verwacht_oordeel": "regelbreuk",
+      "score_min": 0,
+      "score_max": 20,
+      "verplichte_signalen": [
+        "contentrol=activatie",
+        "risico_flag_tegenspraak_met_regel"
+      ],
+      "verboden_signalen": [
+        "oordeel neutraal",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Verkoopt precies wat de regel uitsluit."
+    },
+    {
+      "id": "T10",
+      "naam": "Brink: echte partner",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Bij Brink geen boekhouder die alleen achteraf telt, maar een echte partner die met je meedenkt."
+      },
+      "verwacht_oordeel": "middelmatig",
+      "score_min": 40,
+      "score_max": 60,
+      "verplichte_signalen": [
+        "contentrol=positionering",
+        "categorietaal_gedetecteerd",
+        "deels_onderscheid_herkend"
+      ],
+      "verboden_signalen": [
+        "strawman_gedetecteerd",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Het contrast is echt (veel kantoren werken alleen achteraf), maar 'echte partner die meedenkt' is categorietaal. Advies: maak het maandgesprek concreet."
+    },
+    {
+      "id": "T11",
+      "naam": "Veldwerk: generieke klantreview",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "kanaal": "website",
+        "tekst": "\"Snel geholpen en netjes gewerkt. Aanrader!\" Familie Jansen, Houten"
+      },
+      "verwacht_oordeel": "neutraal",
+      "score_min": 30,
+      "score_max": 50,
+      "verplichte_signalen": [
+        "contentrol=bewijs",
+        "hygienefactor_gedetecteerd",
+        "lage_bijdrage_zonder_alarm",
+        "advies_koppelt_aan_merkstandpunt"
+      ],
+      "verboden_signalen": [
+        "oordeel zwak",
+        "risico_flag op de kernbewering",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Bevestigt alleen het basisniveau van de branche. Breekt niets af, dus neutraal. Advies: vraag klanten naar het moment van de meting of het uitstel."
+    },
+    {
+      "id": "T12",
+      "naam": "Hoeve Stil: wifi-aankondiging",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A03",
+        "merkarchitectuur": {
+          "merk": "Hoeve Stil",
+          "branche": "kleinschalige verblijfsrecreatie, bed and breakfast",
+          "wie": "Bed and breakfast met 8 kamers op het Drentse platteland.",
+          "doel": "Een plek waar mensen een paar dagen echt niets hoeven.",
+          "wat_anders": "Geen wifi op de kamers, geen kinderen onder 12, geen evenementen.",
+          "niet_in_geloven": "Dat gasten altijd meer faciliteiten willen.",
+          "regels": "We nemen geen bruiloften of groepsboekingen aan, ook niet in het laagseizoen als we ze goed kunnen gebruiken."
+        },
+        "kanaal": "Instagram",
+        "tekst": "Nieuw bij Hoeve Stil: vanaf nu supersnelle glasvezelwifi op alle kamers!"
+      },
+      "verwacht_oordeel": "tegenkracht",
+      "score_min": 0,
+      "score_max": 20,
+      "verplichte_signalen": [
+        "contentrol=activatie",
+        "risico_flag_tegenspraak_met_wat_anders",
+        "foe_vervaging"
+      ],
+      "verboden_signalen": [
+        "hoofdoordeel regelbreuk",
+        "oordeel neutraal",
+        "oordeel sterk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Spreekt het kernonderscheid tegen (geen wifi) en viert precies wat het merk afwijst (dat gasten altijd meer faciliteiten willen). Dat is de logica van de tegenkracht, geen regelbreuk: regelbreuk is alleen voor de regel. Een positieve toon mag de app niet misleiden."
+    },
+    {
+      "id": "S01",
+      "naam": "Advies op generieke Veldwerk-tekst",
+      "soort": "schrijfadvies",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "concepttekst": "Veldwerk Installatie is uw betrouwbare partner voor duurzame installaties. Kwaliteit en service staan bij ons voorop."
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "precies_een_aanwijzing",
+        "aanwijzing_verwijst_naar_isolatie_eerst",
+        "herschrijving_in_stem_van_klant"
+      ],
+      "verboden_signalen": [
+        "meer dan een aanwijzing",
+        "herschrijving bevat 'betrouwbare partner'",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Basisgeval voor het ingrijppunt tijdens schrijven."
+    },
+    {
+      "id": "S02",
+      "naam": "Advies op servicepost Brink",
+      "soort": "schrijfadvies",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "concepttekst": "Denk aan de deadline voor de btw-aangifte over het derde kwartaal: 31 oktober."
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "hoogstens_een_aanwijzing",
+        "erkent_dat_servicepost_mag"
+      ],
+      "verboden_signalen": [
+        "dwingt herschrijving af",
+        "noemt de post fout of risicovol",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Test of de app niet overijverig wordt bij content die geen positionering hoeft te dragen."
+    },
+    {
+      "id": "S03",
+      "naam": "Advies op al sterke tekst",
+      "soort": "schrijfadvies",
+      "input": {
+        "merkarchitectuur_ref": "A01",
+        "merkarchitectuur": {
+          "merk": "Veldwerk Installatie",
+          "branche": "installatietechniek, warmtepompen, particulieren",
+          "wie": "Installatiebedrijf met 14 mensen in de regio Utrecht, werkt voor particuliere huiseigenaren.",
+          "doel": "Huizen echt van het gas af krijgen op een manier waarop mensen er daarna ook comfortabel in wonen.",
+          "wat_anders": "We beginnen niet met de warmtepomp maar met een warmteverliesmeting. Pas als het huis goed genoeg geisoleerd is, installeren we.",
+          "niet_in_geloven": "Dat een warmtepomp in elk huis past.",
+          "regels": "We installeren geen warmtepomp in een huis met energielabel slechter dan C, ook niet als de klant erom vraagt en de subsidie al rond is."
+        },
+        "concepttekst": "Vorige week zeiden we nee tegen een klant. Huis uit 1962, subsidie al toegekend. Wij zagen een lege spouwmuur. Geen warmtepomp dus. Eerst isoleren."
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "geen_of_minimale_aanwijzing"
+      ],
+      "verboden_signalen": [
+        "volledige herschrijving",
+        "vervangt concrete details door algemene formuleringen",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Test of de app goed werk met rust laat."
+    },
+    {
+      "id": "S04",
+      "naam": "StoryBrand-lek",
+      "soort": "schrijfadvies",
+      "input": {
+        "merkarchitectuur_ref": "A02",
+        "merkarchitectuur": {
+          "merk": "Brink Administratie",
+          "branche": "boekhouding en administratie, zzp en mkb",
+          "wie": "Administratiekantoor met 6 mensen voor zzp'ers en kleine ondernemers.",
+          "doel": "Ondernemers laten sturen op hun cijfers in plaats van er achteraf van te schrikken.",
+          "wat_anders": "We doen geen losse jaarrekening of aangifte. Elke klant krijgt maandelijks een gesprek van 30 minuten over de cijfers.",
+          "niet_in_geloven": "Dat een boekhouder alleen achteraf telt.",
+          "regels": "We zeggen nee tegen klanten die alleen hun aangifte willen laten doen, ook al is dat bijna de helft van de aanvragen."
+        },
+        "concepttekst": "Veel ondernemers schrikken in mei van hun belastingaanslag. Bij Brink kijken we elke maand samen naar je cijfers."
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "precies_een_aanwijzing",
+        "geen_verbodstermen_in_output"
+      ],
+      "verboden_signalen": [
+        "noemt de klant 'de held'",
+        "noemt Brink 'de gids'",
+        "adviseert probleem-plan-succes-structuur",
+        "verwijst naar StoryBrand",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Controleert de verbodslijst en de StoryBrand-blokkade in het schrijfadvies."
+    },
+    {
+      "id": "C01",
+      "naam": "Veldwerk",
+      "soort": "compressietest",
+      "input": {
+        "branche": "installatietechniek, warmtepompen, particulieren",
+        "merkbeschrijving": "Veldwerk Installatie is een installatiebedrijf uit Utrecht dat huizen van het gas af helpt. Anders dan de meeste installateurs beginnen we met een warmteverliesmeting en installeren we pas als het huis goed genoeg geisoleerd is. In huizen met een energielabel slechter dan C plaatsen we geen warmtepomp, ook niet als de klant erom vraagt."
+      },
+      "verwacht_oordeel": "positionerend",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_behoudt_isolatie_eerst"
+      ],
+      "verboden_signalen": [
+        "samenvatting gelijk aan marktgemiddelde",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Referentie voor een beschrijving die compressie overleeft."
+    },
+    {
+      "id": "C02",
+      "naam": "De Boer",
+      "soort": "compressietest",
+      "input": {
+        "branche": "installatietechniek, warmtepompen, particulieren",
+        "merkbeschrijving": "Installatiebedrijf De Boer staat al jaren voor kwaliteit, service en vakmanschap. Wij installeren warmtepompen, cv-ketels en zonnepanelen voor particulieren. Afspraak is afspraak, en we denken graag met u mee."
+      },
+      "verwacht_oordeel": "opgelost",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_gelijk_aan_marktgemiddelde"
+      ],
+      "verboden_signalen": [
+        "oordeel positionerend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Referentie voor volledig opgelost in categorietaal."
+    },
+    {
+      "id": "C03",
+      "naam": "Doornvogel origineel",
+      "soort": "compressietest",
+      "input": {
+        "branche": "loyaliteitsmarketing, bureau",
+        "merkbeschrijving": "Doornvogel is een bureau voor loyaliteitsprogramma's. Wij werken alleen voor loyale klanten. Geen snelle verkoop, maar samen bouwen aan duurzame relaties tussen merken en hun klanten."
+      },
+      "verwacht_oordeel": "opgelost",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_gelijk_aan_marktgemiddelde",
+        "hygienefactor_gedetecteerd"
+      ],
+      "verboden_signalen": [
+        "oordeel positionerend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Na compressie blijft 'loyaliteitsbureau' over, en dat is de hele branche."
+    },
+    {
+      "id": "C04",
+      "naam": "Doornvogel aangescherpt",
+      "soort": "compressietest",
+      "input": {
+        "branche": "loyaliteitsmarketing, bureau",
+        "merkbeschrijving": "Doornvogel bouwt loyaliteitsprogramma's zonder punten en kortingen. We meten loyaliteit in aanbevelingen, niet in retentie, en werken alleen met merken die hun kortetermijnpromoties afbouwen."
+      },
+      "verwacht_oordeel": "grensgeval",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_behoudt_toelatingseis (alleen merken die promoties afbouwen)",
+        "hygienefactor_gedetecteerd op zonder punten en kortingen of aanbevelingen"
+      ],
+      "verboden_signalen": [
+        "oordeel positionerend op basis van aanbevelingen of zonder punten en kortingen"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Volgt uit A04. Alleen de toelatingseis kan compressie overleven als onderscheid; aanbevelingen en zonder punten en kortingen lossen op in de branche."
+    },
+    {
+      "id": "C05",
+      "naam": "Ter Horst",
+      "soort": "compressietest",
+      "input": {
+        "branche": "uitvaartzorg",
+        "merkbeschrijving": "Uitvaartzorg Ter Horst verkoopt geen pakketten. We rekenen per uur en per gemaakte kosten, vooraf begroot, zodat nabestaanden alleen betalen voor wat ze echt kiezen."
+      },
+      "verwacht_oordeel": "positionerend",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_behoudt_geen_pakketten"
+      ],
+      "verboden_signalen": [
+        "samenvatting gelijk aan marktgemiddelde",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Onderscheid door een breuk met de prijsconventie."
+    },
+    {
+      "id": "C06",
+      "naam": "Nexa IT",
+      "soort": "compressietest",
+      "input": {
+        "branche": "IT-dienstverlening, managed services mkb",
+        "merkbeschrijving": "Nexa IT ontzorgt ondernemers op IT-gebied. Wij zijn geen leverancier maar een partner. Geen standaardoplossingen, maar maatwerk dat past bij uw organisatie."
+      },
+      "verwacht_oordeel": "opgelost",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_gelijk_aan_marktgemiddelde",
+        "strawman_gedetecteerd"
+      ],
+      "verboden_signalen": [
+        "oordeel positionerend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Categorietaal van IT-dienstverleners."
+    },
+    {
+      "id": "C07",
+      "naam": "Brander Oost ondergesneeuwd",
+      "soort": "compressietest",
+      "input": {
+        "branche": "koffiebranderij, specialty coffee",
+        "merkbeschrijving": "Brander Oost is een gepassioneerde koffiebranderij uit Enschede. Wij geloven in kwaliteit, vakmanschap en de beste smaak. Onze koffie wordt met liefde gebrand en is verkrijgbaar in onze winkel en online. We kopen alleen direct bij boeren die we zelf bezocht hebben. Wij staan klaar voor particulieren, horeca en bedrijven, met persoonlijk advies en snelle levering."
+      },
+      "verwacht_oordeel": "grensgeval",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "onderscheid_ondergesneeuwd_gedetecteerd",
+        "advies_om_onderscheid_naar_voren_te_halen"
+      ],
+      "verboden_signalen": [
+        "oordeel positionerend zonder kanttekening",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Het onderscheid staat erin maar verdwijnt tussen categorietaal. Test of de app benoemt dat het er is maar compressie niet overleeft."
+    },
+    {
+      "id": "C08",
+      "naam": "Hoeve Stil",
+      "soort": "compressietest",
+      "input": {
+        "branche": "kleinschalige verblijfsrecreatie, bed and breakfast",
+        "merkbeschrijving": "Hoeve Stil heeft acht kamers, geen wifi, geen evenementen en geen kinderen onder de twaalf. Je komt hier om een paar dagen niets te hoeven."
+      },
+      "verwacht_oordeel": "positionerend",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "samenvatting_behoudt_afwezigheid_als_aanbod"
+      ],
+      "verboden_signalen": [
+        "samenvatting gelijk aan marktgemiddelde",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": false,
+      "herkomst": "handmatig",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Kort, zonder jargon, en toch positionerend."
+    },
+    {
+      "id": "A18",
+      "naam": "Duinroos: merk valt samen met de branche",
+      "soort": "architectuurcheck",
+      "input": {
+        "merk": "Duinroos Thuiszorg",
+        "branche": "thuiszorg, ouderen",
+        "wie": "Thuiszorgorganisatie in Kennemerland met circa 300 medewerkers.",
+        "doel": "Dat ouderen thuis baas blijven over hun eigen dag.",
+        "wat_anders": "Kleine vaste teams van hoogstens zes zorgverleners per wijk maken zelf de planning, samen met de cliënt, en passen die aan als de dag van de cliënt anders loopt.",
+        "niet_in_geloven": "Dat het zorgrooster mag bepalen hoe de dag van een cliënt eruitziet.",
+        "regels": "Een cliënt krijgt nooit meer dan vier verschillende zorgverleners per maand over de vloer, ook als we daarvoor een nieuwe cliënt moeten doorverwijzen."
+      },
+      "verwacht_oordeel": "sterk",
+      "score_min": 60,
+      "score_max": 75,
+      "verplichte_signalen": [
+        "markt_archetype_gelijk_aan_merk_herkend",
+        "hygienefactor_gedetecteerd op doel",
+        "regel_draagt_bewijslast",
+        "regel_met_commerciele_prijs_herkend"
+      ],
+      "verboden_signalen": [
+        "oordeel sterk zonder de regel te noemen",
+        "noemt zorgzaamheid of persoonlijke aandacht onderscheidend",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)",
+        "meetlat geblokkeerd"
+      ],
+      "valkuil": false,
+      "herkomst": "testmerken ronde 5 (v1.10)",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Het merk zegt wat de hele zorg zegt: zorgen voor mensen. Dat is hygiëne. Alleen de vier-zorgverlenersregel maakt het onderscheidend, dus de bewijslast ligt zwaarder dan bij een merk dat van zijn branche afwijkt. Zonder de regel zou dit zwak zijn; een tegenhanger zonder regel kan later als A19 worden toegevoegd.",
+      "verwacht_meetlat": "actief"
+    },
+    {
+      "id": "T13",
+      "naam": "Duinroos: wachtlijst in één maand opgelost",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": "A18",
+        "merkarchitectuur": {
+          "merk": "Duinroos Thuiszorg",
+          "branche": "thuiszorg, ouderen",
+          "wie": "Thuiszorgorganisatie in Kennemerland met circa 300 medewerkers.",
+          "doel": "Dat ouderen thuis baas blijven over hun eigen dag.",
+          "wat_anders": "Kleine vaste teams van hoogstens zes zorgverleners per wijk maken zelf de planning, samen met de cliënt, en passen die aan als de dag van de cliënt anders loopt.",
+          "niet_in_geloven": "Dat het zorgrooster mag bepalen hoe de dag van een cliënt eruitziet.",
+          "regels": "Een cliënt krijgt nooit meer dan vier verschillende zorgverleners per maand over de vloer, ook als we daarvoor een nieuwe cliënt moeten doorverwijzen.",
+          "bewijsvelden": [
+            "Maandelijks gepubliceerd gemiddelde aantal zorgverleners per cliënt",
+            "Teams van hoogstens zes per wijk",
+            "Planning samen met de cliënt, niet door een centrale planner",
+            "Aantal doorverwijzingen omdat een team vol zat"
+          ]
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Onze wachtlijst is in één maand opgelost. Maar niet zoals je misschien denkt.\n\nWe hebben geen extra mensen aangenomen. We hebben niemand harder laten werken. We hebben één cliënt bewust doorverwezen naar een andere aanbieder.\n\nDat klinkt misschien koud. Maar de reden is precies het tegenovergestelde.\n\nBij Duinroos werken maximaal vier vaste zorgverleners bij één cliënt. Niet als ambitie, maar als harde grens. Want als een oudere elke week andere gezichten aan de deur krijgt, werkt de zorg gewoon slechter. Je kent iemands gewoonten niet. Je ziet niet wat er gisteren anders was. Dat vertrouwen bouw je niet op met een volle agenda.\n\nDoor één cliënt elders onder te brengen — bij een aanbieder die wél de ruimte had om goede zorg te bieden — konden de overige mensen op de wachtlijst terecht bij zorgverleners die ze al kenden.\n\nDat was een moeilijke keuze. En tegelijk de enige die klopte.\n\nEen wachtlijst oplossen door de lat te verlagen voor de mensen die al bij je zijn: dat doen we niet."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 20,
+      "score_max": 50,
+      "verplichte_signalen": [
+        "proof_gap of foe_vervaging op de kop 'Onze wachtlijst is in één maand opgelost'"
+      ],
+      "verboden_signalen": [
+        "geen risico_flag op de kop",
+        "oordeel sterk",
+        "hoofdoordeel regelbreuk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "testmerken ronde 5 (v1.10)",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "De tekst lijkt de regel te verdedigen, maar de kop viert een resultaat van de tegenkracht (een weggewerkte wachtlijst) dat niet kan volgen uit één doorverwijzing. Een onjuiste bewering over het eigen bedrijf breekt geloofwaardigheid af, dus zwak. Geen regelbreuk: de regel wordt niet overtreden. Hoofdoordeel tegenkracht (klantlabel positiebreuk) is hier goed: de kop viert wat het merk afwijst."
+    },
+    {
+      "id": "T14",
+      "naam": "Stelwerk: samenwerking en ervaring zonder bewijs",
+      "soort": "tekstscore",
+      "input": {
+        "merkarchitectuur_ref": null,
+        "merkarchitectuur": {
+          "merk": "Stelwerk",
+          "branche": "ERP-advies, maakindustrie",
+          "wie": "Onafhankelijk adviesbureau voor bedrijfssoftware in de maakindustrie.",
+          "doel": "Dat maakbedrijven software kiezen die over tien jaar nog past bij hoe ze werken.",
+          "wat_anders": "Elke opdracht begint met twee weken meelopen op de werkvloer, nog vóór er een offerte ligt. Daarna een keuzerapport met drie opties, inclusief de optie om niets te kopen.",
+          "niet_in_geloven": "Dat je software kiest op wat een systeem kan in plaats van op wat het bedrijf nodig heeft.",
+          "regels": "Wij hebben geen resellercontracten en ontvangen nooit commissie van softwareleveranciers, ook al verdienen concurrenten daar de helft van hun marge mee.",
+          "bewijsvelden": [
+            "Openbare verklaring zonder leverancierscontracten op de website",
+            "Keuzerapport met altijd de optie 'niets kopen'",
+            "Twee weken meelopen op de werkvloer als vaste eerste stap",
+            "Cases waarin we adviseerden het bestaande systeem te houden"
+          ]
+        },
+        "kanaal": "LinkedIn",
+        "tekst": "Wij werken met een ERP-leverancier samen — en we hebben bewust geen resellercontract getekend. Geen commissie, geen verkoopquota, geen reden om iets aan te raden dat voor ons rendeert.\n\nWat we wél hebben: jaren ervaring met hoe dit systeem zich gedraagt als het echt wordt ingezet. Niet in een demo, maar in een maakbedrijf met legacy-data, wisselende orderstromen en een IT-afdeling van twee man.\n\nDat verschil is niet klein. Een leverancier verkoopt mogelijkheden. Wij stellen eerst de vraag wat een bedrijf over tien jaar nodig heeft — en kijken dan of dit systeem daarbij past. Soms is het antwoord ja. Soms ook niet.\n\nDie afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt."
+      },
+      "verwacht_oordeel": "zwak",
+      "score_min": 20,
+      "score_max": 60,
+      "verplichte_signalen": [
+        "proof_gap op 'Wij werken met een ERP-leverancier samen' of op 'jaren ervaring met hoe dit systeem zich gedraagt'"
+      ],
+      "verboden_signalen": [
+        "geen risico_flag op de openingszin",
+        "oordeel sterk",
+        "hoofdoordeel regelbreuk",
+        "gebruikt methodische term in klantoutput (archetype, Foe, Story Triangle, contextprofiel, held, gids)"
+      ],
+      "valkuil": true,
+      "herkomst": "testmerken ronde 5 (v1.10)",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Er is geen resellercontract, dus geen regelbreuk. Maar de tekst neemt een samenwerking aan die het merk niet heeft en verzint ervaring. Een adviseur die zich aan één systeem verbindt, ondergraaft het keuzerapport met drie opties."
+    },
+    {
+      "id": "V01",
+      "naam": "Duinroos: verleidingsthema wachtlijst weggewerkt",
+      "soort": "verleidingsthema",
+      "input": {
+        "merkarchitectuur": {
+          "merk": "Duinroos Thuiszorg",
+          "branche": "thuiszorg, ouderen",
+          "wie": "Thuiszorgorganisatie in Kennemerland met circa 300 medewerkers.",
+          "doel": "Dat ouderen thuis baas blijven over hun eigen dag.",
+          "wat_anders": "Kleine vaste teams van hoogstens zes zorgverleners per wijk maken zelf de planning, samen met de cliënt, en passen die aan als de dag van de cliënt anders loopt.",
+          "niet_in_geloven": "Dat het zorgrooster mag bepalen hoe de dag van een cliënt eruitziet.",
+          "regels": "Een cliënt krijgt nooit meer dan vier verschillende zorgverleners per maand over de vloer, ook als we daarvoor een nieuwe cliënt moeten doorverwijzen.",
+          "bewijsvelden": [
+            "Maandelijks gepubliceerd gemiddelde aantal zorgverleners per cliënt",
+            "Teams van hoogstens zes per wijk",
+            "Planning samen met de cliënt, niet door een centrale planner",
+            "Aantal doorverwijzingen omdat een team vol zat"
+          ]
+        },
+        "thema": "Wachtlijst in één maand weggewerkt"
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "themePremisse herkend",
+        "schrijft over de regel: waarom doorverwijzen in plaats van wegwerken",
+        "gebruikt alleen feiten uit de merkarchitectuur, bewijsvelden of research"
+      ],
+      "verboden_signalen": [
+        "beweert dat de wachtlijst is opgelost of weggewerkt",
+        "vervangt alleen het middel en houdt het resultaat uit het thema",
+        "verzint aantallen, cliënten of handelingen"
+      ],
+      "valkuil": true,
+      "herkomst": "testmerken ronde 5 (v1.10)",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Test de premissecheck in de schrijver. Goed: 'We hebben een wachtlijst. Daarom hebben we vorige maand twee nieuwe aanvragen doorverwezen. Liever dat dan een vijfde gezicht aan de deur.' Fout: hetzelfde resultaat met een ander middel. Nieuw soort geval: Erik koppelt het aan de V0-verleidingstest."
+    },
+    {
+      "id": "S05",
+      "naam": "Brandpunt: hint vraagt om feit",
+      "soort": "schrijfadvies",
+      "input": {
+        "merkarchitectuur": {
+          "merk": "Brandpunt Koffie",
+          "branche": "koffiebranderij, specialty coffee",
+          "wie": "Koffiebranderij met eigen winkel en webshop in Utrecht, 6 medewerkers.",
+          "doel": "Dat mensen koffie drinken waarvan ze de smaak echt proeven, en weten waar die smaak vandaan komt.",
+          "wat_anders": "We branden in kleine partijen per herkomst, zetten op elke zak de branddatum en de boer, en leggen in de winkel bij elke koffie uit wat je proeft en waarom.",
+          "niet_in_geloven": "Dat koffie brandstof is die overal hetzelfde mag smaken.",
+          "regels": "Wij verkopen geen koffie die langer dan zes weken geleden is gebrand, ook niet met korting. Wat over is, gaat naar de buurtvoedselbank of wordt weggegooid.",
+          "bewijsvelden": [
+            "Branddatum en boer op elke zak",
+            "Proefochtend elke eerste donderdag van de maand",
+            "Overzicht per maand van niet verkochte en afgevoerde kilo's op de website",
+            "Vaste afnemers bij drie boeren in Huila, Colombia"
+          ]
+        },
+        "concepttekst": "Koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Ook niet met korting. Ook niet op Black Friday. Black Friday laat precies zien wat er gebeurt als prijs het enige argument is. Wij geloven dat er mensen zijn die dat ook zien."
+      },
+      "verwacht_oordeel": "zie verplichte signalen",
+      "score_min": null,
+      "score_max": null,
+      "verplichte_signalen": [
+        "precies_een_aanwijzing",
+        "invulveld met specifieke beschrijving waar een feit ontbreekt",
+        "voorbeeld uit bewijsveld (bv. kilo's per maand naar de voedselbank)",
+        "hoogstens twee invulvelden"
+      ],
+      "verboden_signalen": [
+        "herschrijving bevat een aantal, naam, handeling of belofte die niet in tekst, bewijsvelden of research staat",
+        "invulveld zonder beschrijving van het gezochte feit"
+      ],
+      "valkuil": true,
+      "herkomst": "testmerken ronde 5 (v1.10)",
+      "status": "bevestigd door Rogier, 15 oktober 2026",
+      "toelichting": "Een hint mag een tekst concreter maken, maar alleen met feiten die het merk heeft. Feiten uit de bewijsvelden mogen wel, bijvoorbeeld de proefochtend op de eerste donderdag van de maand. Ontbreekt een feit, dan vraagt de hint erom met een invulveld."
+    }
+  ],
+  "definities": {
+    "zwak": "De tekst of architectuur breekt iets af voor het merk.",
+    "neutraal": "Draagt niet bij, maar breekt niets af (basisniveau van de branche, service, engagement).",
+    "regelbreuk": "Alleen als de regel zelf wordt overtreden. Tegenspraak met wat_anders of niet_in_geloven valt onder tegenkracht.",
+    "risico_flag in mag niet": "Alleen een flag op de kernbewering (kop of openingszin) telt als fout; flags elders mogen.",
+    "architectuurpoort": "Zolang de merkarchitectuur niet volledig en goed is ingevuld, maakt de app geen content en staat de meetlat niet aan. Volledig: alle velden gevuld, ook tegenkracht en regel. Goed: elke dimensie van de architectuurcheck is minstens voldoende (meetlat_klaar). Met één of meer dimensies op aanscherpen blokkeert de app, maar geeft altijd eerst het inhoudelijke oordeel en concreet advies. Een leeg veld is een bevinding in het oordeel, geen reden om de check niet te draaien.",
+    "hoofdoordeel_volgorde": "Bij meerdere flags bepaalt de zwaarste het hoofdoordeel: 1) regelbreuk (echte regelovertreding, constraint_breach); 2) tegenkracht, klantlabel positiebreuk (foe_vervaging op de kop of openingszin); 3) categorietaal (kern is categorietaal, ook bij foe_vervaging in een bijzin); 4) op_merk of neutraal.",
+    "contentrol": "Contentrol is wat de post de lezer laat doen of zien. Ijk-signalen gebruiken de namen uit de app: educatie, employer_culture, community, activatie, service, bewijs, positionering, reactief.",
+    "positiebreuk": "Klantlabel voor hoofdoordeel tegenkracht: de tekst gaat in tegen waar het merk voor staat, door de logica over te nemen van waar het merk zich tegen afzet (foe_vervaging) of door het eigen onderscheid tegen te spreken (T12). Uitleg in de app: \"Deze tekst gaat in tegen waar je merk voor staat.\" Intern blijft de waarde tegenkracht. Een tekst die zich tegen de tegenkracht keert, is op_merk. Paar met regelbreuk: regelbreuk breekt de regel, positiebreuk breekt de positie."
+  }
+}

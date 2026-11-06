@@ -1,0 +1,29 @@
+# LinkedIn Scan — afscherming (LiteSpeed / Apache)
+# Publiek: index.php, scan.php, report.php, forgot/reset-password.php, migrate.php, assets/
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Gevoelige mappen (api/ alleen via require — geen HTTP)
+  RewriteRule ^(output|fixtures|scripts|sql|includes|api)(/|$) - [F,L]
+
+  # Documentatie / schema / fixtures / voorbeelden
+  RewriteRule \.(md|sql|json|example)$ - [F,L]
+
+  # Git / verborgen
+  RewriteRule (^|/)\.git - [F,L]
+  RewriteRule (^|/)\.gitignore$ - [F,L]
+</IfModule>
+
+# Fallback zonder rewrite (FilesMatch geldt alleen bestanden in dezelfde map)
+<FilesMatch "\.(md|sql|json|example)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</FilesMatch>

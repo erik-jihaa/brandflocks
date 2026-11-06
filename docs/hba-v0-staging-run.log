@@ -1,0 +1,247 @@
+==> V0.1 CE-04 post 3 (trigger, daarna feedback poll)…
+    wacht 90s op CE-04 (n8n)…
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.3 Brandpunt Koffie (bestaand slot) slot d733223a-7964-4324-9883-dcd4b1809006
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot eefc37b8-02af-4372-94d2-8c2edcd1ffd1, CE-02 triggered=True
+==> V0.3 Stelwerk (nieuw fastlane) slot eefc37b8-02af-4372-94d2-8c2edcd1ffd1
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot 056c70f5-524c-45f3-942a-7aa313c48f7f, CE-02 triggered=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot 056c70f5-524c-45f3-942a-7aa313c48f7f
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-12 07:10:23 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.7",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "031d144b-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "0d7cb7f8-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "123451f6-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 156,
+      "selfReview": null,
+      "hbaHint": null,
+      "contentExcerpt": "Vandaag wordt koffie massaal weggegeven als kortingsartikel. Geen verhaal, geen herkomst, geen reden — gewoon een lagere prijs op iets wat toch al goedkoop werd ingekocht.\n\nWij doen daar niet aan mee.\n\nNiet omdat wij de korting niet kunnen geven, maar omdat korting om de korting precies het tegenovergestelde zegt van wat wij geloven. Koffie heeft een prijs omdat er mensen aan hebben gewerkt, op een plek die je kunt aanwijzen op een kaart, met een methode die het verschil maakt in wat je proeft.\n",
+      "hbaScore": {
+        "hoofdoordeel": null,
+        "flags": null,
+        "brandContribution": null
+      }
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 0,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "eefc37b8-02af-4372-94d2-8c2edcd1ffd1",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 8,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 101,
+      "selfReview": null,
+      "hbaHint": null,
+      "contentExcerpt": "We gaan samenwerken met een ERP-leverancier. Dat zegt op zich weinig.\n\nDe ERP-markt zit vol met partnerships die eigenlijk verkoopkanalen zijn. Een mooie demo, een handdruk, en hopen dat het past. Maakbedrijven staan onder druk: de cloud, nieuwe spelers, migraties — de keuze wordt er niet eenvoudiger op.\n\nDaarom beginnen wij bij een andere vraag. Niet: wat kan dit systeem? Maar: past dit bij hoe jij over tien jaar werkt?\n\nSoms is het antwoord ja. Soms ook niet. Dat zeggen we dan gewoon.\n\nDat is ",
+      "hbaScore": {
+        "hoofdoordeel": null,
+        "flags": null,
+        "brandContribution": null
+      }
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "056c70f5-524c-45f3-942a-7aa313c48f7f",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 8,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 166,
+      "selfReview": null,
+      "hbaHint": null,
+      "contentExcerpt": "Wachtlijsten in de ouderenzorg zijn groot nieuws. Maar wachten hoeft geen gegeven te zijn.\n\nVorige maand stonden er mensen op onze lijst die al te lang thuis zaten zonder de hulp die ze nodig hadden. Niet omdat ze niet in aanmerking kwamen. Niet omdat er geen zorgvraag was. Maar omdat het systeem zijn eigen tempo had.\n\nWij besloten dat tempo los te laten.\n\nIn vier weken hebben we die wachtlijst weggewerkt. Niet met een plan of een traject, maar gewoon door het te doen: planningen opnieuw ingedee",
+      "hbaScore": {
+        "hoofdoordeel": null,
+        "flags": null,
+        "brandContribution": null
+      }
+    }
+  ]
+}

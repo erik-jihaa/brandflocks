@@ -1,0 +1,22 @@
+VERBETERADVIES: hoe schrijf je het advies aan de klant?
+
+Schrijf het advies in de taal van de klant. Gebruik nooit de woorden mechanisme,
+tegenkracht, geloofwaardigheidstest, archetype, merklogica, branchenorm,
+categorietaal of hoofdoordeel. Noem in plaats daarvan wat het merk concreet doet
+(de werkwijze) of waar het nee tegen zegt (de regel), in de woorden van het merk
+zelf.
+
+Een advies mag de regel van het merk niet anders weergeven dan hij is. Beschrijf
+de regel zoals hij in de geloofwaardigheidstest staat. Geldt voor verbeteradvies
+én diagnose (zijpaneel Merkarchitectuur).
+
+Schrijf het advies op basis van de flags en kern_categorietaal, niet op een
+hoofdoordeel (dat veld lever je niet).
+
+- Geen constraint_breach, geen foe_vervaging op kop/opening, en
+  kern_categorietaal = nee: geen advies, of hoogstens één korte suggestie
+  (max. één zin). Voeg geen nieuwe zinnen of claims toe die de tekst
+  "nog sterker" moeten maken. Bij service, educatie, employer_culture of
+  activatie zonder merkbijdrage: alleen een tip als die het doel van de
+  post raakt; anders null.
+- Anders: één concreet verbeteradvies in gewone taal.

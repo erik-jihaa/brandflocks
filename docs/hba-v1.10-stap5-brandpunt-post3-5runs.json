@@ -1,0 +1,52 @@
+{
+  "promptVersion": "v1.10.2",
+  "merk": "Brandpunt Koffie",
+  "index": 3,
+  "post_tekst": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+  "runs": 5,
+  "goed": 5,
+  "functionele_flag_hits": 0,
+  "uitleg_zes_weken": 5,
+  "rows": [
+    {
+      "run": 1,
+      "judgment": "goed",
+      "hoofdoordeel": "regelbreuk",
+      "flags": ["constraint_breach", "foe_vervaging"],
+      "citaat": "alle zakken van twee maanden geleden voor de halve prijs",
+      "uitleg": "Het merk verkoopt hier koffie die twee maanden geleden is gebrand met korting, terwijl de regel zegt dat het merk geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting."
+    },
+    {
+      "run": 2,
+      "judgment": "goed",
+      "hoofdoordeel": "regelbreuk",
+      "flags": ["constraint_breach", "foe_vervaging"],
+      "citaat": "alle zakken van twee maanden geleden voor de halve prijs",
+      "uitleg": "Het merk verkoopt hier koffie die twee maanden geleden is gebrand met korting, terwijl de regel zegt dat het merk geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting."
+    },
+    {
+      "run": 3,
+      "judgment": "goed",
+      "hoofdoordeel": "regelbreuk",
+      "flags": ["constraint_breach", "foe_vervaging"],
+      "citaat": "alle zakken van twee maanden geleden voor de halve prijs",
+      "uitleg": "Het merk verkoopt hier koffie die twee maanden geleden is gebrand met korting, terwijl de regel zegt dat koffie die langer dan zes weken geleden is gebrand niet wordt verkocht — ook niet met korting."
+    },
+    {
+      "run": 4,
+      "judgment": "goed",
+      "hoofdoordeel": "regelbreuk",
+      "flags": ["constraint_breach", "foe_vervaging"],
+      "citaat": "alle zakken van twee maanden geleden voor de halve prijs",
+      "uitleg": "Het merk verkoopt hier koffie die twee maanden geleden is gebrand met korting, terwijl de regel zegt dat koffie ouder dan zes weken niet wordt verkocht — ook niet met korting — maar naar de voedselbank gaat of wordt weggegooid."
+    },
+    {
+      "run": 5,
+      "judgment": "goed",
+      "hoofdoordeel": "regelbreuk",
+      "flags": ["constraint_breach", "foe_vervaging"],
+      "citaat": "alle zakken van twee maanden geleden voor de halve prijs",
+      "uitleg": "Het merk verkoopt koffie die twee maanden geleden is gebrand met korting, terwijl de regel zegt dat koffie die langer dan zes weken geleden is gebrand niet wordt verkocht — ook niet met korting."
+    }
+  ]
+}

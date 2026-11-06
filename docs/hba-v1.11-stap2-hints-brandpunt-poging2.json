@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-10-18 11:37:33 UTC",
+  "attempt": 2,
+  "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+  "okCount": 0,
+  "pass": false,
+  "runs": [
+    {
+      "run": 1,
+      "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+      "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die afwijkt van de regel zoals die geldt: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. Pas die zin aan zodat hij de regel weergeeft zoals die werkelijk is. Daarna is de passage het sterkst als er een concreet getal bij staat — hoeveel kilo er vorige maand naar de voedselbank ging maakt de regel tastbaar op precies het moment dat de lezer hem leest.",
+      "regelOvertreden": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' stelt een grens die de regel van het merk niet weergeeft zoals die luidt. De regel is: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. De zin in de tekst beschrijft een andere grens en is daarmee geen uitwerking van de regel maar een afwijking ervan.",
+      "passageNa": "Wij concurreren niet op prijs. Dat is geen hoogmoed; het is eerlijkheid over wat wij maken en voor wie. Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank — [hoeveel kilo er vorige maand is afgevoerd]. Wat u koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+      "ctaNa": null,
+      "ok": false,
+      "derivedBoundary": true,
+      "mentionsZesWeken": true,
+      "literalZesWeken": true,
+      "reasons": [
+        "afgeleide grens (nadert/rond/bijna/grens van zes weken)"
+      ]
+    },
+    {
+      "run": 2,
+      "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+      "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie die langer dan zes weken geleden is gebrand niet wordt verkocht. Pas die zin aan zodat hij de werkelijke regel weergeeft, en voeg op diezelfde plek een concreet getal toe dat de regel tastbaar maakt, bijvoorbeeld hoeveel kilo er vorige maand naar de voedselbank ging.",
+      "regelOvertreden": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' stelt een grens die afwijkt van de geloofwaardigheidstest. De regel luidt: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. De tekst beschrijft een andere grens en geeft daarmee een onjuist beeld van wat het merk doet.",
+      "passageNa": "Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank — [hoeveel kilo er vorige maand is afgevoerd naar de voedselbank, zoals bijgehouden op de website]. Wat u koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+      "ctaNa": null,
+      "ok": false,
+      "derivedBoundary": true,
+      "mentionsZesWeken": true,
+      "literalZesWeken": true,
+      "reasons": [
+        "afgeleide grens (nadert/rond/bijna/grens van zes weken)"
+      ]
+    },
+    {
+      "run": 3,
+      "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+      "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie die langer dan zes weken geleden is gebrand niet verkocht wordt. Pas die zin aan zodat hij de werkelijke regel weergeeft, en voeg op diezelfde plek een concreet getal toe dat de regel tastbaar maakt, bijvoorbeeld hoeveel kilo er vorige maand naar de voedselbank ging.",
+      "regelOvertreden": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' stelt een grens die afwijkt van de geloofwaardigheidstest. De regel luidt: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. De tekst beschrijft een andere grens en geeft daarmee een onjuist beeld van wat het merk doet.",
+      "passageNa": "Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. [Hoeveel kilo er vorige maand niet verkocht is en afgevoerd, zoals bijgehouden op de website.] Wat u koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+      "ctaNa": null,
+      "ok": false,
+      "derivedBoundary": true,
+      "mentionsZesWeken": true,
+      "literalZesWeken": true,
+      "reasons": [
+        "afgeleide grens (nadert/rond/bijna/grens van zes weken)"
+      ]
+    },
+    {
+      "run": 4,
+      "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+      "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie die langer dan zes weken geleden is gebrand niet wordt verkocht. Pas die zin aan zodat hij de werkelijke regel weergeeft, en voeg een concreet getal toe dat de regel tastbaar maakt, bijvoorbeeld hoeveel kilo er vorige maand naar de voedselbank ging.",
+      "regelOvertreden": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' stelt een grens die afwijkt van de geloofwaardigheidstest. De regel luidt: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. De tekst beschrijft een andere grens en geeft daarmee een onjuist beeld van wat het merk doet.",
+      "passageNa": "Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. [Hoeveel kilo er vorige maand naar de voedselbank is gegaan — dat cijfer houden jullie al bij op de website.] Wat u koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+      "ctaNa": null,
+      "ok": false,
+      "derivedBoundary": true,
+      "mentionsZesWeken": true,
+      "literalZesWeken": true,
+      "reasons": [
+        "afgeleide grens (nadert/rond/bijna/grens van zes weken)"
+      ]
+    },
+    {
+      "run": 5,
+      "articleId": "fa79e799-c710-11f1-9456-9c6b00b7cd02",
+      "aanwijzing": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' beschrijft een grens die het merk niet hanteert — de regel is dat koffie niet verkocht wordt die langer dan zes weken geleden is gebrand. Pas die zin aan zodat hij de werkelijke regel weergeeft, en voeg op diezelfde plek een concreet getal toe dat de regel tastbaar maakt, bijvoorbeeld hoeveel kilo er vorige maand naar de voedselbank ging.",
+      "regelOvertreden": "De zin 'koffie die de zes weken na het branden nadert, verkopen wij niet' stelt een grens die afwijkt van de werkelijke regel. De regel luidt: wij verkopen geen koffie die langer dan zes weken geleden is gebrand. De tekst beschrijft een andere grens en geeft daarmee een onjuist beeld van wat het merk doet.",
+      "passageNa": "Een kilo Brandpunt-koffie kost meer dan een kilo supermarktkoffie. Dat verschil zit in één keuze die geld kost: koffie die langer dan zes weken geleden is gebrand, verkopen wij niet. Die gaat naar de voedselbank. [Hoeveel kilo er vorige maand niet verkocht is en is afgevoerd — dit cijfer staat al op de website.] Wat u koopt, is altijd binnen die grens gebrand — niet omdat wij dat beloven, maar omdat er geen andere koffie meer in ons magazijn staat. Wie dat niet relevant vindt, heeft alle reden om elders te kopen. Wie dat wél relevant vindt, weet nu waarom wij vandaag geen aanbieding doen.",
+      "ctaNa": null,
+      "ok": false,
+      "derivedBoundary": true,
+      "mentionsZesWeken": true,
+      "literalZesWeken": true,
+      "reasons": [
+        "afgeleide grens (nadert/rond/bijna/grens van zes weken)"
+      ]
+    }
+  ]
+}

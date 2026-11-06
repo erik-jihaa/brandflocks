@@ -1,0 +1,23 @@
+[
+    {
+        "postId": "123",
+        "text": "Codam College post over software engineering en peer learning.",
+        "publishedAt": "2026-06-04T17:07:43.292Z",
+        "author": {
+            "name": "Codam College",
+            "url": "https://www.linkedin.com/school/codamcollege/",
+            "type": "company",
+            "profile": {
+                "followerCount": 4200
+            }
+        },
+        "engagement": {
+            "reactionCount": 42,
+            "commentCount": 3
+        },
+        "media": {
+            "imageUrls": ["https://media.licdn.com/example.jpg"],
+            "video": null
+        }
+    }
+]

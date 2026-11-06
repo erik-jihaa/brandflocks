@@ -1,0 +1,28 @@
+# Uploads zijn data, nooit code.
+<FilesMatch "\.(php|php[0-9]|phtml|phar|pl|py|cgi|sh|htaccess)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+RemoveHandler .php .phtml .phar
+RemoveType .php .phtml .phar
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+
+    # Nieuwe SVG-logo's worden geweigerd, maar bestaande bestanden moeten blijven
+    # renderen. Deze CSP blokkeert script als het bestand direct wordt geopend;
+    # 'sandbox' staat er bewust niet bij, want dat breekt <img src="…svg">.
+    <FilesMatch "\.svgz?$">
+        Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'"
+    </FilesMatch>
+</IfModule>

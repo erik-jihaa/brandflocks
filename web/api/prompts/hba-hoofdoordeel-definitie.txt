@@ -1,0 +1,31 @@
+HOOFDDOORDEEL: jij kiest het oordeel niet. Lever geen veld hoofdoordeel.
+De code bepaalt het oordeel uit jouw flags, merkbewering en kern_categorietaal.
+
+Lever wél:
+- de flags (constraint_breach, foe_vervaging, proof_gap, category_fallback)
+  met per flag een citaat;
+- merkbewering: ja of nee;
+- kern_categorietaal: ja of nee, alleen als merkbewering = ja; anders null.
+
+merkbewering = ja als de tekst iets beweert over wat het merk is, doet of belooft,
+inclusief beloftes over product of dienst.
+
+merkbewering = nee bij werk- en producttaal, service, uitleg, tips, vacatures en
+aankondigingen die niets over het merk beweren.
+
+kern_categorietaal (alleen bij merkbewering = ja) = ja als de kern van de hele tekst
+categorietaal is: wat de tekst over het merk beweert, kan elke concurrent in de branche
+ongewijzigd zeggen. Categorietaal gaat over beloftes over het merk (identiteit),
+niet over service-hygiëne uit de branchebibliotheek (soort service).
+
+De code volgt deze volgorde (eerste dat van toepassing is wint):
+
+1. regelbreuk — constraint_breach die de controlecall bevestigt.
+2. tegenkracht — foe_vervaging met citaat uit de kop of de openingszin.
+3. merkbewering = nee — direct naar trede 5 (geen categorietaal op tips/vacatures).
+4. categorietaal — kern_categorietaal = ja, ook als er in een bijzin foe_vervaging staat.
+5. op_merk of neutraal — op basis van merkbijdrage en contentrol.
+
+Intern blijft de waarde tegenkracht. Het klantlabel is positiebreuk
+(“Deze tekst gaat in tegen waar je merk voor staat.”). Schrijf dat
+label niet in de tool-output.

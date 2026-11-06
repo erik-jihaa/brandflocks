@@ -1,0 +1,264 @@
+==> V0.1 CE-04 post 3 (trigger, daarna feedback poll)…
+    wacht 90s op CE-04 (n8n)…
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.3 Brandpunt Koffie (bestaand slot) slot d733223a-7964-4324-9883-dcd4b1809006
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot ee5a00a5-f2d5-494b-94e5-7cf642b86387, CE-02 triggered=True
+==> V0.3 Stelwerk (nieuw fastlane) slot ee5a00a5-f2d5-494b-94e5-7cf642b86387
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot d75b191c-9277-44f2-a472-fc815d26dff6, CE-02 triggered=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot d75b191c-9277-44f2-a472-fc815d26dff6
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-12 13:24:20 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.8.1",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "f1383ec5-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "f955dff7-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": false,
+          "httpCode": 500,
+          "error": "{\"message\":\"Error in workflow\"}"
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "ff6077fa-c60c-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen (controleer n8n-run).",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 156,
+      "selfReview": {
+        "weakestClaim": "Koffie heeft een prijs omdat er mensen aan hebben gewerkt, op een plek die je kunt aanwijzen op een kaart, met een methode die het verschil maakt in wat je proeft.",
+        "unsupportedAssumption": "Het artikel stelt dat klanten koffie kopen omdat ze weten wat ze krijgen — niet omdat het goedkoper is. Dit is een aanname over koopmotivatie die nergens uit research volgt; het model vult zelf in wat de klant drijft.",
+        "missedCounterpoint": "Er zijn geen research-items gekoppeld, dus er is geen tegengeluid uit de research om te verwerken.",
+        "regelbreuk": null
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": false,
+        "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+        "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+        "articleId": "5985b0ca-c60c-11f1-9456-9c6b00b7cd02",
+        "hint": null,
+        "code": null,
+        "error": "invalid x-api-key",
+        "architectureFootnote": null
+      },
+      "hbaHint": null,
+      "contentExcerpt": "Vandaag wordt koffie massaal weggegeven als kortingsartikel. Geen verhaal, geen herkomst, geen reden — gewoon een lagere prijs op iets wat toch al goedkoop werd ingekocht.\n\nWij doen daar niet aan mee.\n\nNiet omdat wij de korting niet kunnen geven, maar omdat korting om de korting precies het tegenovergestelde zegt van wat wij geloven. Koffie heeft een prijs omdat er mensen aan hebben gewerkt, op een plek die je kunt aanwijzen op een kaart, met een methode die het verschil maakt in wat je proeft.\n",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": [
+          "proof_gap"
+        ],
+        "brandContribution": 7.5
+      }
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 0,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "ee5a00a5-f2d5-494b-94e5-7cf642b86387",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "d75b191c-9277-44f2-a472-fc815d26dff6",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    }
+  ]
+}

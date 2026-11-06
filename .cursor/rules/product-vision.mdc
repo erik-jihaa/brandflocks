@@ -1,0 +1,51 @@
+---
+description: Strategisch kompas — raadpleeg bij grote wijzigingen (features, schermen, onboarding)
+alwaysApply: true
+---
+
+# Content Engine — productvisie
+
+**Bron:** `briefing/product-vision.md` — lees dit bestand bij **grote wijzigingen**:
+nieuwe features, schermherontwerp, onboarding-flow, Strategy/Account/Report-uitbreidingen, of wijzigingen die de CE-workflows (CE-01 t/m CE-07) raken.
+
+## Wanneer verplicht raadplegen
+
+- Nieuwe schermen of grote UX-wijzigingen aan bestaande schermen
+- Nieuwe databasevelden of klantconfiguratie (Strategy, Account)
+- Wijzigingen aan Home nextAction, onboarding of week-gating
+- Report-KPI's, contentpijlers, doelgroep, kernboodschap
+- Features die niet duidelijk bij de tien strategische basisvragen passen
+
+## Kompas (kort)
+
+De Content Engine bouwt **herkenbare merken** — niet losse AI-posts. Elk voorstel moet minstens één van de tien vragen uit `product-vision.md` **versterken of beter toepassen**:
+
+> Waarom posten we — voor wie — met welke boodschap — op welke kanalen — in welke vorm — hoe vaak — door wie — en hoe meten we succes?
+
+**Afwijzen of uitstellen** als een feature geen van deze vragen beter beantwoordt.
+
+## Mapping naar huidige app (check product-vision.md voor details)
+
+| Vraag | Huidige velden / schermen |
+|-------|---------------------------|
+| 1 Doel | `brand_goal` (Strategy) |
+| 2 Doelgroep | impliciet in tone; **nog geen apart veld** |
+| 3 Content voor doelgroep | `writing_guide`, research like/forget |
+| 4 Merkpersoonlijkheid | `archetype`, `archetype_traits` |
+| 5 Kernboodschap | `adversary`, `brand_goal` |
+| 6 Kanalen | `default_platform`, platform per artikel |
+| 7 Contentpijlers | impliciet via `phase_key` / Angle — **nog geen apart veld** |
+| 8 Ritme | `posts_per_week`, week-gating, `contact_role` |
+| 9 Succes | Report (CE-07); KPI nog niet gekoppeld aan doel |
+| 10 Spelregels | `writing_guide` (Schrijfwijzer) |
+
+## Documenthiërarchie
+
+| Document | Rol |
+|----------|-----|
+| `briefing/product-vision.md` | **Strategisch kompas** (grote wijzigingen) |
+| `briefing/Build-briefing-Content-Engine.docx` | Functionele specs (§-secties) |
+| `docs/BUILD-NOTES.md` | Bouwstatus, inzichten, changelog |
+| `.cursor/rules/content-engine-design.mdc` | UI-tokens en layout |
+
+Bij conflict: productvisie wint op **richting en prioriteit**; build-briefing op **gedetailleerde UI/API-spec**.

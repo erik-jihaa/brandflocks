@@ -1,0 +1,543 @@
+==> V0.1 CE-04 post 3 (trigger, daarna feedback poll)…
+    wacht 90s op CE-04 (n8n)…
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot f6a4c75c-8607-4af1-8d0d-9be4b172f502, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Stelwerk (nieuw fastlane) slot f6a4c75c-8607-4af1-8d0d-9be4b172f502
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot 9d3db1c6-04df-4595-8e5d-d509a55da768, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot 9d3db1c6-04df-4595-8e5d-d509a55da768
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-18 22:36:50 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.11",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "8c576c9a-49bb-45b4-81e2-4ec8a41c31b0",
+        "articleId": "d0e73a13-041a-4098-a08f-2687e6cbe534",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "90c4c9fb-162a-402f-b729-ff74d2db4202",
+        "articleId": "3d3123f8-1759-4b82-afbe-8cf803c7c024",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "8d849c19-b447-4b47-9ab9-8fa2aa047048",
+        "articleId": "5e95b384-3432-462d-a600-132da0384cd1",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "8c576c9a-49bb-45b4-81e2-4ec8a41c31b0",
+        "articleId": "d0e73a13-041a-4098-a08f-2687e6cbe534",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 5,
+        "regelFeedback": [
+          {
+            "id": "72f4f62d-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+            "status": "open"
+          },
+          {
+            "id": "72f5002b-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit is inhoudelijk strijdig met de merkregel (zie regelbreuk). Los van de regelkwestie: de formulering 'van twee maanden geleden' is ook als verkoopargument zwak — het benoemt een nadeel zonder enige framing.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "alle zakken van twee maanden geleden",
+            "status": "open"
+          }
+        ],
+        "feedbackSample": [
+          {
+            "id": "72f4f62d-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je geen koffie verkoopt die langer dan zes weken geleden is gebrand, ook niet met korting.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "Black Friday: alle zakken van twee maanden geleden voor de halve prijs!",
+            "status": "open"
+          },
+          {
+            "id": "72f4fc2a-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "De post is identiek aan de AI-tekst. Er is geen menselijke bewerking zichtbaar — overweeg of er inhoudelijk iets aangepast of toegevoegd had moeten worden voor publicatie.",
+            "actionLabel": "Verwijderen",
+            "excerpt": null,
+            "status": "open"
+          },
+          {
+            "id": "72f5002b-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit is inhoudelijk strijdig met de merkregel (zie regelbreuk). Los van de regelkwestie: de formulering 'van twee maanden geleden' is ook als verkoopargument zwak — het benoemt een nadeel zonder enige framing.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "alle zakken van twee maanden geleden",
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "90c4c9fb-162a-402f-b729-ff74d2db4202",
+        "articleId": "3d3123f8-1759-4b82-afbe-8cf803c7c024",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 5,
+        "regelFeedback": [
+          {
+            "id": "7c55db7d-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je wachtlijsten nooit wegwerkt door invalkrachten in te zetten, ook niet als dat betekent dat je een nieuwe cliënt moet doorverwijzen.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+            "status": "open"
+          },
+          {
+            "id": "7c55e4db-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit is de kern van de regelbreuk — zie regelbreuk-veld. Los van de merkregel beschrijft de tekst een werkwijze die het vertrouwen van cliënten ondermijnt: vreemde gezichten aan de deur is precies wat Duinroos wil voorkomen.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "door de inzet van invalkrachten uit het uitzendbureau",
+            "status": "open"
+          }
+        ],
+        "feedbackSample": [
+          {
+            "id": "7c55db7d-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je wachtlijsten nooit wegwerkt door invalkrachten in te zetten, ook niet als dat betekent dat je een nieuwe cliënt moet doorverwijzen.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!",
+            "status": "open"
+          },
+          {
+            "id": "7c55e4db-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit is de kern van de regelbreuk — zie regelbreuk-veld. Los van de merkregel beschrijft de tekst een werkwijze die het vertrouwen van cliënten ondermijnt: vreemde gezichten aan de deur is precies wat Duinroos wil voorkomen.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "door de inzet van invalkrachten uit het uitzendbureau",
+            "status": "open"
+          },
+          {
+            "id": "7c55e8b4-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "De tekst spreekt over zichzelf ('we') en over een operationeel resultaat. Dat is het tegenovergestelde van de schrijfwijzer: spreek over de cliënt, niet over de organisatie. Een wachtlijst is bovendien geen prestatie om mee te adverteren.",
+            "actionLabel": "Herschrijven",
+            "excerpt": "hebben we onze wachtlijst in een maand weggewerkt!",
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "8d849c19-b447-4b47-9ab9-8fa2aa047048",
+        "articleId": "5e95b384-3432-462d-a600-132da0384cd1",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 5,
+        "regelFeedback": [
+          {
+            "id": "849d76c3-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "status": "open"
+          }
+        ],
+        "feedbackSample": [
+          {
+            "id": "849d76c3-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit stuk gaat in tegen je regel dat je nooit resellercontracten aangaat en nooit commissie ontvangt van softwareleveranciers.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "status": "open"
+          },
+          {
+            "id": "849d7eb5-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "Dit is niet alleen categorietaal — het beschrijft een concrete nieuwe status en werkwijze van het merk. Een resellerpartnerschap impliceert commerciële afhankelijkheid van een leverancier, wat de geloofwaardigheid van onafhankelijk advies direct ondergraaft.",
+            "actionLabel": "Verwijderen",
+            "excerpt": "officieel gecertificeerd resellerpartner",
+            "status": "open"
+          },
+          {
+            "id": "849d821a-cb44-11f1-84cf-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "De toon is triomfantelijk en verkoopgericht, wat haaks staat op de rustige, afgewogen stem van Stelwerk. 'Trots' als opener past bij een merk dat successen uitroept — niet bij een merk dat eerst vragen stelt en dan een oordeel geeft.",
+            "actionLabel": "Herschrijven",
+            "excerpt": "Trots:",
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": true,
+          "itemCount": 5,
+          "themeGroupCount": 1,
+          "slotTheme": "Black Friday-actie",
+          "phaseKey": "41"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 161,
+      "selfReview": {
+        "weakestClaim": "\"Dat specialty coffee ook zonder kortingsdruk blijft groeien, weten we uit de marktcijfers.\" — dit wordt onderbouwd door een GfK/NielsenIQ-item met reliability=high, maar de zinsnede 'weten we uit de marktcijfers' wekt de indruk van eigen, actuele bedrijfsdata, terwijl het externe marktonderzoek betreft. Niet onjuist, maar de presentatie als 'ons weten' is iets te zelfverzekerd voor wat external research is.",
+        "unsupportedAssumption": "\"Mensen die eenmaal letten op smaak en herkomst, blijven dat doen.\" — de research bevestigt dat specialty coffee groeit ook rondom kortingspieken, maar de aanname dat bewuste kopers structureel loyaal blijven (en dus nooit terugkeren naar bulkkoffie) volgt niet expliciet uit de research. Het model vult hier een gedragsconclusie in die de research niet letterlijk stelt.",
+        "missedCounterpoint": "Het research-item met stance=nuanceert ('De beste Black Friday-actie voor een ambachtsmerk is er geen — of toch?') wordt niet verwerkt. Dit item stelt dat het Maker-archetype juist de regels op eigen manier kan spelen — niet alleen vermijden. Het artikel presenteert het vermijden van Black Friday als de enige logische keuze, terwijl de research een legitieme spanning benoemt die het artikel negeert.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Het thema 'Black Friday-actie' verleidt de schrijver tot het aanbieden van korting op voorraad — wat de merkregel expliciet verbiedt (geen aanbiedingen of stapelkorting op oudere voorraad, en koffie ouder dan zes weken gaat naar de voedselbank of wordt afgevoerd). Bovendien neemt het thema als vanzelfsprekend aan dat Brandpunt Koffie een Black Friday-actie kán voeren met kortingen op bestaande voorraad — een premisse die niet klopt: er is geen voorraad die voor korting in aanmerking komt, want wat over is gaat weg. Een gewone kortingsfolder is hier dus structureel onmogelijk zonder de regel te breken.",
+        "themePremisse": true,
+        "themePremisseWat": "Het thema neemt aan dat Brandpunt Koffie op Black Friday korting kan geven op (oudere) voorraad, terwijl het merk geen voorraad aanhoudt die voor korting in aanmerking komt — koffie ouder dan zes weken verlaat het assortiment.",
+        "themePremisseActie": "Niet overnemen; schrijf niet over korting of een actie op voorraad. Schrijf in plaats daarvan waarom Brandpunt Koffie geen Black Friday-korting geeft, wat er wél op die dag gebeurt (bijv. de zes-wekenregel, de afvoer naar de voedselbank, de branddatum op elke zak), en wat een bewuste koper op zo'n dag anders kan doen — zoals de proefochtend of een proefpakket met herkomstverhaal.",
+        "merkBeweringen": [
+          {
+            "citaat": "Koffie die bij ons langer dan zes weken geleden is gebrand, verkopen wij niet — ook niet met korting.",
+            "bron": "merkarchitectuur"
+          },
+          {
+            "citaat": "Wat niet verkocht wordt, gaat naar de buurtvoedselbank of wordt afgevoerd.",
+            "bron": "merkarchitectuur"
+          },
+          {
+            "citaat": "Per maand, in kilo's, te lezen op onze website.",
+            "bron": "bewijsveld",
+            "steuntOp": "Wat niet verkocht wordt, gaat naar de buurtvoedselbank of wordt afgevoerd."
+          },
+          {
+            "citaat": "Wij zetten op elke zak de branddatum en de naam van de boer.",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "Op de eerste donderdag van de maand organiseren wij een proefochtend.",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "Dat specialty coffee ook zonder kortingsdruk blijft groeien, weten we uit de marktcijfers.",
+            "bron": "research"
+          }
+        ]
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+        "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+        "articleId": "d69cfc2d-cb44-11f1-84cf-9c6b00b7cd02",
+        "hint": {
+          "id": "8f28a575-c34c-4781-802b-bcbc7086bc6f",
+          "aanwijzing": "De slotzin nodigt uit om te proeven, maar laat niet zien wat er op die proefochtend concreet gebeurt — voeg een getal of gegeven toe dat de drempel verlaagt, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en afgevoerd, zodat de lezer begrijpt dat de regel ook op de drukste dag van het jaar gewoon geldt.",
+          "passageVoor": null,
+          "passageNa": null,
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": "Wil je proeven waar wij het over hebben? Op de eerste donderdag van de maand organiseren wij een proefochtend. Of kijk op onze website voor het maandoverzicht.",
+          "ctaNa": "Wil je proeven waar wij het over hebben? Op de eerste donderdag van de maand organiseren wij een proefochtend. Op de website staat ook het maandoverzicht: hoeveel kilo er niet verkocht werd en waar die naartoe ging.",
+          "regelOvertreden": null,
+          "invulvelden": [
+            "Het aantal kilo's koffie dat de afgelopen maand niet verkocht werd en naar de voedselbank ging of afgevoerd werd — dit maakt de zes-wekenregel tastbaar op precies de dag dat lezers zich afvragen of het merk een uitzondering maakt.",
+            "Hoeveel kilo er de afgelopen maand naar de voedselbank ging of afgevoerd werd."
+          ],
+          "bewijsveldBron": "Overzicht per maand van niet verkochte en afgevoerde kilo's op de website",
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "8f28a575-c34c-4781-802b-bcbc7086bc6f",
+        "aanwijzing": "De slotzin nodigt uit om te proeven, maar laat niet zien wat er op die proefochtend concreet gebeurt — voeg een getal of gegeven toe dat de drempel verlaagt, bijvoorbeeld hoeveel kilo er vorige maand niet verkocht werd en afgevoerd, zodat de lezer begrijpt dat de regel ook op de drukste dag van het jaar gewoon geldt.",
+        "passageVoor": null,
+        "passageNa": null,
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": "Wil je proeven waar wij het over hebben? Op de eerste donderdag van de maand organiseren wij een proefochtend. Of kijk op onze website voor het maandoverzicht.",
+        "ctaNa": "Wil je proeven waar wij het over hebben? Op de eerste donderdag van de maand organiseren wij een proefochtend. Op de website staat ook het maandoverzicht: hoeveel kilo er niet verkocht werd en waar die naartoe ging.",
+        "regelOvertreden": null,
+        "invulvelden": [
+          "Het aantal kilo's koffie dat de afgelopen maand niet verkocht werd en naar de voedselbank ging of afgevoerd werd — dit maakt de zes-wekenregel tastbaar op precies de dag dat lezers zich afvragen of het merk een uitzondering maakt.",
+          "Hoeveel kilo er de afgelopen maand naar de voedselbank ging of afgevoerd werd."
+        ],
+        "bewijsveldBron": "Overzicht per maand van niet verkochte en afgevoerde kilo's op de website",
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Vandaag geen Black Friday-actie van ons. Dat is geen vergissing.\n\nKoffie die bij ons langer dan zes weken geleden is gebrand, verkopen wij niet — ook niet met korting. Wat niet verkocht wordt, gaat naar de buurtvoedselbank of wordt afgevoerd. Per maand, in kilo's, te lezen op onze website. Er is dus simpelweg geen oude voorraad om vandaag op te ruimen.\n\nBlack Friday draait om prijs als reden om iets te kopen. Wij zetten op elke zak de branddatum en de naam van de boer. Dat is het verhaal dat je ",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": [
+          "proof_gap"
+        ],
+        "brandContribution": 8
+      }
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "f6a4c75c-8607-4af1-8d0d-9be4b172f502",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": true,
+          "itemCount": 2,
+          "themeGroupCount": 1,
+          "slotTheme": "Nieuw partnerschap met een ERP-leverancier",
+          "phaseKey": "43"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 179,
+      "selfReview": {
+        "weakestClaim": "\"ook al verdienen concurrenten daar de helft van hun marge mee\" — deze bewering over de omvang van commissie-inkomsten bij concurrerende bureaus wordt nergens gestaafd door de aangeleverde research. De research bevat alleen Consumentenbond-pagina's en een Rijksoverheid ICT-pagina; geen van deze bronnen onderbouwt margepercentages in de adviesbranche.",
+        "unsupportedAssumption": "Het artikel stelt impliciet dat het tekenen van een resellercontract automatisch leidt tot partijdigheid in het advies — \"ook als je dat zelf niet doorhebt.\" Dit is een psychologische aanname over onbewuste beïnvloeding die niet uit de aangeleverde research volgt. De research bevat geen studie of bron die dit mechanisme onderbouwt.",
+        "missedCounterpoint": "De aangeleverde research bevat geen item met stance = spreekt_tegen. Er is dan ook geen tegengeluid uit de research dat in het artikel gemist wordt.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Het thema 'nieuw partnerschap met een ERP-leverancier' botst op twee manieren hard met de merkregels. Ten eerste is 'partnerschap' letterlijk een verboden woord in de verboden logica. Ten tweede neemt het thema als feit aan dat het merk zo'n partnerschap heeft gesloten — maar dat staat nergens in de bewijsvelden of research. Het merk heeft juist een openbare verklaring dat het geen leverancierscontracten heeft en nooit commissie ontvangt. Een partnerschap schrijven zonder contract lost de premisse niet op: de samenwerking zelf bestaat niet en mag niet worden verzonnen.",
+        "themePremisse": true,
+        "themePremisseWat": "Het thema neemt aan dat het merk een partnerschap of samenwerkingsverband met een ERP-leverancier heeft gesloten — een feit dat niet in de bewijsvelden of research staat en dat de commissieregel rechtstreeks zou breken.",
+        "themePremisseActie": "Niet overnemen. Schrijf niet over een partnerschap dat er niet is. Schrijf in plaats daarvan waarom het merk dit soort partnerschappen weigert: wat er werd aangeboden, waarom het nee was, en wat het merk in plaats daarvan doet (onafhankelijk advies, keuzerapport met de optie 'niets kopen', geen commissie).",
+        "merkBeweringen": [
+          {
+            "citaat": "twee weken meelopen op de werkvloer, kijken hoe mensen echt werken, en dan een keuzerapport schrijven",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "Dat rapport bevat altijd de optie 'niets kopen'.",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "op onze website staat een openbare verklaring: geen contracten met leveranciers, geen afspraken over doorverwijzingen",
+            "bron": "bewijsveld"
+          }
+        ]
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": false,
+        "slotId": "f6a4c75c-8607-4af1-8d0d-9be4b172f502",
+        "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+        "articleId": "13261003-cb45-11f1-84cf-9c6b00b7cd02",
+        "hint": null,
+        "code": null,
+        "error": "Geen aanwijzing ontvangen — probeer opnieuw",
+        "architectureFootnote": null
+      },
+      "hbaHint": null,
+      "contentExcerpt": "Voor een adviesbureau is zo'n constructie aantrekkelijk: zichtbaarheid via de leverancier, warme doorverwijzingen, en een commissie als de klant tekent. Je begrijpt waarom veel bureaus het doen.\n\nDat aanbod heeft ook bij ons op tafel gelegen.\n\nWe hebben nee gezegd. Niet omdat het verdienmodel ons niet aanstond, maar omdat je op het moment dat je een contract tekent ophoudt onafhankelijk te zijn — ook als je dat zelf niet doorhebt. De belangen zijn dan niet langer die van de klant. Ze zijn die va",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": null,
+        "brandContribution": 8
+      }
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "9d3db1c6-04df-4595-8e5d-d509a55da768",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": true,
+          "itemCount": 3,
+          "themeGroupCount": 1,
+          "slotTheme": "Wachtlijst in één maand weggewerkt",
+          "phaseKey": "43"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 156,
+      "selfReview": {
+        "weakestClaim": "\"Cliënten zien per maand maximaal vier vaste mensen.\" — De research bevat geen enkel item dat dit getal onderbouwt. Het is uitsluitend een merkregel, niet gestaafd door extern onderzoek.",
+        "unsupportedAssumption": "Het artikel stelt dat een invalkracht erbij zetten voor bestaande cliënten betekent dat ze \"weer een onbekend gezicht aan de deur\" krijgen. Die causale redenering (invalkracht → onbekend gezicht → slechtere zorg) wordt als vanzelfsprekend gepresenteerd, maar volgt nergens expliciet uit de research. De research zegt niets over het effect van wisselende zorgverleners op zorgkwaliteit of cliëntbeleving.",
+        "missedCounterpoint": "De research (Rijksoverheid) stelt expliciet dat wachten op niet-acute zorg \"normaal en in principe ook niet zorgelijk\" is, zolang het niet leidt tot gezondheidsschade of onnodig lang werkverzuim. Het artikel noemt deze nuance wel in de openingszin, maar werkt de voorwaarden ('tenzij het leidt tot gezondheidsschade') niet verder uit. De vraag wanneer doorverwijzen wél problematisch kan zijn — namelijk als de wachtlijst bij de doorverwezen partij ook lang is — blijft onbesproken.",
+        "regelbreuk": null,
+        "themeConflict": true,
+        "themeConflictResolution": "a",
+        "themeConflictWhy": "Het thema stelt als feit dat de wachtlijst in één maand is weggewerkt. Dat resultaat staat niet in de bewijsvelden of research. Bovendien is de enige manier om een wachtlijst snel weg te werken die de merkregels verbieden: extra inzet van invalkrachten. Het merk werkt juist met vaste kleine teams per wijk en verwijst nieuwe cliënten door als een team vol zit. Het thema verleidt de schrijver dus dubbel: het neemt een onbewezen prestatie over én het is alleen haalbaar via een verboden middel.",
+        "themePremisse": true,
+        "themePremisseWat": "Het thema neemt aan dat het merk een wachtlijst in één maand heeft weggewerkt — een resultaat dat niet in de bewijsvelden of research staat en alleen bereikbaar is via invalkrachten, wat de merkregel verbiedt.",
+        "themePremisseActie": "Niet overnemen. Schrijf niet over het wegwerken van de wachtlijst. Schrijf over waarom het merk wachtlijsten niet wegwerkt met extra handen, en wat het in plaats daarvan doet: doorverwijzen als een team vol zit, zodat bestaande cliënten hun vaste gezichten houden.",
+        "merkBeweringen": [
+          {
+            "citaat": "elk team in een wijk met hoogstens zes zorgverleners",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "Cliënten zien per maand maximaal vier vaste mensen.",
+            "bron": "merkarchitectuur"
+          },
+          {
+            "citaat": "De planning maken we samen met de cliënt — niet eromheen.",
+            "bron": "bewijsveld"
+          },
+          {
+            "citaat": "Als een van onze teams vol zit, verwijzen we door.",
+            "bron": "merkarchitectuur"
+          }
+        ]
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "9d3db1c6-04df-4595-8e5d-d509a55da768",
+        "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+        "articleId": "47a0e887-cb45-11f1-84cf-9c6b00b7cd02",
+        "hint": {
+          "id": "da81900f-de05-4d1d-b510-ade02acd5a49",
+          "aanwijzing": "De slotzin blijft abstract: 'eerlijk zijn over wat een team aankan' zegt iedereen. Maak concreet wat er met iemand gebeurt die jullie doorverwijzen — voegen jullie zelf het contact met de andere aanbieder, of geven jullie alleen aan dat jullie vol zitten? Dat verschil laat zien dat de grens bewaken ook iets kost.",
+          "passageVoor": "Een wachtlijst wegwerken begint dus niet met harder rennen. Het begint met eerlijk zijn over wat een team aankan — en die grens bewaken, ook als dat ongemakkelijk is.",
+          "passageNa": "Een wachtlijst wegwerken begint dus niet met harder rennen. Het begint met eerlijk zijn over wat een team aankan — en die grens bewaken, ook als dat ongemakkelijk is.",
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": null,
+          "invulvelden": [
+            "Wat jullie doen voor iemand die jullie doorverwijzen: leggen jullie zelf het contact met de andere aanbieder, of regelen jullie de overdracht op een andere manier?"
+          ],
+          "bewijsveldBron": "Aantal doorverwijzingen omdat een team vol zat",
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "da81900f-de05-4d1d-b510-ade02acd5a49",
+        "aanwijzing": "De slotzin blijft abstract: 'eerlijk zijn over wat een team aankan' zegt iedereen. Maak concreet wat er met iemand gebeurt die jullie doorverwijzen — voegen jullie zelf het contact met de andere aanbieder, of geven jullie alleen aan dat jullie vol zitten? Dat verschil laat zien dat de grens bewaken ook iets kost.",
+        "passageVoor": "Een wachtlijst wegwerken begint dus niet met harder rennen. Het begint met eerlijk zijn over wat een team aankan — en die grens bewaken, ook als dat ongemakkelijk is.",
+        "passageNa": "Een wachtlijst wegwerken begint dus niet met harder rennen. Het begint met eerlijk zijn over wat een team aankan — en die grens bewaken, ook als dat ongemakkelijk is.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "invulvelden": [
+          "Wat jullie doen voor iemand die jullie doorverwijzen: leggen jullie zelf het contact met de andere aanbieder, of regelen jullie de overdracht op een andere manier?"
+        ],
+        "bewijsveldBron": "Aantal doorverwijzingen omdat een team vol zat",
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Wachten op zorg is normaal, zegt de overheid. Wij vinden van niet — maar eerlijk zijn we ook.\n\nAls een van onze teams vol zit, verwijzen we door. Niet omdat we het niet aankunnen, maar omdat we een nieuwe cliënt geen halve oplossing willen geven. Een invalkracht erbij zetten klinkt daadkrachtig. Maar voor de mensen die al bij ons komen, betekent het: weer een onbekend gezicht aan de deur.\n\nDaarom werkt elk team in een wijk met hoogstens zes zorgverleners. Cliënten zien per maand maximaal vier va",
+      "hbaScoreError": "HTTP Error 404: Not Found"
+    }
+  ]
+}
+ er daarna gebeurt als iemand reageert — of wat een doorverwijzing in de praktijk betekent voor die persoon — maakt de tekst concreter en onderscheidender. Een getal over doorverwijzingen, bijvoorbeeld hoeveel aanvragen vorige maand zijn doorverwezen omdat een team vol zat, geeft de lezer iets tastbaars.",
+        "passageVoor": "Hoeveel zorgverleners komen er bij jou — of je naaste — over de vloer?",
+        "passageNa": "Hoeveel zorgverleners komen er bij jou — of je naaste — over de vloer? Vorige maand verwezen we door naar een andere aanbieder.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "invulvelden": [
+          "Hoeveel aanvragen vorige maand zijn doorverwezen omdat een team vol zat — dit maakt de doorverwijzingsregel tastbaar voor de lezer",
+          "Wat er concreet gebeurt met iemand die wordt doorverwezen: leggen jullie zelf het contact met de andere aanbieder, of regelen jullie de overdracht"
+        ],
+        "bewijsveldBron": "Aantal doorverwijzingen omdat een team vol zat",
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Een wachtlijst wegwerken klinkt goed. Maar hoe doe je dat? Door zoveel mogelijk mensen aan te nemen en elk gaatje op te vullen? Dat doen wij niet.\n\nAls een wijkteam van Duinroos vol zit, verwijzen we een nieuwe aanvraag door. Niet omdat het makkelijker is, maar omdat een vijfde of zesde zorgverlener aan de deur meer schade aanricht dan een korte wachttijd. Een oudere die thuis wil blijven wonen, heeft rust en vertrouwdheid nodig — geen nieuw gezicht elke dag.\n\nHoe vaak we doorverwijzen omdat een",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": [
+          "proof_gap"
+        ],
+        "brandContribution": 6
+      }
+    }
+  ]
+}

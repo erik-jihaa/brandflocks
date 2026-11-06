@@ -1,0 +1,520 @@
+/**
+ * iGiSNext identity — goedgekeurde design tokens + componenten
+ *
+ * Bron van waarheid voor CSS buiten de React-app (PHP-tools, e-mail-adjunct).
+ * React/CE: zelfde waarden in frontend/src/index.css (@theme) + Tailwind utilities.
+ *
+ * Beslissingen + mapping: docs/igisnext-identity.md
+ * Live referentie CE-app: /design (DesignSystemPage.tsx)
+ *
+ * Kopie voor deploy: linkedin-analyse/assets/igisnext-identity.css
+ * Wijzig altijd docs/ en sync de kopie vóór deploy linkedin-analyse.
+ */
+
+:root {
+  /* Kleuren — Artboard 20 */
+  --igis-blue: #033dff;
+  --igis-green: #52ffa8;
+  --igis-green-text: #1a7a4c;
+  --igis-offwhite: #eae6dc;
+  --igis-black: #2e2014;
+  --igis-pink: #f7eef3;
+  --igis-beige: #ada695;
+  --igis-red: #c17156;
+  --igis-grey: #89adaa;
+  --igis-white: #ffffff;
+
+  /* Aliassen CE (zelfde waarden — backwards compat linkedin-analyse) */
+  --ce-blue: var(--igis-blue);
+  --ce-green: var(--igis-green);
+  --ce-green-text: var(--igis-green-text);
+  --ce-offwhite: var(--igis-offwhite);
+  --ce-black: var(--igis-black);
+  --ce-pink: var(--igis-pink);
+  --ce-beige: var(--igis-beige);
+  --ce-red: var(--igis-red);
+  --ce-grey: var(--igis-grey);
+  --ce-white: var(--igis-white);
+
+  /* Typografie */
+  --igis-font: "Figtree", system-ui, -apple-system, sans-serif;
+  --igis-text-body: 14px;
+  --igis-leading-body: 18px;
+  --igis-text-title-page: 32px;
+  --igis-leading-title-page: 40px;
+  --igis-text-section: 24px;
+  --igis-leading-section: 32px;
+  --igis-border: 1.5px;
+  /** Outline pulldown + pill second (niet focus/radio) */
+  --igis-border-outline: 1px;
+
+  /* Spacing — lijsten (LIST_SECTION) */
+  --igis-list-section-top: 10px;
+  --igis-list-header-gap: 20px;
+  --igis-list-row-gap: 20px;
+  --igis-form-gap: 18px;
+  --igis-header-field-gap: 18px;
+  /** Ruimte boven/onder pill-vorm t.o.v. lijn of ander element (= body leading) */
+  --igis-pill-line-gap: 18px;
+}
+
+/* ── Basis ───────────────────────────────────────────── */
+
+body,
+.igis-body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--igis-offwhite);
+  color: var(--igis-black);
+  font-family: var(--igis-font);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.igis-page-title {
+  margin: 0;
+  color: var(--igis-blue);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.igis-section-title {
+  margin: 0;
+  font-size: var(--igis-text-section);
+  line-height: var(--igis-leading-section);
+  font-weight: 600;
+  color: var(--igis-black);
+}
+
+/* ── Pill-knoppen (PillButton) ───────────────────────── */
+
+.igis-pill,
+.pill {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 30px;
+  border: var(--igis-border-outline) solid var(--igis-green);
+  border-radius: 20px;
+  font-family: var(--igis-font);
+  font-size: var(--igis-text-body);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* main — gevuld groen, blauwe tekst */
+.igis-pill-main,
+.pill-primary {
+  background: var(--igis-green);
+  color: var(--igis-blue);
+}
+
+/* second — groene outline, blauwe tekst, geen beige fill */
+.igis-pill-second,
+.pill-secondary {
+  background: transparent;
+  color: var(--igis-blue);
+}
+
+.igis-pill:disabled,
+.igis-pill[disabled],
+.pill:disabled,
+.pill[disabled] {
+  cursor: not-allowed;
+  border-color: var(--igis-beige);
+  background: transparent;
+  color: var(--igis-beige);
+}
+
+/* ── Pulldown (Pulldown / SourceTabs) ─────────────────── */
+
+.igis-pulldown,
+.pulldown-box {
+  width: 100%;
+  border: var(--igis-border-outline) solid var(--igis-beige);
+  border-radius: 20px;
+  background: transparent;
+}
+
+.igis-pulldown-narrow {
+  max-width: 320px;
+}
+
+/* ── Pill-spacing t.o.v. lijn / element ─────────────── */
+
+.igis-pill-line-gap-before,
+.ce-pill-line-gap-before {
+  margin-top: var(--igis-pill-line-gap);
+}
+
+.igis-pill-line-gap-after,
+.ce-pill-line-gap-after {
+  margin-bottom: var(--igis-pill-line-gap);
+}
+
+.igis-pill-actions-row,
+.ce-pill-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: var(--igis-pill-line-gap);
+}
+
+/* Sectie met scheidingslijn — 18px tussen inhoud en lijn eronder */
+.igis-bordered-section,
+.ce-bordered-section {
+  border-bottom: 1px solid var(--igis-beige);
+  padding-bottom: var(--igis-pill-line-gap);
+}
+
+/* Gestapelde secties — 18px tussen lijn erboven en volgende header (één kant) */
+.igis-bordered-section-stack > section + section,
+.ce-bordered-section-stack > section + section {
+  padding-top: var(--igis-pill-line-gap);
+}
+
+/* ── Account-dark (Settings-hoofdstuk, CE React: ce-theme-account-dark) ── */
+
+.igis-theme-dark,
+html.igis-theme-dark {
+  --igis-offwhite: #463b35;
+  --igis-black: #ffffff;
+  --igis-blue: #52ffa8;
+  --igis-green-text: #52ffa8;
+}
+
+.igis-theme-dark .igis-pill-main,
+.igis-theme-dark .pill-primary,
+html.igis-theme-dark .igis-pill-main,
+html.igis-theme-dark .pill-primary {
+  color: #2e2014;
+}
+
+.igis-theme-dark .igis-pill-second,
+.igis-theme-dark .pill-secondary,
+html.igis-theme-dark .igis-pill-second,
+html.igis-theme-dark .pill-secondary {
+  color: var(--igis-green);
+}
+
+/* Roze velden op dark: copy blijft donker */
+.igis-theme-dark .igis-field,
+.igis-theme-dark .input-field,
+html.igis-theme-dark .igis-field,
+html.igis-theme-dark .input-field {
+  color: #2e2014;
+}
+
+.igis-theme-dark .igis-field::placeholder,
+.igis-theme-dark .input-field::placeholder,
+html.igis-theme-dark .igis-field::placeholder,
+html.igis-theme-dark .input-field::placeholder {
+  color: var(--igis-beige);
+}
+
+/* ── Fields (FieldSingle) ────────────────────────────── */
+
+.igis-form-stack,
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--igis-form-gap);
+}
+
+.igis-form-offset-header,
+.form-offset-header {
+  margin-top: var(--igis-header-field-gap);
+}
+
+.igis-field,
+.input-field {
+  width: 100%;
+  height: 40px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--igis-pink);
+  color: var(--igis-black);
+  font-family: var(--igis-font);
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-text-body);
+}
+
+.igis-field::placeholder,
+.input-field::placeholder {
+  color: var(--igis-beige);
+}
+
+.igis-field:focus,
+.input-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--igis-border) var(--igis-blue);
+}
+
+/* Geen label boven veld — placeholder + aria-label */
+
+.igis-hint,
+.hint {
+  margin: 0;
+  color: var(--igis-beige);
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+}
+
+/* ── CheckboxOption / RadioIndicator ─────────────────── */
+
+.igis-visually-hidden,
+.ce-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.igis-checkbox-option,
+.ce-checkbox-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+  color: var(--igis-black);
+}
+
+.igis-radio-indicator,
+.ce-radio-indicator {
+  display: inline-flex;
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  border-radius: 50%;
+  border: var(--igis-border) solid var(--igis-black);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.igis-checkbox-option input:checked + .igis-radio-indicator,
+.ce-checkbox-option input:checked + .ce-radio-indicator {
+  background: var(--igis-black);
+}
+
+/* ── Lijsten — Agenda / LIST_ROW ─────────────────────── */
+
+.igis-list-section,
+.list-section {
+  padding-top: var(--igis-list-section-top);
+}
+
+.igis-list-section-body,
+.list-section-body {
+  border-bottom: 1px solid rgba(46, 32, 20, 0.1);
+  padding-top: var(--igis-list-header-gap);
+  padding-bottom: var(--igis-list-header-gap);
+}
+
+.igis-list-stack,
+.list-section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--igis-list-row-gap);
+}
+
+.igis-list-row,
+.list-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+}
+
+.igis-row-title-link,
+.row-title-link {
+  color: var(--igis-beige);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.igis-row-title-link:hover,
+.row-title-link:hover {
+  color: var(--igis-black);
+}
+
+.igis-status-label,
+.status-label {
+  font-weight: 600;
+  color: var(--igis-green-text);
+}
+
+.igis-action-sep,
+.action-sep {
+  margin: 0 6px;
+  color: var(--igis-beige);
+}
+
+.igis-action-link,
+.action-link,
+.igis-action-link-emphasis,
+.action-link-delete {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+  color: var(--igis-black);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.igis-action-link:hover,
+.action-link:hover,
+.igis-action-link-emphasis:hover,
+.action-link-delete:hover {
+  color: var(--igis-black);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.action-link-confirm-delete {
+  color: var(--igis-red);
+  text-decoration: none;
+}
+
+.action-link-confirm-delete:hover {
+  color: var(--igis-red);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* Platform-logo op beige/offwhite — zelfde als CE GridShell (Logo platform light) */
+.platform-logo {
+  display: block;
+  max-height: 32px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  background: transparent;
+}
+
+/* ── Flash-feedback (SaveNotice) — geen kader ──────────── */
+
+.igis-notice-text,
+.notice-text {
+  margin: 0 0 16px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+  transition: opacity 0.5s ease;
+}
+
+.igis-notice-success,
+.notice-text-success {
+  color: var(--igis-green-text);
+}
+
+.igis-notice-error,
+.notice-text-error {
+  color: var(--igis-red);
+}
+
+.igis-notice-info,
+.notice-text-info {
+  color: var(--igis-black);
+}
+
+.igis-notice-fade.is-fading,
+.notice-fade.is-fading {
+  opacity: 0;
+}
+
+/* ── Info-blokken (cache-tip, mail-hint) — wel kader ─── */
+
+.igis-notice-box,
+.notice {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: var(--igis-text-body);
+}
+
+.igis-notice-box-info,
+.notice-info {
+  background: #eef4ff;
+  color: #1a3270;
+}
+
+.igis-auth-intro,
+.auth-intro {
+  margin: 0;
+  color: var(--igis-beige);
+  font-size: var(--igis-text-body);
+  line-height: 20px;
+}
+
+.igis-auth-intro strong,
+.auth-intro strong {
+  color: var(--igis-black);
+  font-weight: 600;
+}
+
+.igis-text-link,
+.text-link {
+  color: var(--igis-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.igis-text-link:hover,
+.text-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.igis-nav-back-link,
+.nav-back-link {
+  color: var(--igis-black);
+  font-weight: 600;
+  font-size: var(--igis-text-body);
+  line-height: var(--igis-leading-body);
+  text-decoration: none;
+}
+
+.igis-nav-back-link:hover,
+.nav-back-link:hover {
+  color: var(--igis-black);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.igis-actions,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 0;
+}

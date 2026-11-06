@@ -1,0 +1,41 @@
+---
+description: iGiSNext identity — goedgekeurde tokens en componenten (altijd raadplegen bij UI/CSS)
+globs: "**/*.{css,tsx,jsx,php,html}"
+alwaysApply: false
+---
+
+# iGiSNext identity
+
+**Lees vóór nieuwe UI of CSS:** `docs/igisnext-identity.md` + `docs/igisnext-identity.css`
+
+## Snel kompas
+
+| Onderdeel | Regel |
+|---|---|
+| **Kleuren** | Tokens `--igis-*` — geen ad-hoc hex |
+| **Groen tekst op offwhite** | `--igis-green-text` (#1A7A4C), nooit mint #52FFA8 |
+| **Pill main (licht)** | Groen fill + blauwe tekst |
+| **Pill second (licht)** | Groene outline **1px** + blauwe tekst — **geen beige fill** |
+| **Pulldown outline** | **1px beige** — zelfde pill-vorm, geen 2px border |
+| **Pill / pulldown spacing** | **18px** (één witregel) — `designStackClass`, `pillActionsRowClass`, `borderedSectionStackClass`. Nooit gap+mt+mb stapelen |
+| **Pill main (dark)** | Groen fill + **donkere ink (#2E2014)** |
+| **Pill second (dark)** | Groene outline + **groene tekst** — alleen gepaarde acties (Upload/Delete) |
+| **Forgot password (licht auth)** | **Second pill** naast Login — zie `docs/design/auth-light-good-linkedin-login.png` |
+| **Login disabled bij lege velden** | **Fout** — knop blijft main (groen); validatie via `required` |
+| **Logo beige (platform)** | `SVG/iGiSNext_Blue-main.svg` — sync naar alle subdomeinen; class `.platform-logo` |
+| **Logo Account-dark** | `iGiSNext_Blue-dark.svg` — Settings-hoofdstuk (Support e.d.); geen klantlogo |
+| **Pill breedte** | **Content-breed** — `self-start`, nooit kolombreed in flex-col |
+| **Lijsten** | Agenda LIST_ROW: 14/18, status groen, View \| Delete → Confirm delete (rood, inline) |
+| **Flash feedback** | Alleen typografie (SaveNotice), geen groen kader; fade 5s |
+| **StrategySection hint** | **Leestekst = zwart** (`hintTone="black"`); beige alleen invoerhint/placeholder |
+| **Lijn ↔ kop** | **18px** beide kanten — `borderedSectionClass` + `borderedSectionStackClass`; geen wrapper-divs ertussen |
+
+## Waar implementeren
+
+| Context | Gebruik |
+|---|---|
+| React CE-app | `frontend/src/components/ui/*`, `/design` |
+| PHP standalone | `@import igisnext-identity.css` + minimale layout-css |
+| E-mail (GrowthElements) | Apart — zie linkedin `report-renderer.php` |
+
+Sync: wijzig `docs/igisnext-identity.css` → kopieer naar `linkedin-analyse/assets/` vóór deploy.

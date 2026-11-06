@@ -1,0 +1,221 @@
+@import 'tailwindcss';
+
+/* Design tokens — briefing/Artboard 20Type+.png (bijgewerkt) */
+@theme {
+  --color-ce-blue: #033dff;
+  --color-ce-green: #52ffa8;
+  --color-ce-green-fill: #52ffa8;
+  /* Leesbare groene tekst op offwhite/beige — niet #52ffa8 (pill/dot only) */
+  --color-ce-green-text: #1a7a4c;
+  --color-ce-offwhite: #eae6dc;
+  --color-ce-red: #c17156;
+  --color-ce-orange: #d4845c;
+  --color-ce-pink: #f7eef3;
+  --color-ce-beige: #ada695;
+  /* Optioneel voor latere hint-ronde (4,6:1 op offwhite); hints blijven nu ce-beige */
+  --color-ce-beige-text: #6b665c;
+  --color-ce-grey: #89adaa;
+  --color-ce-black: #2e2014;
+  --color-ce-white: #ffffff;
+
+  --font-figtree: 'Figtree', system-ui, sans-serif;
+
+  /* Typografie */
+  --text-ce-menu: 14px;
+  --leading-ce-menu: 24px;
+  --text-ce-body: 14px;
+  --leading-ce-body: 18px;
+  --text-ce-action: 18px;
+  --leading-ce-action: 32px;
+  --text-ce-field: 21px;
+  --text-ce-header-field: 24px;
+  --text-ce-page-title: 32px;
+  --leading-ce-page-title: 40px;
+
+  /* Vorm */
+  --radius-ce-pill: 20px;
+  --height-ce-pill: 40px;
+  --padding-ce-pill-x: 30px;
+  --border-ce: 1.5px;
+  --border-ce-outline: 1px;
+  --spacing-ce-pill-line-gap: 18px;
+
+  /* Grid — briefing/stramien *.png */
+  --spacing-ce-top: 60px;
+  --spacing-ce-header: 63px;
+  --spacing-ce-header-gap: 40px;
+  --spacing-ce-col-nav: 270px;
+  --spacing-ce-col-gap: 30px;
+  --spacing-ce-col-main: 820px;
+  --spacing-ce-col-gap-meta: 30px;
+  --spacing-ce-col-meta: 290px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-figtree);
+  font-size: var(--text-ce-body);
+  line-height: var(--leading-ce-body);
+  color: var(--color-ce-black);
+  background: var(--color-ce-offwhite);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 1.5s ease,
+    color 1.5s ease;
+}
+
+/*
+ * Account-hoofdstuk (8 nav-items) — dark mode
+ * bg #463b35 · zwart→wit · blauw→green · roze blijft
+ */
+html.ce-theme-account-dark {
+  --color-ce-offwhite: #463b35;
+  --color-ce-black: #ffffff;
+  --color-ce-blue: #52ffa8;
+  --color-ce-green-text: #52ffa8;
+  /* roze (--color-ce-pink) ongewijzigd */
+}
+
+html.ce-theme-account-dark body,
+html.ce-theme-account-dark #root {
+  background: var(--color-ce-offwhite);
+  color: var(--color-ce-black);
+}
+
+/* Rustige fade 1.5s bij wissel light ↔ Account-dark (geen trage hovers) */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  #root,
+  .bg-ce-offwhite,
+  .bg-ce-pink,
+  .bg-ce-beige,
+  .bg-ce-white,
+  .text-ce-black,
+  .text-ce-blue,
+  .text-ce-beige,
+  .text-ce-green-text,
+  .border-ce-black,
+  .border-ce-beige,
+  .border-ce-blue,
+  .border-ce-green,
+  .decoration-ce-black,
+  .fill-ce-black,
+  .stroke-ce-black {
+    transition-property: background-color, color, border-color, fill, stroke, text-decoration-color;
+    transition-duration: 1.5s;
+    transition-timing-function: ease;
+  }
+}
+
+/* Main pill: groen fill + blauwe tekst → bij blue→green onleesbaar; behoud donkere ink */
+html.ce-theme-account-dark .bg-ce-green.text-ce-blue {
+  color: #2e2014;
+}
+
+/* Roze invulvelden: copy blijft zwart (niet wit/groen van Account-dark) */
+html.ce-theme-account-dark .bg-ce-pink,
+html.ce-theme-account-dark .bg-ce-pink.text-ce-black,
+html.ce-theme-account-dark .bg-ce-pink.text-ce-blue,
+html.ce-theme-account-dark .bg-ce-pink .text-ce-black,
+html.ce-theme-account-dark .bg-ce-pink .text-ce-blue,
+html.ce-theme-account-dark .bg-ce-pink input,
+html.ce-theme-account-dark .bg-ce-pink textarea,
+html.ce-theme-account-dark .bg-ce-pink select {
+  color: #2e2014;
+}
+
+html.ce-theme-account-dark .bg-ce-pink::placeholder,
+html.ce-theme-account-dark .bg-ce-pink input::placeholder,
+html.ce-theme-account-dark .bg-ce-pink textarea::placeholder {
+  color: #ada695;
+}
+
+/* Nav-iconen (donkere SVG) leesbaar op Account-dark */
+html.ce-theme-account-dark nav img {
+  filter: brightness(0) invert(1);
+  transition: filter 1.5s ease;
+}
+
+/* Staging/local banner — altijd iGiS-blauw, ook in Account-dark (waar --color-ce-blue → green) */
+.environment-banner {
+  background-color: #033dff;
+  color: #ffffff;
+}
+
+/* Sidebar hoofditems — fade via inline style in SidebarNav (JS timer);
+   class blijft voor semantieк / eventuele toekomstige CSS-hooks. */
+.nav-main-label {
+  color: var(--color-ce-black);
+  pointer-events: none;
+}
+
+@keyframes ce-loading-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.animate-ce-loading-dot {
+  animation: ce-loading-dot 1.2s ease-in-out infinite;
+}
+
+/* Native inputs volledig verbergen — custom RadioIndicator (Safari lekt anders door sr-only) */
+.ce-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Pill-vorm (knop / pulldown) — één regel (18px) t.o.v. lijn of ander element */
+.ce-pill-line-gap-before {
+  margin-top: var(--spacing-ce-pill-line-gap);
+}
+
+.ce-pill-line-gap-after {
+  margin-bottom: var(--spacing-ce-pill-line-gap);
+}
+
+.ce-pill-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: var(--spacing-ce-pill-line-gap);
+}
+
+/* Sectie met scheidingslijn — 18px tussen inhoud en lijn eronder */
+.ce-bordered-section {
+  border-bottom: 1px solid var(--color-ce-beige);
+  padding-bottom: var(--spacing-ce-pill-line-gap);
+}
+
+.ce-bordered-section-stack > section + section {
+  padding-top: var(--spacing-ce-pill-line-gap);
+}

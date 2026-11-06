@@ -1,0 +1,485 @@
+{
+  "ok": true,
+  "generatedAt": "2026-10-09 15:18:59 UTC",
+  "promptVersion": "v1.6",
+  "codePromptVersion": "v1.6",
+  "modelsUsed": [
+    "claude-sonnet-4-6"
+  ],
+  "environment": "staging",
+  "note": "Testmerken op staging kunnen guardrail PASS geforceerd hebben voor scoring.",
+  "rows": [
+    {
+      "merk": "Brandpunt Koffie",
+      "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+      "index": 1,
+      "label": "Op merk",
+      "verwacht": "hoge brand_contribution, geen risk-flags",
+      "verwacht_flags": [],
+      "verboden_flags": [],
+      "toegestane_flags": [],
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "hoog",
+      "ambiguous": false,
+      "brandContribution": 6.5,
+      "distinctiviteit": 2,
+      "contentrol": "bewijs",
+      "flags": [
+        "category_fallback",
+        "proof_gap"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "fout",
+      "reasons": [
+        "Post 1: flag niet toegestaan: category_fallback",
+        "Post 1: flag niet toegestaan: proof_gap"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+      "index": 2,
+      "label": "Categorietaal",
+      "verwacht": "lage distinctiviteit, flag category_fallback",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 1,
+      "distinctiviteit": 1,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback",
+        "proof_gap"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "fout",
+      "reasons": [
+        "distinctiviteit op niveau post 1 (≥ post1 − 1)"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+      "index": 3,
+      "label": "Breekt de regel",
+      "verwacht": "flag constraint_breach: breekt de zes-wekenregel",
+      "verwacht_flags": [
+        "constraint_breach"
+      ],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 0,
+      "distinctiviteit": 0,
+      "contentrol": "activatie",
+      "flags": [
+        "constraint_breach",
+        "foe_vervaging"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+      "index": 4,
+      "label": "Neutraal / grensgeval",
+      "verwacht": "contentrol educatie of service, neutraal, lage bijdrage aan de architectuur",
+      "verwacht_flags": [],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "neutraal",
+      "ambiguous": false,
+      "brandContribution": 0.5,
+      "distinctiviteit": 0.5,
+      "contentrol": "educatie",
+      "flags": [
+        "category_fallback",
+        "opportunistische_trendcontent"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+      "index": 5,
+      "label": "Verdedigt de regel",
+      "verwacht": "hoge brand_contribution, geen constraint_breach: noemt het verboden onderwerp, maar verdedigt de regel",
+      "verwacht_flags": [],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "hoog",
+      "ambiguous": false,
+      "brandContribution": 7.5,
+      "distinctiviteit": 3,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 1,
+      "label": "Op merk",
+      "verwacht": "hoge brand_contribution, geen risk-flags",
+      "verwacht_flags": [],
+      "verboden_flags": [],
+      "toegestane_flags": [],
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "hoog",
+      "ambiguous": false,
+      "brandContribution": 7.5,
+      "distinctiviteit": 2,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "fout",
+      "reasons": [
+        "Post 1: flag niet toegestaan: category_fallback"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 2,
+      "label": "Categorietaal",
+      "verwacht": "lage distinctiviteit, flag category_fallback; Verzorger zonder bewijs is hygiëne",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 1,
+      "distinctiviteit": 1,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback",
+        "proof_gap",
+        "foe_vervaging"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "fout",
+      "reasons": [
+        "distinctiviteit op niveau post 1 (≥ post1 − 1)"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 3,
+      "label": "Breekt de regel",
+      "verwacht": "flag constraint_breach: meer dan vier zorgverleners per cliënt",
+      "verwacht_flags": [
+        "constraint_breach"
+      ],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 0,
+      "distinctiviteit": 0,
+      "contentrol": "positionering",
+      "flags": [
+        "constraint_breach",
+        "foe_vervaging",
+        "category_fallback"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 4,
+      "label": "Neutraal / grensgeval",
+      "verwacht": "contentrol employer_culture; neutraal tenzij de teamregel erin staat",
+      "verwacht_flags": [],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "neutraal",
+      "ambiguous": true,
+      "brandContribution": 1,
+      "distinctiviteit": 0,
+      "contentrol": "employer_culture",
+      "flags": [
+        "category_fallback"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "review",
+      "reasons": [
+        "Ambigue verwachting — handmatige beoordeling"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 5,
+      "label": "Archetype zonder bewijs",
+      "verwacht": "distinctiviteit hoogstens 2, flag category_fallback: warm en concreet, maar zonder mechanisme of regel",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": 2,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 1,
+      "distinctiviteit": 0,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback",
+        "foe_vervaging",
+        "proof_gap"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+      "index": 6,
+      "label": "Logica van de tegenkracht",
+      "verwacht": "flag foe_vervaging, geen constraint_breach: efficiëntie als prestatie, maar geen handeling tegen de vier-zorgverlenersregel",
+      "verwacht_flags": [
+        "foe_vervaging"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 1,
+      "distinctiviteit": 1,
+      "contentrol": "positionering",
+      "flags": [
+        "foe_vervaging",
+        "category_fallback",
+        "constraint_breach"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "fout",
+      "reasons": [
+        "Verboden flag aanwezig: constraint_breach"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Stelwerk",
+      "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+      "index": 1,
+      "label": "Op merk",
+      "verwacht": "hoge brand_contribution, geen risk-flags",
+      "verwacht_flags": [],
+      "verboden_flags": [],
+      "toegestane_flags": [
+        "proof_gap"
+      ],
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "hoog",
+      "ambiguous": false,
+      "brandContribution": 7.5,
+      "distinctiviteit": 4,
+      "contentrol": "bewijs",
+      "flags": [
+        "proof_gap"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Stelwerk",
+      "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+      "index": 2,
+      "label": "Categorietaal",
+      "verwacht": "lage distinctiviteit, flag category_fallback",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 0.5,
+      "distinctiviteit": 0.5,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback",
+        "foe_vervaging",
+        "proof_gap"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Stelwerk",
+      "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+      "index": 3,
+      "label": "Breekt de regel",
+      "verwacht": "flag constraint_breach: breekt de commissieregel",
+      "verwacht_flags": [
+        "constraint_breach"
+      ],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 0,
+      "distinctiviteit": 0,
+      "contentrol": "positionering",
+      "flags": [
+        "constraint_breach",
+        "foe_vervaging"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Stelwerk",
+      "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+      "index": 4,
+      "label": "Neutraal / grensgeval",
+      "verwacht": "mogelijk flag opportunistische_trendcontent, tenzij gekoppeld aan doel of tegenkracht",
+      "verwacht_flags": [
+        "opportunistische_trendcontent"
+      ],
+      "verboden_flags": [],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "neutraal",
+      "ambiguous": true,
+      "brandContribution": 1,
+      "distinctiviteit": 1,
+      "contentrol": "activatie",
+      "flags": [
+        "opportunistische_trendcontent",
+        "foe_vervaging",
+        "category_fallback"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "review",
+      "reasons": [
+        "Ambigue verwachting — handmatige beoordeling"
+      ],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    },
+    {
+      "merk": "Stelwerk",
+      "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+      "index": 5,
+      "label": "Branchetaal uit de verboden logica",
+      "verwacht": "lage distinctiviteit, flag category_fallback, geen constraint_breach: onafhankelijk zonder de commissieregel is branchetaal",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "toegestane_flags": null,
+      "max_distinctiviteit": null,
+      "verwacht_niveau": "laag",
+      "ambiguous": false,
+      "brandContribution": 1,
+      "distinctiviteit": 0,
+      "contentrol": "positionering",
+      "flags": [
+        "category_fallback",
+        "proof_gap",
+        "foe_vervaging"
+      ],
+      "flags_verwijderd": [],
+      "judgment": "goed",
+      "reasons": [],
+      "modelUsed": "claude-sonnet-4-6",
+      "promptVersion": "v1.6"
+    }
+  ],
+  "reviewList": [
+    {
+      "merk": "Stelwerk",
+      "post": "Neutraal / grensgeval",
+      "verwacht": "mogelijk flag opportunistische_trendcontent, tenzij gekoppeld aan doel of tegenkracht"
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "post": "Neutraal / grensgeval",
+      "verwacht": "contentrol employer_culture; neutraal tenzij de teamregel erin staat"
+    }
+  ],
+  "summary": {
+    "goed": 9,
+    "fout": 5,
+    "review": 2,
+    "geen_score": 0
+  }
+}

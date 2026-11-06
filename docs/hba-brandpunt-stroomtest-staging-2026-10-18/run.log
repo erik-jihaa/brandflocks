@@ -1,0 +1,11 @@
+==> Output: /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-brandpunt-stroomtest-staging-2026-10-18
+==> full_pipeline (onboarding + 25 posts + checkpoints)
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py", line 348, in decode
+    raise JSONDecodeError("Extra data", s, end)
+json.decoder.JSONDecodeError: Extra data: line 1 column 3 (char 2)
+Expecting value: line 1 column 1 (char 0)

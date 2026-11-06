@@ -1,0 +1,66 @@
+6. Output schema
+Per scoring-call retourneert de LLM exact dit JSON. De velden long_term_value en short_term_value zijn toegevoegd ten opzichte van de v1.0-only kit; ze voeden v1.5 en v2.0.
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["status", "narrative_check"],
+  "properties": {
+    "status": { "type": "string", "enum": ["scored", "narrative_incomplete"] },
+    "narrative_check": {
+      "type": "object",
+      "properties": {
+        "complete": { "type": "boolean" },
+        "missing_or_inconsistent": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "contentrol": {
+      "type": ["string", "null"],
+      "enum": ["positionering", "bewijs", "educatie", "activatie",
+               "community", "service", "employer_culture", "reactief", null]
+    },
+    "contentrol_motivation": { "type": ["string", "null"] },
+    "scores": {
+      "type": ["object", "null"],
+      "properties": {
+        "brand_contribution": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number", "minimum": 0, "maximum": 10 },
+            "dimensions": {
+              "type": "object",
+              "properties": {
+                "archetype_fit":    { "type": "number", "minimum": 0, "maximum": 5 },
+                "doel_fit":         { "type": "number", "minimum": 0, "maximum": 5 },
+                "tegenkracht_fit":  { "type": "number", "minimum": 0, "maximum": 5 },
+                "spanning":         { "type": "number", "minimum": 0, "maximum": 5 },
+                "mechanisme_proof": { "type": "number", "minimum": 0, "maximum": 5 },
+                "distinctiviteit":  { "type": "number", "minimum": 0, "maximum": 5 }
+              }
+            }
+          }
+        },
+        "brand_consistency": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number", "minimum": 0, "maximum": 10 },
+            "notes": { "type": "string" }
+          }
+        },
+        "architecture_risk": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number", "minimum": 0, "maximum": 10 },
+            "flags": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["category_fallback", "archetype_drift", "proof_gap", "constraint_breach", "opportunistische_trendcontent", "foe_vervaging"] }
+            }
+          }
+        },
+        "long_term_value":  { "type": "number", "minimum": 0, "maximum": 5 },
+        "short_term_value": { "type": "number", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "diagnose":       { "type": ["string", "null"] },
+    "verbeteradvies": { "type": ["string", "null"] }
+  }
+}

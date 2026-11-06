@@ -1,0 +1,104 @@
+{
+  "testmerk": {
+    "merknaam": "Stelwerk",
+    "branche": "Onafhankelijk adviesbureau voor bedrijfssoftware (ERP) in de maakindustrie",
+    "type": "mkb, B2B met lange verkoopcyclus",
+    "toelichting": "Test of de app een regel herkent die marge kost in een markt waar 'onafhankelijk' en 'partnerschap' hygiëne zijn."
+  },
+  "brand_narrative": {
+    "archetype": "Wijze",
+    "doel": "Dat maakbedrijven software kiezen die over tien jaar nog past bij hoe ze werken.",
+    "foe": "De verkooplogica die een systeem verkoopt op wat het kan, in plaats van op wat het bedrijf nodig heeft.",
+    "spanning": "Een wijze die eerst wil begrijpen hoe een fabriek werkt, in een markt die beslissingen laat nemen op basis van demo's en features.",
+    "mechanisme": "Elke opdracht begint met twee weken meelopen op de werkvloer, nog vóór er een offerte ligt. Pas daarna maken we een keuzerapport met drie opties, inclusief de optie om niets te kopen.",
+    "geloofwaardigheidstest": "Wij hebben geen resellercontracten en ontvangen nooit commissie van softwareleveranciers, ook al verdienen concurrenten daar de helft van hun marge mee.",
+    "verboden_logica": [
+      "onafhankelijk als losse claim zonder de commissieregel",
+      "partnerschap en ontzorgen",
+      "feature-vergelijkingen als hoofdargument",
+      "digitale transformatie",
+      "snel live in drie maanden"
+    ],
+    "bewijsvelden": [
+      "Openbare verklaring zonder leverancierscontracten op de website",
+      "Keuzerapport met altijd de optie 'niets kopen'",
+      "Twee weken meelopen op de werkvloer als vaste eerste stap",
+      "Cases waarin we adviseerden het bestaande systeem te houden"
+    ],
+    "tone_of_behaviour": "Rustig, precies en zonder verkooptaal. Stelt eerst vragen en geeft dan een oordeel. Durft te zeggen dat iets niet nodig is.",
+    "goede_voorbeelden": [
+      "Bij een metaalbewerker in Helmond adviseerden we vorig jaar om níét over te stappen. Hun huidige systeem deed 90 procent van wat ze nodig hadden. Wat ontbrak, losten we op met een koppeling van drie weken.",
+      "Waarom we geen commissie aannemen van softwareleveranciers: zodra iemand aan je advies verdient, weet je klant niet meer voor wie je werkt.",
+      "Voordat we een offerte schrijven, lopen we twee weken mee. Niet in de vergaderzaal, op de werkvloer. Daar zie je waar het systeem moet passen."
+    ],
+    "zwakke_voorbeelden": [
+      "Stelwerk: uw onafhankelijke partner in digitale transformatie. Wij ontzorgen u van A tot Z.",
+      "Ontdek de vijf nieuwste features van het populairste ERP-pakket van 2026!",
+      "Snel live in drie maanden? Wij maken het mogelijk."
+    ],
+    "contextprofiel": "b2b_complex_sale",
+    "default_platforms": [
+      "linkedin",
+      "website_blog",
+      "newsletter"
+    ],
+    "target_post_volume_per_month": 8
+  },
+  "testposts": [
+    {
+      "post_tekst": "Een klant vroeg ons waarom ons keuzerapport altijd een optie 'niets kopen' heeft. Omdat dat in een op de drie gevallen het beste advies is.",
+      "platform": "linkedin",
+      "verwacht": "hoge brand_contribution, geen risk-flags",
+      "toegestane_flags": [
+        "proof_gap"
+      ],
+      "verwacht_hoofdoordeel": "op_merk"
+    },
+    {
+      "post_tekst": "Wij zijn uw betrouwbare partner voor ERP-implementaties. Neem contact op voor een vrijblijvend gesprek.",
+      "platform": "linkedin",
+      "verwacht": "lage distinctiviteit, flag category_fallback",
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "verwacht_hoofdoordeel": "categorietaal"
+    },
+    {
+      "post_tekst": "Trots: Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+      "platform": "linkedin",
+      "verwacht": "flag constraint_breach: breekt de commissieregel",
+      "verwacht_hoofdoordeel": "regelbreuk"
+    },
+    {
+      "post_tekst": "Webinar volgende week: AI in de maakindustrie, wat kun je ermee?",
+      "platform": "linkedin",
+      "verwacht": "contentrol educatie; neutraal hoofdoordeel, lage bijdrage aan de architectuur",
+      "verwacht_hoofdoordeel": "neutraal"
+    },
+    {
+      "post_tekst": "Wij zijn volledig onafhankelijk. Daarom kiezen steeds meer maakbedrijven voor Stelwerk.",
+      "platform": "linkedin",
+      "label": "Branchetaal uit de verboden logica",
+      "verwacht": "lage distinctiviteit, flag category_fallback, geen constraint_breach: onafhankelijk zonder de commissieregel is branchetaal",
+      "verwacht_flags": [
+        "category_fallback"
+      ],
+      "verboden_flags": [
+        "constraint_breach"
+      ],
+      "verwacht_niveau": "laag",
+      "verwacht_hoofdoordeel": "categorietaal"
+    },
+    {
+      "post_tekst": "Wij werken met een ERP-leverancier samen — en we hebben bewust geen resellercontract getekend. Geen commissie, geen verkoopquota, geen reden om iets aan te raden dat voor ons rendeert.\n\nWat we wél hebben: jaren ervaring met hoe dit systeem zich gedraagt als het echt wordt ingezet. Niet in een demo, maar in een maakbedrijf met legacy-data, wisselende orderstromen en een IT-afdeling van twee man.\n\nDat verschil is niet klein. Een leverancier verkoopt mogelijkheden. Wij stellen eerst de vraag wat een bedrijf over tien jaar nodig heeft — en kijken dan of dit systeem daarbij past. Soms is het antwoord ja. Soms ook niet.\n\nDie afstand is geen gebrek aan betrokkenheid. Het is precies wat een opdrachtgever nodig heeft op het moment dat verkooplogica het hardst trekt.",
+      "platform": "linkedin",
+      "label": "Samenwerking/ervaring zonder bewijs (V0 v1.9)",
+      "verwacht": "proof_gap op de samenwerkings- of ervaringszin, merkbijdrage hoogstens 6",
+      "verwacht_flags": [
+        "proof_gap"
+      ],
+      "max_brand_contribution": 6,
+      "ambigu": true
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+{
+    "ok": true,
+    "runsPerCase": 5,
+    "includeVerbodenLogica": true,
+    "summary": {
+        "pass": 6,
+        "fail": 0
+    },
+    "results": [
+        {
+            "case": 1,
+            "merk": "Stelwerk",
+            "citaat": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "verwachtJa": false,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn uw betrouwbare partner voor ERP-implementaties\" is categorietaal en beschrijft geen handeling van het merk \u2014 het woord \"partner\" verwijst hier naar de relatie met de klant, niet naar een resellercontract of partnerschap met een softwareleverancier.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn uw betrouwbare partner voor ERP-implementaties\" is categorietaal en beschrijft geen handeling van het merk \u2014 het woord \"partner\" verwijst hier naar de relatie met de klant, niet naar een resellercontract of partnerschap met een softwareleverancier.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn uw betrouwbare partner voor ERP-implementaties\" is categorietaal en beschrijft geen handeling van het merk \u2014 het woord \"partner\" verwijst naar de relatie met de klant, niet naar een resellercontract of partnerschap met een softwareleverancier.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn uw betrouwbare partner voor ERP-implementaties\" is categorietaal en beschrijft geen handeling van het merk \u2014 het woord \"partner\" verwijst hier naar de relatie met de klant, niet naar een resellercontract of partnerschap met een softwareleverancier.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn uw betrouwbare partner voor ERP-implementaties\" is categorietaal en beschrijft geen handeling van het merk \u2014 het woord \"partner\" verwijst hier naar de relatie met de klant, niet naar een resellercontract of partnerschap met een softwareleverancier.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        },
+        {
+            "case": 2,
+            "merk": "Stelwerk",
+            "citaat": "Wij zijn volledig onafhankelijk.",
+            "verwachtJa": false,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn volledig onafhankelijk\" is categorietaal \u2014 het merk beschrijft geen handeling (geen commissie ontvangen, geen contract tekenen, geen leveranciersrelatie aangaan), dus er is geen aantoonbare verboden handeling, alleen een losse claim.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn volledig onafhankelijk\" is categorietaal \u2014 het merk beschrijft geen handeling (geen commissie ontvangen, geen contract tekenen, geen leveranciersrelatie aangaan), maar gebruikt enkel een los adjectief zonder de commissieregel te noemen, wat precies de verboden logica is; toch beschrijft de zin geen verboden handeling van het merk, maar slechts een claim.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn volledig onafhankelijk\" is categorietaal \u2014 het merk beschrijft zichzelf met een eigenschap maar beschrijft geen handeling (zoals het tekenen van een resellercontract of het ontvangen van commissie), en de zin noemt de commissieregel niet, maar dat weglaten is geen verboden handeling.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn volledig onafhankelijk\" is categorietaal \u2014 een losse kwalificatie zonder beschrijving van een handeling \u2014 en beschrijft niet wat het merk doet, aanbiedt of als werkwijze heeft, waardoor er geen aantoonbare verboden handeling plaatsvindt.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "\"Wij zijn volledig onafhankelijk\" is categorietaal \u2014 het merk beschrijft zichzelf met een eigenschap maar beschrijft geen handeling (zoals het tekenen van een resellercontract of het ontvangen van commissie), en de verboden logica verbiedt \"onafhankelijk als losse claim zonder de commissieregel\", maar een losse claim is geen handeling van het merk die de geloofwaardigheidstest schendt.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        },
+        {
+            "case": 3,
+            "merk": "Duinroos Thuiszorg",
+            "citaat": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "verwachtJa": false,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "De zin beschrijft een operationeel resultaat (minder reistijd door slimmere routes), maar noemt geen handeling waarbij het merk effici\u00ebntie of productiviteit als prestatie viert, aanbiedt of als werkwijze presenteert \u2014 het is categorietaal zonder verboden handeling.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "De zin beschrijft een operationeel resultaat (minder reistijd door slimmere routes), maar het merk viert dit niet als prestatie \u2014 er is geen verboden handeling, alleen een feitelijke mededeling over routeoptimalisatie.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "De zin beschrijft een operationeel resultaat (minder reistijd door slimmere routes), maar het merk viert dit niet expliciet als prestatie of productiviteitscijfer \u2014 het is een feitelijke mededeling zonder verboden handeling.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "De zin beschrijft een operationeel resultaat (minder reistijd door slimmere routes), maar het merk viert dit niet als prestatie \u2014 er is geen expliciete handeling waarbij effici\u00ebntie of productiviteit als verkoopargument of trots wordt gepresenteerd, waardoor het bij categorietaal blijft zonder verboden handeling.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": false,
+                    "reden": "De zin beschrijft een operationeel resultaat (minder reistijd door slimmere routes), maar noemt geen handeling waarbij het merk effici\u00ebntie of productiviteit als prestatie viert, aanbiedt of als werkwijze presenteert \u2014 het is categorietaal zonder verboden handeling.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        },
+        {
+            "case": 4,
+            "merk": "Brandpunt Koffie",
+            "citaat": "Black Friday: alle zakken van vorige maand voor de halve prijs!",
+            "verwachtJa": true,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aanbieden van zakken van vorige maand voor de halve prijs \u2014 wat direct de verboden logica schendt: aanbiedingen en stapelkorting op oudere voorraad, \u00e9n de geloofwaardigheidsregel dat koffie ouder dan zes weken niet verkocht wordt, ook niet met korting.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aanbieden van zakken van vorige maand voor de halve prijs \u2014 wat direct de verboden logica schendt: aanbiedingen en stapelkorting op oudere voorraad, \u00e9n de regel dat koffie ouder dan zes weken niet verkocht wordt, ook niet met korting.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aanbieden van zakken van \"vorige maand\" (dus potentieel ouder dan zes weken) voor de halve prijs \u2014 wat rechtstreeks in strijd is met zowel de verboden logica (aanbiedingen en stapelkorting op oudere voorraad) als de geloofwaardigheidsregel (koffie ouder dan zes weken wordt niet verkocht, ook niet met korting).",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aanbieden van zakken van \"vorige maand\" (dus potentieel ouder dan zes weken) voor de halve prijs \u2014 wat direct in strijd is met zowel de verboden logica (aanbiedingen op oudere voorraad) als de geloofwaardigheidsregel (koffie ouder dan zes weken wordt niet verkocht, ook niet met korting).",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aanbieden van zakken van vorige maand voor de halve prijs \u2014 wat direct de verboden logica schendt: aanbiedingen en stapelkorting op oudere voorraad, \u00e9n de geloofwaardigheidsregel dat koffie ouder dan zes weken niet verkocht wordt, ook niet met korting.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        },
+        {
+            "case": 5,
+            "merk": "Stelwerk",
+            "citaat": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "verwachtJa": true,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het officieel aangaan van een gecertificeerd resellerpartnerschap met een softwareleverancier \u2014 wat rechtstreeks in strijd is met de geloofwaardigheidstest die stelt dat het merk geen resellercontracten heeft.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het officieel aangaan van een gecertificeerd resellerpartnerschap met een softwareleverancier \u2014 wat direct in strijd is met de geloofwaardigheidstest die stelt dat het merk geen resellercontracten heeft.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het aangaan van een officieel gecertificeerd resellerpartnerschap met een softwareleverancier \u2014 wat direct in strijd is met de geloofwaardigheidstest die stelt dat het merk geen resellercontracten heeft.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het officieel aangaan van een gecertificeerd resellerpartnerschap met een softwareleverancier \u2014 wat rechtstreeks in strijd is met de geloofwaardigheidstest die stelt dat het merk geen resellercontracten heeft.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het officieel worden van een gecertificeerd resellerpartnerschap met een softwareleverancier \u2014 wat direct in strijd is met de geloofwaardigheidstest die stelt dat het merk geen resellercontracten heeft.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        },
+        {
+            "case": 6,
+            "merk": "Duinroos Thuiszorg",
+            "citaat": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "verwachtJa": true,
+            "runsOk": 5,
+            "runsTotal": 5,
+            "pass": true,
+            "runs": [
+                {
+                    "run": 1,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het inzetten van invalkrachten uit een uitzendbureau om een wachtlijst weg te werken \u2014 wat exact de verboden logica is: wachtlijsten weggewerkt door extra inzet van invalkrachten.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 2,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het inzetten van invalkrachten uit een uitzendbureau om een wachtlijst weg te werken \u2014 wat exact de verboden logica is: wachtlijsten weggewerkt door extra inzet van invalkrachten.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 3,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het inzetten van invalkrachten uit een uitzendbureau om een wachtlijst weg te werken \u2014 wat exact de verboden logica is: wachtlijsten weggewerkt door extra inzet van invalkrachten.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 4,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het inzetten van invalkrachten uit een uitzendbureau om een wachtlijst weg te werken \u2014 wat exact de verboden logica is: wachtlijsten weggewerkt door extra inzet van invalkrachten.",
+                    "match": true,
+                    "error": ""
+                },
+                {
+                    "run": 5,
+                    "ok": true,
+                    "ja": true,
+                    "reden": "De zin beschrijft een concrete handeling van het merk \u2014 het inzetten van invalkrachten uit een uitzendbureau om een wachtlijst weg te werken \u2014 wat exact de verboden logica is: wachtlijsten weggewerkt door extra inzet van invalkrachten.",
+                    "match": true,
+                    "error": ""
+                }
+            ]
+        }
+    ]
+}

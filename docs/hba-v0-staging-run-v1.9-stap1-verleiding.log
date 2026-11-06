@@ -1,0 +1,356 @@
+==> V0.1 CE-04 overgeslagen (V0_SKIP_CE04); hergebruik ce04 uit /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot c61952ce-44b5-45da-a074-9c801afae322, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Stelwerk (nieuw fastlane) slot c61952ce-44b5-45da-a074-9c801afae322
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot 4346e419-28d6-442f-bfef-e28272598f3a, hydration updated=3, usable=3, CE-02=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot 4346e419-28d6-442f-bfef-e28272598f3a
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-12 14:43:59 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.8.1",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "c62d693b-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "cecdf1d5-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "d564acec-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 139,
+      "selfReview": {
+        "weakestClaim": "De bonen die wij inkopen komen van een specifieke plek, zijn op een bepaalde manier verwerkt en smaken daar ook naar.",
+        "unsupportedAssumption": "Het artikel stelt dat de koffie vraagt om bewust te kiezen en dat dit zichtbaar zit in het kopje — dit is een aanname over de smaakbeleving van de klant die nergens door research wordt gestaafd.",
+        "missedCounterpoint": "Er zijn geen research-items gekoppeld, dus er is geen tegengeluid dat gemist had kunnen worden.",
+        "regelbreuk": null
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+        "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+        "articleId": "6b82f0c6-c64b-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "847b4e41-caf2-400b-b09e-58ddf99dd9f9",
+          "aanwijzing": "De slotvraag ('Wat doet bewust kiezen voor uw bedrijf of uw team?') klinkt als een verkoopgesprek dat iedereen kan voeren — hij raakt niet aan wat de koffie zelf concreet maakt. Maak de uitnodiging specifieker: wat proeft iemand vandaag anders dan gisteren, en waarom?",
+          "passageVoor": "Wat doet bewust kiezen voor uw bedrijf of uw team? Dat is de vraag die wij onze klanten vandaag stellen.",
+          "passageNa": null,
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": "Wat doet bewust kiezen voor uw bedrijf of uw team? Dat is de vraag die wij onze klanten vandaag stellen.",
+          "ctaNa": "Vandaag hebben wij één partij bonen waarvan u precies kunt horen waar ze vandaan komen en hoe ze smaken. Dat is de enige actie die wij voeren.",
+          "regelOvertreden": null,
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "847b4e41-caf2-400b-b09e-58ddf99dd9f9",
+        "aanwijzing": "De slotvraag ('Wat doet bewust kiezen voor uw bedrijf of uw team?') klinkt als een verkoopgesprek dat iedereen kan voeren — hij raakt niet aan wat de koffie zelf concreet maakt. Maak de uitnodiging specifieker: wat proeft iemand vandaag anders dan gisteren, en waarom?",
+        "passageVoor": "Wat doet bewust kiezen voor uw bedrijf of uw team? Dat is de vraag die wij onze klanten vandaag stellen.",
+        "passageNa": null,
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": "Wat doet bewust kiezen voor uw bedrijf of uw team? Dat is de vraag die wij onze klanten vandaag stellen.",
+        "ctaNa": "Vandaag hebben wij één partij bonen waarvan u precies kunt horen waar ze vandaan komen en hoe ze smaken. Dat is de enige actie die wij voeren.",
+        "regelOvertreden": null,
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Vandaag schreeuwen duizend merken om aandacht. Wij doen dat niet.\n\nBlack Friday is precies het tegenovergestelde van waar wij voor staan: koffie als snel, goedkoop en inwisselbaar. Een product zonder herkomst, zonder smaak die ergens naar verwijst.\n\nToch doen wij mee — maar anders. Geen schapkorting, geen countdown-timer. Wel een uitnodiging: kies vandaag één keer bewust, in plaats van automatisch.\n\nWant dat is precies wat onze koffie vraagt. De bonen die wij inkopen komen van een specifieke ple",
+      "hbaScore": {
+        "hoofdoordeel": "tegenkracht",
+        "flags": [
+          "proof_gap",
+          "foe_vervaging",
+          "category_fallback"
+        ],
+        "brandContribution": 5.5
+      }
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "c61952ce-44b5-45da-a074-9c801afae322",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 154,
+      "selfReview": {
+        "weakestClaim": "\"Een ERP-keuze is geen aankoop die je elk jaar overdoet.\" — De onderliggende research bestaat uitsluitend uit pagina's van de Consumentenbond en Rijksoverheid over zorg en consumentenproducten. Geen enkele bron ondersteunt een uitspraak over ERP-trajecten, implementatieduur of besliscycli.",
+        "unsupportedAssumption": "Het artikel stelt dat demo's standaard indrukwekkend zijn en dat verkoopdruk een reëel risico is bij ERP-keuzes. Dit is een aanname die het model zelf invult — de research bevat geen enkel gegeven over ERP-selectietrajecten, verkoopgedrag van leveranciers of de rol van demos daarin.",
+        "missedCounterpoint": "Nee. De research bevat geen enkel item met stance = spreekt_tegen over het onderwerp van het artikel. De bronnen gaan over zorgwachttijden en consumentenproducten — volledig buiten scope.",
+        "regelbreuk": {
+          "regel": "je nooit een partnerschap met een softwareleverancier aangaat, omdat je geen resellercontracten hebt en nooit commissie van softwareleveranciers ontvangt",
+          "citaat": "We kondigen vandaag een nieuw partnerschap aan met een ERP-leverancier."
+        }
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "c61952ce-44b5-45da-a074-9c801afae322",
+        "clientId": "27b4136b-d251-fc60-e8ff-45222cb8a407",
+        "articleId": "9a8225c3-c64b-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "3ad41427-02e2-41cf-b917-a71ecdf68bbf",
+          "aanwijzing": "De headline en de openingszin kondigen een partnerschap aan — maar dit merk zegt juist niet te werken met resellercontracten of leveranciersafspraken. Dat is een regelbreuk: de tekst presenteert een nieuw feit over het merk dat direct ingaat tegen de geloofwaardigheidstest.",
+          "passageVoor": "We kondigen vandaag een nieuw partnerschap aan met een ERP-leverancier. Goed nieuws, vinden we zelf. Maar we zeggen er meteen iets bij.",
+          "passageNa": null,
+          "headlineVoor": "Een nieuw ERP-partnerschap begint niet met een demo — het begint met de vraag wat je over tien jaar nodig hebt.",
+          "headlineNa": "Een ERP-keuze begint niet met een demo — het begint met de vraag wat je over tien jaar nodig hebt.",
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": "De geloofwaardigheidstest stelt dat het merk geen resellercontracten heeft en nooit commissie ontvangt van softwareleveranciers. De tekst kondigt een partnerschap aan met een ERP-leverancier — een nieuw feit over het merk dat die test direct ondergraaft, ongeacht de toon of intentie van de rest van de tekst.",
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "3ad41427-02e2-41cf-b917-a71ecdf68bbf",
+        "aanwijzing": "De headline en de openingszin kondigen een partnerschap aan — maar dit merk zegt juist niet te werken met resellercontracten of leveranciersafspraken. Dat is een regelbreuk: de tekst presenteert een nieuw feit over het merk dat direct ingaat tegen de geloofwaardigheidstest.",
+        "passageVoor": "We kondigen vandaag een nieuw partnerschap aan met een ERP-leverancier. Goed nieuws, vinden we zelf. Maar we zeggen er meteen iets bij.",
+        "passageNa": null,
+        "headlineVoor": "Een nieuw ERP-partnerschap begint niet met een demo — het begint met de vraag wat je over tien jaar nodig hebt.",
+        "headlineNa": "Een ERP-keuze begint niet met een demo — het begint met de vraag wat je over tien jaar nodig hebt.",
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": "De geloofwaardigheidstest stelt dat het merk geen resellercontracten heeft en nooit commissie ontvangt van softwareleveranciers. De tekst kondigt een partnerschap aan met een ERP-leverancier — een nieuw feit over het merk dat die test direct ondergraaft, ongeacht de toon of intentie van de rest van de tekst.",
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "We kondigen vandaag een nieuw partnerschap aan met een ERP-leverancier. Goed nieuws, vinden we zelf. Maar we zeggen er meteen iets bij.\n\nWant dit soort trajecten heeft een valkuil. De demo's zijn indrukwekkend. De beloftes zijn groot. En ergens in dat enthousiasme verdwijnt de vraag die er het meest toe doet: past dit systeem bij hoe ons bedrijf er over vijf of tien jaar uitziet — niet bij hoe de presentatie er vandaag uitziet?\n\nWij zijn dit partnerschap ingegaan met die vraag als vertrekpunt. N",
+      "hbaScore": {
+        "hoofdoordeel": "regelbreuk",
+        "flags": [
+          "constraint_breach",
+          "foe_vervaging",
+          "proof_gap"
+        ],
+        "brandContribution": 3.5
+      }
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "4346e419-28d6-442f-bfef-e28272598f3a",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 3,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 123,
+      "selfReview": {
+        "weakestClaim": "We zoeken dan ook actief naar ruimte in onze roosters — niet omdat het systeem die vanzelf biedt, maar omdat we die zelf maken.",
+        "unsupportedAssumption": "De stelling dat Duinroos nieuwe cliënten binnen één maand inwerkt, wordt nergens door de research gestaafd. De research zegt alleen dat wachttijden per instelling en zorgsoort verschillen, niet dat één maand een realistisch of gangbaar streefdoel is.",
+        "missedCounterpoint": "De Rijksoverheid-research stelt expliciet dat wachten op niet-acute zorg \"normaal en in principe ook niet zorgelijk\" is, zolang het niet leidt tot gezondheidsschade. Dit tegengeluid — dat een wachttijd op zichzelf niet per definitie een probleem is — ontbreekt volledig in het artikel.",
+        "regelbreuk": {
+          "regel": "je wachtlijsten niet wegwerkt door extra inzet van invalkrachten",
+          "citaat": "We zoeken dan ook actief naar ruimte in onze roosters — niet omdat het systeem die vanzelf biedt, maar omdat we die zelf maken."
+        }
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "4346e419-28d6-442f-bfef-e28272598f3a",
+        "clientId": "a4b504fe-1b0c-b758-fcfd-575398b51eff",
+        "articleId": "c8cc80ec-c64b-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "1fbd41a2-7430-4475-94f7-d1e66e50d1f3",
+          "aanwijzing": "De headline 'Wachtlijst in één maand weggewerkt' belooft precies wat het merk bewust niet doet: wachtlijsten wegwerken door extra inzet. Vervang de headline zodat de nadruk ligt op wat de cliënt terugkrijgt — grip op de eigen dag — in plaats van op de organisatieprestatie.",
+          "passageVoor": null,
+          "passageNa": null,
+          "headlineVoor": "Wachtlijst in één maand weggewerkt",
+          "headlineNa": "Binnen een maand weer baas over je eigen ochtend",
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": "De headline presenteert het wegwerken van de wachtlijst als prestatie. Dat gaat in tegen de regel dat wachtlijsten niet worden weggewerkt door extra inzet als organisatiepunt — en zeker niet als iets om mee te adverteren. De zin 'We zoeken dan ook actief naar ruimte in onze roosters' versterkt dit: de lezer gelooft na het lezen dat Duinroos extra capaciteit inzet om snel te kunnen starten, wat de geloofwaardigheidstest ondergraaft.",
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "1fbd41a2-7430-4475-94f7-d1e66e50d1f3",
+        "aanwijzing": "De headline 'Wachtlijst in één maand weggewerkt' belooft precies wat het merk bewust niet doet: wachtlijsten wegwerken door extra inzet. Vervang de headline zodat de nadruk ligt op wat de cliënt terugkrijgt — grip op de eigen dag — in plaats van op de organisatieprestatie.",
+        "passageVoor": null,
+        "passageNa": null,
+        "headlineVoor": "Wachtlijst in één maand weggewerkt",
+        "headlineNa": "Binnen een maand weer baas over je eigen ochtend",
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": "De headline presenteert het wegwerken van de wachtlijst als prestatie. Dat gaat in tegen de regel dat wachtlijsten niet worden weggewerkt door extra inzet als organisatiepunt — en zeker niet als iets om mee te adverteren. De zin 'We zoeken dan ook actief naar ruimte in onze roosters' versterkt dit: de lezer gelooft na het lezen dat Duinroos extra capaciteit inzet om snel te kunnen starten, wat de geloofwaardigheidstest ondergraaft.",
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Een wachtlijst klinkt neutraal. Maar voor iemand die thuis hulp nodig heeft, betekent het gewoon: elke ochtend afwachten hoe de dag loopt.\n\nWie bepaalt wanneer je opstaat, wanneer je eet, wanneer je je kunt wassen? Zolang de zorg nog niet is geregeld, is het antwoord: niet jijzelf.\n\nBij Duinroos Thuiszorg werken we nieuwe cliënten binnen één maand in. Niet omdat dat een mooie belofte klinkt, maar omdat een maand lang geen grip hebben op je eigen dag gewoon te lang is.\n\nWe zoeken dan ook actief n",
+      "hbaScore": {
+        "hoofdoordeel": "regelbreuk",
+        "flags": [
+          "constraint_breach",
+          "foe_vervaging",
+          "proof_gap"
+        ],
+        "brandContribution": 3.5
+      }
+    }
+  ]
+}

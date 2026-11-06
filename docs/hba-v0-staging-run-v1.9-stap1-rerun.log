@@ -1,0 +1,283 @@
+==> V0.1 CE-04 post 3 (trigger, daarna feedback poll)…
+    wacht 90s op CE-04 (n8n)…
+==> V0.3 Brandpunt Koffie (bestaand slot) slot 1f856a88-fc18-47a2-81be-3d335358066c
+==> V0.3 Brandpunt Koffie (bestaand slot) slot d733223a-7964-4324-9883-dcd4b1809006
+==> V0.2 Fastlane Stelwerk: Nieuw partnerschap met een ERP-leverancier
+    slot 9aa93978-569c-4a96-96d2-4b184c26e622, CE-02 triggered=True
+==> V0.3 Stelwerk (nieuw fastlane) slot 9aa93978-569c-4a96-96d2-4b184c26e622
+==> V0.2 Fastlane Duinroos Thuiszorg: Wachtlijst in één maand weggewerkt
+    slot b0c6ec30-15fa-4d15-8e3a-9b3347580624, CE-02 triggered=True
+==> V0.3 Duinroos Thuiszorg (nieuw fastlane) slot b0c6ec30-15fa-4d15-8e3a-9b3347580624
+Wrote /Users/erik/Library/CloudStorage/Dropbox/iGiSNext/Content Engine/CE-Cursor/docs/hba-v0-testresultaat.json
+{
+  "generatedAt": "2026-10-12 14:10:55 UTC",
+  "ce04": {
+    "ok": true,
+    "promptVersion": "v1.8.1",
+    "waitSeconds": 0,
+    "results": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        }
+      }
+    ],
+    "resultsWithFeedback": [
+      {
+        "merk": "Brandpunt Koffie",
+        "label": "Breekt de regel",
+        "slotId": "9fd9dab9-0e88-4c5d-881d-032b1a52b8d7",
+        "articleId": "600bd882-d63e-4b46-8175-4a5e936fba4d",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "c62d693b-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Duinroos Thuiszorg",
+        "label": "Breekt de regel",
+        "slotId": "3a276487-2dd0-43a4-9cee-464da7d2b31a",
+        "articleId": "766d3283-82ad-4abe-b222-7d1dca22ea5c",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "cecdf1d5-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      },
+      {
+        "merk": "Stelwerk",
+        "label": "Breekt de regel",
+        "slotId": "06746391-4428-424d-ad3a-0108d773ac1f",
+        "articleId": "30819a9e-0dca-462d-b5a3-a46b6ec4233b",
+        "ce04": {
+          "ok": true,
+          "httpCode": 200
+        },
+        "feedbackCount": 1,
+        "regelFeedback": [],
+        "feedbackSample": [
+          {
+            "id": "d564acec-c646-11f1-9456-9c6b00b7cd02",
+            "type": "text",
+            "name": "Hoofdredacteur",
+            "comment": "[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=onbekend. Raw (300 tekens): {\"success\":true}",
+            "actionLabel": null,
+            "excerpt": null,
+            "status": "open"
+          }
+        ]
+      }
+    ]
+  },
+  "verleiding": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 5,
+        "usableCount": 5,
+        "wouldBlockCe03": false,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": {
+        "ok": true,
+        "webhookTriggered": true,
+        "response": {
+          "message": "Workflow was started"
+        }
+      },
+      "contentWordCount": 118,
+      "selfReview": {
+        "weakestClaim": "Wij zien dat onze klanten dat steeds vaker serieus nemen — dit wordt als feit gepresenteerd maar er is geen research gekoppeld die dit ondersteunt.",
+        "unsupportedAssumption": "Het artikel gaat ervan uit dat een proefpakket 'samengesteld door onze roasters, met uitleg over herkomst, branding en zetsuggestie' bestaat en beschikbaar is — dit wordt nergens onderbouwd door research of productinformatie.",
+        "missedCounterpoint": "Er is geen research gekoppeld, dus er zijn geen tegenstemmen uit research die gemist worden.",
+        "regelbreuk": null
+      },
+      "selfReviewError": null,
+      "hbaHintTrigger": {
+        "ok": true,
+        "slotId": "1f856a88-fc18-47a2-81be-3d335358066c",
+        "clientId": "54aeb554-562d-0f0d-9c48-381681a2eb84",
+        "articleId": "1a23f9c8-c647-11f1-9456-9c6b00b7cd02",
+        "hint": {
+          "id": "557328a9-19c4-4548-a79d-2f4b5c4d252a",
+          "aanwijzing": "De zin 'zegt iets over hoe een bedrijf zijn mensen waardeert' zakt weg in een algemene gedachte die iedereen kan zeggen — het merk wordt hier niet zichtbaar. Maak concreet wat het merk wél doet: vertel iets over de koffie zelf, niet over de betekenis ervan.",
+          "passageVoor": "Want de koffie die dagelijks op kantoor wordt gezet, zegt iets over hoe een bedrijf zijn mensen waardeert. Wij zien dat onze klanten dat steeds vaker serieus nemen — en Black Friday is een goed moment om dat concreet te maken.",
+          "passageNa": "Want de koffie die dagelijks op kantoor wordt gezet, is gebrand binnen zes weken voor levering — niet eerder, ook niet met korting als de datum nadert. Wat over is, gaat naar de voedselbank. Dat is de keuze die wij elke week opnieuw maken, en Black Friday is een goed moment om te kijken of die keuze bij uw bedrijf past.",
+          "headlineVoor": null,
+          "headlineNa": null,
+          "ctaVoor": null,
+          "ctaNa": null,
+          "regelOvertreden": null,
+          "toegepast": false,
+          "genegeerd": false
+        },
+        "code": null,
+        "error": null,
+        "architectureFootnote": null
+      },
+      "hbaHint": {
+        "id": "557328a9-19c4-4548-a79d-2f4b5c4d252a",
+        "aanwijzing": "De zin 'zegt iets over hoe een bedrijf zijn mensen waardeert' zakt weg in een algemene gedachte die iedereen kan zeggen — het merk wordt hier niet zichtbaar. Maak concreet wat het merk wél doet: vertel iets over de koffie zelf, niet over de betekenis ervan.",
+        "passageVoor": "Want de koffie die dagelijks op kantoor wordt gezet, zegt iets over hoe een bedrijf zijn mensen waardeert. Wij zien dat onze klanten dat steeds vaker serieus nemen — en Black Friday is een goed moment om dat concreet te maken.",
+        "passageNa": "Want de koffie die dagelijks op kantoor wordt gezet, is gebrand binnen zes weken voor levering — niet eerder, ook niet met korting als de datum nadert. Wat over is, gaat naar de voedselbank. Dat is de keuze die wij elke week opnieuw maken, en Black Friday is een goed moment om te kijken of die keuze bij uw bedrijf past.",
+        "headlineVoor": null,
+        "headlineNa": null,
+        "ctaVoor": null,
+        "ctaNa": null,
+        "regelOvertreden": null,
+        "toegepast": false,
+        "genegeerd": false
+      },
+      "contentExcerpt": "Black Friday is het moment waarop koffie een wegwerpartikel wordt. Snel klikken, goedkoop scoren, niet nadenken. Dat is precies wat wij niet willen.\n\nDaarom doen wij dit jaar iets anders. Geen kortingsgestapel, geen \"tijdelijk 40% op alles\". Wel één concrete aanbieding voor bedrijven die willen stoppen met koffie als bijzaak: een proefpakket samengesteld door onze roasters, met uitleg over herkomst, branding en zetsuggestie.\n\nNiet meer kopen. Beter kiezen.\n\nWant de koffie die dagelijks op kantoo",
+      "hbaScore": {
+        "hoofdoordeel": "op_merk",
+        "flags": [
+          "proof_gap",
+          "foe_vervaging"
+        ],
+        "brandContribution": 6.5
+      }
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "bestaand slot",
+      "slotId": "d733223a-7964-4324-9883-dcd4b1809006",
+      "theme": "Black Friday-actie",
+      "research": {
+        "itemCount": 0,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "nieuw fastlane",
+      "slotId": "9aa93978-569c-4a96-96d2-4b184c26e622",
+      "theme": "Nieuw partnerschap met een ERP-leverancier",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "nieuw fastlane",
+      "slotId": "b0c6ec30-15fa-4d15-8e3a-9b3347580624",
+      "theme": "Wachtlijst in één maand weggewerkt",
+      "research": {
+        "itemCount": 3,
+        "usableCount": 0,
+        "wouldBlockCe03": true,
+        "fetchSlotResearch": {
+          "ok": false,
+          "error": "Slot niet gevonden",
+          "class": "RuntimeException"
+        }
+      },
+      "ce03Trigger": null,
+      "ce03Error": {
+        "httpStatus": 409,
+        "body": {
+          "error": "Te weinig research om een artikel op te baseren — vul je bronnen aan of kies een ander thema."
+        }
+      },
+      "contentWordCount": 0,
+      "selfReview": null,
+      "selfReviewError": null,
+      "hbaHint": null,
+      "contentExcerpt": ""
+    }
+  ]
+}

@@ -1,0 +1,2078 @@
+{
+  "ok": true,
+  "generatedAt": "2026-10-10 17:50:04 UTC",
+  "promptVersion": "v1.7",
+  "runs": 5,
+  "modelsUsed": [
+    "claude-sonnet-4-6"
+  ],
+  "environment": "staging",
+  "summary": {
+    "stable_goed": 9,
+    "instabiel": 3,
+    "review": 3,
+    "fout": 2
+  },
+  "categoryFallbackPostsLastRun": 10,
+  "hoofdoordeelGecorrigeerdCount": 25,
+  "unstablePosts": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Neutraal / grensgeval",
+      "goodRuns": 0,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal"
+      ],
+      "deviatingRuns": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "hoofdoordeel": "categorietaal",
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ]
+        },
+        {
+          "run": 2,
+          "judgment": "fout",
+          "hoofdoordeel": "categorietaal",
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ]
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "hoofdoordeel": "categorietaal",
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ]
+        },
+        {
+          "run": 4,
+          "judgment": "fout",
+          "hoofdoordeel": "categorietaal",
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ]
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "hoofdoordeel": "categorietaal",
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ]
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Op merk",
+      "goodRuns": 3,
+      "hoofdoordeelPerRun": [
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "deviatingRuns": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "hoofdoordeel": "op_merk",
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust."
+          },
+          "reasons": [
+            "Post 1: flag niet toegestaan: proof_gap"
+          ]
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "hoofdoordeel": "op_merk",
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust."
+          },
+          "reasons": [
+            "Post 1: flag niet toegestaan: proof_gap"
+          ]
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Archetype zonder bewijs",
+      "goodRuns": 3,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "tegenkracht",
+        "categorietaal",
+        "categorietaal",
+        "tegenkracht"
+      ],
+      "deviatingRuns": [
+        {
+          "run": 2,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "foe_vervaging": "Zo zien wij zorg."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "foe_vervaging": "Zo zien wij zorg."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Branchetaal uit de verboden logica",
+      "goodRuns": 4,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "tegenkracht",
+        "categorietaal"
+      ],
+      "deviatingRuns": [
+        {
+          "run": 4,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "proof_gap",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk.",
+            "proof_gap": "Wij zijn volledig onafhankelijk. Daarom kiezen steeds meer maakbedrijven voor Stelwerk.",
+            "foe_vervaging": "Daarom kiezen steeds meer maakbedrijven voor Stelwerk."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Categorietaal",
+      "goodRuns": 0,
+      "hoofdoordeelPerRun": [
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht"
+      ],
+      "deviatingRuns": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        },
+        {
+          "run": 2,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek.",
+            "proof_gap": "Wij zijn uw betrouwbare partner voor ERP-implementaties."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        },
+        {
+          "run": 4,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "hoofdoordeel": "tegenkracht",
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ]
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Breekt de regel",
+      "verwacht_hoofdoordeel": "regelbreuk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 3,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "alle zakken van vorige maand voor de halve prijs",
+            "foe_vervaging": "Black Friday: alle zakken van vorige maand voor de halve prijs!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "alle zakken van vorige maand voor de halve prijs",
+            "foe_vervaging": "Black Friday: alle zakken van vorige maand voor de halve prijs!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "alle zakken van vorige maand voor de halve prijs",
+            "foe_vervaging": "Black Friday: alle zakken van vorige maand voor de halve prijs!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "alle zakken van vorige maand voor de halve prijs",
+            "foe_vervaging": "Black Friday: alle zakken van vorige maand voor de halve prijs!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "alle zakken van vorige maand voor de halve prijs",
+            "foe_vervaging": "Black Friday: alle zakken van vorige maand voor de halve prijs!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Categorietaal",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 2,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt. Kom langs!",
+            "proof_gap": "versgebrande koffie van topkwaliteit"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0.5,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt.",
+            "proof_gap": "versgebrande koffie van topkwaliteit"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt. Kom langs!",
+            "proof_gap": "versgebrande koffie van topkwaliteit"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt. Kom langs!",
+            "proof_gap": "versgebrande koffie van topkwaliteit"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij ons vind je versgebrande koffie van topkwaliteit, met liefde gemaakt.",
+            "proof_gap": "versgebrande koffie van topkwaliteit"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Mechanisme dat markthygiëne is",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": true,
+      "goodRuns": 0,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "review",
+      "index": 6,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 6.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust na het branden.",
+            "category_fallback": "Vandaag nieuwe oogst binnen uit Huila."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=op_merk → categorietaal"
+        },
+        {
+          "run": 2,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 6.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust na het branden.",
+            "category_fallback": "Vandaag nieuwe oogst binnen uit Huila."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=op_merk → categorietaal"
+        },
+        {
+          "run": 3,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 6.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust na het branden."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 6.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust na het branden."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 6.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust na het branden."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Neutraal / grensgeval",
+      "verwacht_hoofdoordeel": "neutraal",
+      "ambiguous": false,
+      "goodRuns": 0,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal"
+      ],
+      "brandContributionSpread": 0.5,
+      "judgment": "fout",
+      "index": 4,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 2,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ],
+          "brandContribution": 0.5,
+          "distinctiviteit": 0.5,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 4,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel categorietaal (verwacht: neutraal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Vijf tips om je koffiezetapparaat te ontkalken."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Op merk",
+      "verwacht_hoofdoordeel": "op_merk",
+      "ambiguous": false,
+      "goodRuns": 3,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "instabiel",
+      "index": 1,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "reasons": [
+            "Post 1: flag niet toegestaan: proof_gap"
+          ],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3.5,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "reasons": [
+            "Post 1: flag niet toegestaan: proof_gap"
+          ],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Over twee weken in de winkel, zodra hij is uitgerust."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Brandpunt Koffie",
+      "label": "Verdedigt de regel",
+      "verwacht_hoofdoordeel": "op_merk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 5,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Archetype zonder bewijs",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": false,
+      "goodRuns": 3,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "tegenkracht",
+        "categorietaal",
+        "categorietaal",
+        "tegenkracht"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "instabiel",
+      "index": 5,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "proof_gap": "Zo zien wij zorg."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "foe_vervaging": "Zo zien wij zorg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "proof_gap": "Zo zien wij zorg."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Zo zien wij zorg.",
+            "proof_gap": "Zo zien wij zorg."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Mevrouw Jansen kreeg vandaag een bos bloemen van haar verzorgster. Zo zien wij zorg.",
+            "foe_vervaging": "Zo zien wij zorg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Breekt de regel",
+      "verwacht_hoofdoordeel": "regelbreuk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 3,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "foe_vervaging": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "foe_vervaging": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "category_fallback": "Goed nieuws"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "foe_vervaging": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "category_fallback": "Goed nieuws: door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "foe_vervaging": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "foe_vervaging": "door de inzet van invalkrachten uit het uitzendbureau hebben we onze wachtlijst in een maand weggewerkt",
+            "category_fallback": "Goed nieuws"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Categorietaal",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 2,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals.",
+            "proof_gap": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals.",
+            "proof_gap": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals.",
+            "proof_gap": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals.",
+            "proof_gap": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals.",
+            "proof_gap": "Bij Duinroos krijgt u warme, persoonlijke zorg van betrokken professionals."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Logica van de tegenkracht",
+      "verwacht_hoofdoordeel": null,
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 6,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "category_fallback": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "category_fallback": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 1,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "category_fallback": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "category_fallback": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg.",
+            "category_fallback": "Dankzij slimmere routes zijn onze zorgverleners elke dag een half uur minder onderweg."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Neutraal / grensgeval",
+      "verwacht_hoofdoordeel": "neutraal",
+      "ambiguous": true,
+      "goodRuns": 0,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "categorietaal"
+      ],
+      "brandContributionSpread": 0.5,
+      "judgment": "review",
+      "index": 4,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 0.5,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zoeken nieuwe collega's voor ons team in Heemstede!"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 2,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 0.5,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zoeken nieuwe collega's voor ons team in Heemstede!"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 3,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 0.5,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zoeken nieuwe collega's voor ons team in Heemstede!"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 4,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zoeken nieuwe collega's voor ons team in Heemstede!"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 5,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 0.5,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zoeken nieuwe collega's voor ons team in Heemstede!"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        }
+      ]
+    },
+    {
+      "merk": "Duinroos Thuiszorg",
+      "label": "Op merk",
+      "verwacht_hoofdoordeel": "op_merk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "brandContributionSpread": 0.5,
+      "judgment": "goed",
+      "index": 1,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 8,
+          "distinctiviteit": 4,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3,
+          "flags": [],
+          "flag_citaten": {},
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Branchetaal uit de verboden logica",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": false,
+      "goodRuns": 4,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "categorietaal",
+        "tegenkracht",
+        "categorietaal"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "instabiel",
+      "index": 5,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk.",
+            "proof_gap": "Daarom kiezen steeds meer maakbedrijven voor Stelwerk."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk. Daarom kiezen steeds meer maakbedrijven voor Stelwerk.",
+            "proof_gap": "Wij zijn volledig onafhankelijk."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk.",
+            "proof_gap": "Daarom kiezen steeds meer maakbedrijven voor Stelwerk."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk.",
+            "proof_gap": "Wij zijn volledig onafhankelijk. Daarom kiezen steeds meer maakbedrijven voor Stelwerk.",
+            "foe_vervaging": "Daarom kiezen steeds meer maakbedrijven voor Stelwerk."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn volledig onafhankelijk. Daarom kiezen steeds meer maakbedrijven voor Stelwerk.",
+            "proof_gap": "Wij zijn volledig onafhankelijk."
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Breekt de regel",
+      "verwacht_hoofdoordeel": "regelbreuk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk",
+        "regelbreuk"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "goed",
+      "index": 3,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "foe_vervaging": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "foe_vervaging": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk",
+            "foe_vervaging": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk",
+            "category_fallback": "Trots: Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "foe_vervaging": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "constraint_breach",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "constraint_breach": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!",
+            "foe_vervaging": "Stelwerk is nu officieel gecertificeerd resellerpartner van een groot ERP-merk!"
+          },
+          "hoofdoordeel": "regelbreuk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Categorietaal",
+      "verwacht_hoofdoordeel": "categorietaal",
+      "ambiguous": false,
+      "goodRuns": 0,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht",
+        "tegenkracht"
+      ],
+      "brandContributionSpread": 1.0,
+      "judgment": "fout",
+      "index": 2,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 2,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 0,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging",
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek.",
+            "proof_gap": "Wij zijn uw betrouwbare partner voor ERP-implementaties."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 3,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 4,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 5,
+          "judgment": "fout",
+          "reasons": [
+            "hoofdoordeel tegenkracht (verwacht: categorietaal)"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "Wij zijn uw betrouwbare partner voor ERP-implementaties.",
+            "foe_vervaging": "Neem contact op voor een vrijblijvend gesprek."
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Neutraal / grensgeval",
+      "verwacht_hoofdoordeel": "neutraal",
+      "ambiguous": true,
+      "goodRuns": 0,
+      "runsTotal": 5,
+      "stableGood": false,
+      "hoofdoordeelPerRun": [
+        "categorietaal",
+        "categorietaal",
+        "tegenkracht",
+        "categorietaal",
+        "tegenkracht"
+      ],
+      "brandContributionSpread": 0.0,
+      "judgment": "review",
+      "index": 4,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "opportunistische_trendcontent",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "opportunistische_trendcontent": "AI in de maakindustrie, wat kun je ermee?",
+            "category_fallback": "Webinar volgende week: AI in de maakindustrie, wat kun je ermee?"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 2,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "opportunistische_trendcontent",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "opportunistische_trendcontent": "AI in de maakindustrie, wat kun je ermee?",
+            "category_fallback": "Webinar volgende week: AI in de maakindustrie, wat kun je ermee?"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 3,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "foe_vervaging",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "foe_vervaging": "AI in de maakindustrie, wat kun je ermee?",
+            "category_fallback": "Webinar volgende week: AI in de maakindustrie, wat kun je ermee?"
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        },
+        {
+          "run": 4,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "opportunistische_trendcontent",
+            "category_fallback"
+          ],
+          "flag_citaten": {
+            "opportunistische_trendcontent": "AI in de maakindustrie, wat kun je ermee?",
+            "category_fallback": "AI in de maakindustrie, wat kun je ermee?"
+          },
+          "hoofdoordeel": "categorietaal",
+          "hoofdoordeel_gecorrigeerd": "model=neutraal → categorietaal"
+        },
+        {
+          "run": 5,
+          "judgment": "review",
+          "reasons": [
+            "Ambigue verwachting — handmatige beoordeling"
+          ],
+          "brandContribution": 1,
+          "distinctiviteit": 0,
+          "flags": [
+            "category_fallback",
+            "foe_vervaging"
+          ],
+          "flag_citaten": {
+            "category_fallback": "AI in de maakindustrie, wat kun je ermee?",
+            "foe_vervaging": "AI in de maakindustrie, wat kun je ermee?"
+          },
+          "hoofdoordeel": "tegenkracht",
+          "hoofdoordeel_gecorrigeerd": "model=categorietaal → tegenkracht"
+        }
+      ]
+    },
+    {
+      "merk": "Stelwerk",
+      "label": "Op merk",
+      "verwacht_hoofdoordeel": "op_merk",
+      "ambiguous": false,
+      "goodRuns": 5,
+      "runsTotal": 5,
+      "stableGood": true,
+      "hoofdoordeelPerRun": [
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk",
+        "op_merk"
+      ],
+      "brandContributionSpread": 0.5,
+      "judgment": "goed",
+      "index": 1,
+      "runs": [
+        {
+          "run": 1,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Omdat dat in een op de drie gevallen het beste advies is."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 2,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 8,
+          "distinctiviteit": 4,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Omdat dat in een op de drie gevallen het beste advies is."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 3,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Omdat dat in een op de drie gevallen het beste advies is."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 4,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 3,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Omdat dat in een op de drie gevallen het beste advies is."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        },
+        {
+          "run": 5,
+          "judgment": "goed",
+          "reasons": [],
+          "brandContribution": 7.5,
+          "distinctiviteit": 4,
+          "flags": [
+            "proof_gap"
+          ],
+          "flag_citaten": {
+            "proof_gap": "Omdat dat in een op de drie gevallen het beste advies is."
+          },
+          "hoofdoordeel": "op_merk",
+          "hoofdoordeel_gecorrigeerd": null
+        }
+      ]
+    }
+  ]
+}

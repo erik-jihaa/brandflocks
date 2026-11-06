@@ -1,0 +1,5 @@
+# Optioneel: extra afscherming naast app-wachtwoord in config.local.php
+AuthType Basic
+AuthName "LinkedIn Scan"
+AuthUserFile /pad/naar/.htpasswd
+Require valid-user
