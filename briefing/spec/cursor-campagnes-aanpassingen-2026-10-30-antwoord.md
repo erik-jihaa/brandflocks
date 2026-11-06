@@ -1,7 +1,7 @@
 # Antwoord op campagnes-aanpassingen-2026-10-30 — richting voor Cursor
 
 **Datum:** 2026-10-30
-**Bron:** `briefing/hba-input/campagnes-aanpassingen-2026-10-30.md` (Rogier, na doorloop van 30 okt). Dit document beantwoordt de open vragen die nodig zijn om te kunnen starten, en legt vast wat al besloten is. De overige open vragen (die Rogier zelf moet invullen of die pas na §1 scherp te maken zijn) staan onderaan, zodat ze niet verloren gaan.
+**Bron:** `briefing/spec/campagnes-aanpassingen-2026-10-30.md` (Rogier, na doorloop van 30 okt). Dit document beantwoordt de open vragen die nodig zijn om te kunnen starten, en legt vast wat al besloten is. De overige open vragen (die Rogier zelf moet invullen of die pas na §1 scherp te maken zijn) staan onderaan, zodat ze niet verloren gaan.
 
 ## Antwoord aan Rogier — §2: intelligentie achter Touch/Tell/Sell
 

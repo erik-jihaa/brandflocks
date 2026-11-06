@@ -13,4 +13,5 @@ Bindende bronnen voor herontwerp en opschonen. CE-pilotbriefings staan alleen no
 | `campagnes-aanpassingen-2026-10-30.md` + `cursor-campagnes-aanpassingen-2026-10-30-antwoord.md` | Campagne |
 | `hba-input/drempels-thema-onderbouwing.md` | Thema-drempels |
 | `cursor-weekplan-herontwerp-2026-11-03.md` | Bouwweek |
+| `cursor-plan-van-aanpak-herontwerp-2026-11-02.md` | Technische checks vóór bouw |
 | `cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` | Fork + opschonen |

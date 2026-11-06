@@ -12,7 +12,9 @@ web/blog/
 .ce-wp-api-credentials
 backups/
 __pycache__/
+**/__pycache__/
 .DS_Store
 **/.DS_Store
+tests/output/
 /vendor/
 composer.lock

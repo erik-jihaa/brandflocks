@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/schema-helper.php';
 
-/** Rogier HBA branche-bibliotheek startset — briefing/hba-input/HBA_branche_bibliotheek.docx */
+/** Rogier HBA branche-bibliotheek startset — briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov.zip */
 function ce_hba_branche_seed_rows(): array
 {
     return [

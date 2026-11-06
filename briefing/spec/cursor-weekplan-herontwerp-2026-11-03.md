@@ -19,7 +19,7 @@ Een complete herinrichting van de app volgens Rogiers klikmodel. **De functional
 | Hero Brand Core Logic v2.3 | `briefing/spec/hba-input/dc2f9130-Hero_Brand_Core_Logic_v2_3.docx` | Kennisbron: 12 archetypen, Story Triangle, categorie-archetype-risico (§4), eisen aan een Regel (§9). Systeemprompt-context voor wizard stap 6 en de architectuurcheck. |
 | Check- en afleider-addendum | `briefing/spec/hba-input/HBA_bouwaddendum_check_en_afleider.docx` + `HBA_Lees_dit_eerst_addendum.docx` (tekstversie: `briefing/spec/hba-kit-extract/`) | Kant-en-klare systeemprompts voor de architectuurcheck en de gefaseerde branche-afleider, plus acceptatietest ("loyaliteitsbranche"). |
 | Branchebibliotheek | `briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov.zip` | 20 gecureerde branches (JSON) + `branchelijst.csv` (alle 102) + `begrippen-en-schema.md` (bindend schema). |
-| Campagne-aanpassingen 30 okt | `briefing/spec/hba-input/campagnes-aanpassingen-2026-10-30.md` + ons antwoord `briefing/spec/cursor-campagnes-aanpassingen-2026-10-30-antwoord.md` | Campagneslot = thema, Touch/Tell/Sell, stap-7-gedrag. |
+| Campagne-aanpassingen 30 okt | `briefing/spec/campagnes-aanpassingen-2026-10-30.md` + ons antwoord `briefing/spec/cursor-campagnes-aanpassingen-2026-10-30-antwoord.md` | Campagneslot = thema, Touch/Tell/Sell, stap-7-gedrag. |
 | Drempels thema-onderbouwing | `briefing/spec/hba-input/drempels-thema-onderbouwing.md` | Aantal thema's = bruikbare bronfragmenten / 2 (max 6), waarschuwing bij 0–1, label "licht onderbouwd". |
 | Plan van aanpak | `briefing/spec/cursor-plan-van-aanpak-herontwerp-2026-11-02.md` | Technische checks al gedaan (zie §2 hieronder). |
 

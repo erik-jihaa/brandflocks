@@ -1,14 +1,14 @@
 # Plan van aanpak — herontwerp Brandflocks (vanaf voorstel-herontwerp-2026-10-31)
 
 **Datum:** 2026-11-02
-**Bronnen:** `briefing/hba-input/voorstel-herontwerp-2026-10-31.docx` (Rogier, bindende rationale), het klikmodel (bindende UI-specificatie, zie Rogiers mail), `Hero_Brand_Core_Logic_v2_3.docx`, `Branchebibliotheek-voor-Erik-2nov.zip`, en de al aanwezige `HBA_bouwaddendum_check_en_afleider.docx` + `HBA_Lees_dit_eerst_addendum.docx` (augustus-traject, nog gewoon in de repo — zie onder).
+**Bronnen:** `briefing/spec/hba-input/voorstel-herontwerp-2026-10-31.docx` (Rogier, bindende rationale), het klikmodel (bindende UI-specificatie, zie Rogiers mail), `Hero_Brand_Core_Logic_v2_3.docx`, `Branchebibliotheek-voor-Erik-2nov.zip`, en de al aanwezige `HBA_bouwaddendum_check_en_afleider.docx` + `HBA_Lees_dit_eerst_addendum.docx` (augustus-traject — zie onder).
 
 ## 0. Eerst dit teruggeven aan Rogier
 
 **De twee augustus-documenten die hij zoekt, heeft Erik nog gewoon liggen** — hoeven niet opnieuw gestuurd te worden:
-- `briefing/hba-input/HBA_bouwaddendum_check_en_afleider.docx`
-- `briefing/hba-input/HBA_Lees_dit_eerst_addendum.docx`
-- (bonus: er is ook al een eerdere uitgepakte tekstversie in `briefing/hba-kit-extract/`, inclusief een systeemprompt-bestand `04-systeemprompt.txt` en een datamodel `08-datamodel.txt` uit dat traject — kan helpen om te zien wat er destijds al technisch is aangesloten.)
+- `briefing/spec/hba-input/HBA_bouwaddendum_check_en_afleider.docx`
+- `briefing/spec/hba-input/HBA_Lees_dit_eerst_addendum.docx`
+- (bonus: er is ook al een eerdere uitgepakte tekstversie in `briefing/spec/hba-kit-extract/`, inclusief een systeemprompt-bestand `04-systeemprompt.txt` en een datamodel `08-datamodel.txt` uit dat traject — kan helpen om te zien wat er destijds al technisch is aangesloten.)
 
 **De vier technische checkpunten uit het voorstel zijn al (deels) te beantwoorden door in de code te kijken** — hieronder per punt, zodat dit niet nog een ronde heen-en-weer met Rogier kost:
 

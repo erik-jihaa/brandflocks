@@ -2,7 +2,7 @@
 <?php
 /**
  * Offline replay hoofdoordeel uit v1.13 stability JSON (geen LLM, geen staging).
- * Levert docs/hba-v1.13-tegenkracht-diagnose.md
+ * Schrijft tests/output/hba-v1.13-tegenkracht-diagnose.md (niet in docs/).
  */
 declare(strict_types=1);
 
@@ -13,7 +13,12 @@ require_once __DIR__ . '/hba-v1.12-replay-lib.php';
 
 $jsonPath = $root . '/tests/fixtures/hba-testmerken-stability-v1.13-5runs.json';
 $postsPath = $root . '/tests/fixtures/hba-testmerken/alle_drie_testmerken.json';
-$outPath = $root . '/docs/hba-v1.13-tegenkracht-diagnose.md';
+$outDir = $root . '/tests/output';
+$outPath = $outDir . '/hba-v1.13-tegenkracht-diagnose.md';
+if (!is_dir($outDir) && !mkdir($outDir, 0755, true) && !is_dir($outDir)) {
+    fwrite(STDERR, "Kan $outDir niet aanmaken\n");
+    exit(1);
+}
 
 $payload = json_decode((string) file_get_contents($jsonPath), true);
 $postsByMerk = hba_diagnose_load_testposts($postsPath);
@@ -23,7 +28,7 @@ $lines = [];
 $lines[] = '# HBA v1.13 — tegenkracht-diagnose (offline replay, spoor 1b)';
 $lines[] = '';
 $lines[] = 'Gegenereerd: ' . gmdate('Y-m-d H:i:s') . ' UTC';
-$lines[] = 'Bron: `docs/hba-testmerken-stability-v1.13-5runs.json` (95 scores, geen modelcalls).';
+$lines[] = 'Bron: `tests/fixtures/hba-testmerken-stability-v1.13-5runs.json` (95 scores, geen modelcalls).';
 $lines[] = '';
 $lines[] = 'Twee varianten van `ce_hba_resolve_hoofdoordeel()` op dezelfde flags/citaten:';
 $lines[] = '- **Live v1.13:** trede 2 = `foe_vervaging` + `foe_on_kern` (nieuwe foe-definitie, zonder `&& !kernCat`).';

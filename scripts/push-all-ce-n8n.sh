@@ -7,17 +7,16 @@ TARGET="${1:-production}"
 
 "$ROOT/scripts/regenerate-all-ce-workflows.sh" "$TARGET"
 
+# CE-02 en CE-Sources Sync: generators weg in ronde A — wrappers exit 1 tot herbouw.
 for script in \
   push-ce01-n8n.sh \
   push-ce01b-n8n.sh \
-  push-ce02-n8n.sh \
   push-ce03-n8n.sh \
   push-ce04-n8n.sh \
   push-ce041bis-n8n.sh \
   push-ce07-n8n.sh \
   push-ce-llm-visibility-n8n.sh \
   push-ce-linkedin-sync-n8n.sh \
-  push-ce-sources-sync-n8n.sh \
   push-trello-boards-n8n.sh \
   push-trello-cards-n8n.sh
 do

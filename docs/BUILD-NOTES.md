@@ -23,6 +23,8 @@ Design tokens: `docs/igisnext-identity.md` (naam/huisstijl wordt Brandflocks-whi
 
 Pilotdocs, Rogier-pakketten en oude briefing verwijderd; actieve specs onder `briefing/spec/`. CE-geschiedenis blijft in CE-Cursor.
 
+Naloop: CE-02/sources-sync n8n-wrappers falen met verwijzing naar CE-Cursor; HBA-architectuur- en weekplan-paden bijgewerkt; diagnose-output naar `tests/output/` (gitignored).
+
 ### 2026-11-06 — Ronde B pilot/meet/patch-routes
 
 ~35 `/admin/*`-routes uit het fork-plan verwijderd (v1.8–v1.13-pilot, testmerken, eenmalige patches, debug-slots, previews). **Behouden:** `hba-article-hint-slot` (CE-03 n8n), operationele routes voor ronde C.

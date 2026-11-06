@@ -39,7 +39,7 @@ Controleer dat `web/migrations/` op de server overeenkomt met `scripts/migration
 php scripts/import-branchebibliotheek.php
 ```
 
-(Draai tegen de Brandflocks-DB; gebruik de ZIP uit `briefing/hba-input/`.)
+(Draai tegen de Brandflocks-DB; gebruik de ZIP uit `briefing/spec/hba-input/`.)
 
 ## 5. Rooktest (handmatig)
 

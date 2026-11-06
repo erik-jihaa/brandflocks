@@ -1,10 +1,8 @@
 # HBA v2 — architectuurhandoff voor correcties
 
-**Doel:** kompas voor correcties en uitbreidingen. Definitieve Identity-indeling: `briefing/cursor-identity-tabindeling.md`.
+**Doel:** kompas voor correcties aan de bestaande HBA-v2-code. Identity-tabs en save-regels staan in dit document (§2–§5). CE-pilotbriefings staan in **CE-Cursor**.
 
-**Lees ook:** `briefing/cursor-hba-v2-meedenker.md` (prompts, ingrijppunten), `briefing/cursor-hba-scheiding-fix.md` (databug §1, layout §3), `docs/BUILD-NOTES.md` § *HBA — licentiebronnen (ontbrekend)*.
-
-**Licentiebronnen:** bouwaddendum (H3/H4), bouwkit (wizard 1–7) en de volledige branche-bibliotheek zijn **niet** ontvangen. Zie BUILD-NOTES voor gevolgen; CE draait op eigen wizard + 6 seed-branches.
+**Actieve specs:** `briefing/spec/README.md` (klikmodel, Core Logic v2.3, addenda, branchebibliotheek). Bouwstatus: `docs/BUILD-NOTES.md`.
 
 ---
 
@@ -23,7 +21,7 @@
 
 **Harde eis:** aan-/uitzetten van `hba_enabled` wijzigt **geen** opgeslagen waarde. `brandstory` en `brand_narratives` blijven in de database.
 
-**Objectives vs HBA:** de drie HBA-prompts lezen **geen** objective-percentages. Objectives beïnvloeden content via CE-03, niet via de PBS-meetlat. Zie `cursor-identity-tabindeling.md` §2.1.
+**Objectives vs HBA:** de drie HBA-prompts lezen **geen** objective-percentages. Objectives beïnvloeden content via CE-03, niet via de PBS-meetlat. Zie §2 hieronder.
 
 ---
 

@@ -2492,7 +2492,7 @@ function ce_trigger_ce02_research(?string $themeId = null, ?string $slotId = nul
         return [
             'ok' => false,
             'webhookTriggered' => false,
-            'error' => 'CE-02 workflow is niet actief in n8n — run push-ce02-n8n.sh',
+            'error' => 'CE-02 workflow is niet actief in n8n — generator staat in CE-Cursor (Brandflocks ronde A)',
             'response' => $responseMeta,
         ];
     }
