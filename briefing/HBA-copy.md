@@ -1,1 +1,0 @@
-Zet de HBA-laag aan en ontdek niet alleen of je content bij je merk past, maar ook of deze je positionering daadwerkelijk versterkt. Zo houd je je merk per publicatie én over langere tijd herkenbaar, onderscheidend en op koers.

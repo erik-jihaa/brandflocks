@@ -11,8 +11,8 @@ require_once $root . '/web/api/hba-prompt.php';
 require_once $root . '/web/api/hba-repository.php';
 require_once __DIR__ . '/hba-v1.12-replay-lib.php';
 
-$jsonPath = $root . '/docs/hba-testmerken-stability-v1.13-5runs.json';
-$postsPath = $root . '/briefing/hba-input/HBA_testmerken/alle_drie_testmerken.json';
+$jsonPath = $root . '/tests/fixtures/hba-testmerken-stability-v1.13-5runs.json';
+$postsPath = $root . '/tests/fixtures/hba-testmerken/alle_drie_testmerken.json';
 $outPath = $root . '/docs/hba-v1.13-tegenkracht-diagnose.md';
 
 $payload = json_decode((string) file_get_contents($jsonPath), true);

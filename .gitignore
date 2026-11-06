@@ -14,7 +14,5 @@ backups/
 __pycache__/
 .DS_Store
 **/.DS_Store
-docs/rogier-hba-testmerken-pakket-*.zip
-docs/hba-testmerken-stability-run.log
-docs/hba-testmerken-stability-run.err
-docs/hba-testmerken-stability-test-1run.*
+/vendor/
+composer.lock
