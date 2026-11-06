@@ -1,0 +1,11 @@
+{
+  "name": "brandflocks/app",
+  "description": "Brandflocks — test harness (PHP)",
+  "license": "proprietary",
+  "require-dev": {
+    "phpunit/phpunit": "^11.5"
+  },
+  "scripts": {
+    "test": "php tests/php/hba-v113-replay.php && php tests/php/campagne-plan-generator.php"
+  }
+}
