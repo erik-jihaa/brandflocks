@@ -9,7 +9,7 @@
 |------|-----|
 | Fork + vangnet | `./scripts/test-all.sh`, fixtures in `tests/fixtures/` |
 | Inventaris | `docs/inventaris-dode-code.md` |
-| Opschonen | ronde A–D (deels: web/api losse pilot-helper) — `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
+| Opschonen | ronde D gaat door (§ stap 5 integraties open); web/api pilot-testmerken weg — `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
 | Herontwerp | `briefing/spec/cursor-weekplan-herontwerp-2026-11-03.md` |
 
 ## Deploy
@@ -40,3 +40,7 @@ Allowlist vastgelegd in `docs/operational-admin-routes.md`. Twijfelroutes zonder
 ### 2026-11-06 — Ronde D (deel 1) dode PHP
 
 Verwijderd: `ce03-self-review-repository.php` (geen `require`, pilot self-review rerun was al weg), `tenant-bundle-import.php` (alleen door weggehaalde `import-tenant-section`). `testset-repository.php` ingekort tot `ce_sql_exclude_testset_freeze_slots` (freeze-copy na `testset-freeze`-admin weg). Frontend-“orphans” uit inventaris bleken false positives (wel imports).
+
+### 2026-11-06 — Ronde D (deel 2) HBA pilot testmerken
+
+`hba-testmerken-repository.php` weg (alleen voor admin matrix/stability/provision; routes weg). `ce_hba_testmerk_client_names()` en eenvoudige slot-resolver in pilot-repos gezet zodat hint-Negeer-mail en (CLI) weekpayload blijven werken.

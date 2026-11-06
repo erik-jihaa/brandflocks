@@ -1,6 +1,6 @@
 # Inventaris dode code (automatisch)
 
-Gegenereerd: 2026-11-06 08:58 UTC
+Gegenereerd: 2026-11-06 09:01 UTC
 Bron: `brandflocks` — `./scripts/inventaris-dode-code.sh`
 
 > Handmatig aanvullen: crontab/n8n op CE-server (zie onder). False positives mogelijk — altijd dubbelchecken vóór schrappen.
@@ -22,7 +22,7 @@ Zoek ook in **`../JSON/`** (n8n) vóór je een admin-route verwijdert.
 
 ## 2. PHP-functies met ≤1 referentie (definitie only)
 
-Gecontroleerd: **1630** functies (`ce_*`, `hba_*`, … in `web/api/`).
+Gecontroleerd: **1599** functies (`ce_*`, `hba_*`, … in `web/api/`).
 
 - `ce_agenda_display_week_mondays` — `web/api/mappers.php`
 - `ce_analytics_fetch_page_views` — `web/api/metrics-repository.php`
@@ -41,16 +41,19 @@ Gecontroleerd: **1630** functies (`ce_*`, `hba_*`, … in `web/api/`).
 - `ce_feedback_uuid_v4` — `web/api/feedback-repository.php`
 - `ce_hba_category_and_foe_share_kern_citation` — `web/api/hba-prompt.php`
 - `ce_hba_ce04_regel_feedback_ok` — `web/api/hba-hint-verificatie.php`
+- `ce_hba_constraint_breach_verificatie_from_raw` — `web/api/hba-prompt.php`
 - `ce_hba_content_score_tool_summary` — `web/api/hba-repository.php`
 - `ce_hba_count_content_score_test_articles` — `web/api/hba-repository.php`
 - `ce_hba_determinism_run_measurement` — `web/api/hba-determinism-repository.php`
 - `ce_hba_determinism_run_measurement_batch` — `web/api/hba-determinism-repository.php`
 - `ce_hba_dry_run_content_score_for_article` — `web/api/hba-repository.php`
 - `ce_hba_fetch_content_score_test_articles` — `web/api/hba-repository.php`
+- `ce_hba_flag_citaten_from_raw` — `web/api/hba-prompt.php`
+- `ce_hba_flags_verwijderd_from_raw` — `web/api/hba-prompt.php`
 - `ce_hba_format_score_for_display` — `web/api/hba-determinism-repository.php`
 - `ce_hba_hoofdoordeel_from_flags` — `web/api/hba-prompt.php`
 - `ce_hba_hoofdoordeel_valid_for_flags` — `web/api/hba-prompt.php`
-- `ce_hba_import_testposts_from_bundle` — `web/api/hba-testmerken-repository.php`
+- `ce_hba_hoofdoordeel_volgt_uit_flags` — `web/api/hba-prompt.php`
 - `ce_hba_merkbewering_definitie` — `web/api/hba-prompt.php`
 - `ce_hba_pilot_negeer_alert_test` — `web/api/hba-pilot-alert-repository.php`
 - `ce_hba_pilot_weekly_report_markdown` — `web/api/hba-pilot-weekly-repository.php`
@@ -60,8 +63,6 @@ Gecontroleerd: **1630** functies (`ce_*`, `hba_*`, … in `web/api/`).
 - `ce_hba_repair_brand_narrative_from_client` — `web/api/hba-repository.php`
 - `ce_hba_store_derived_branche` — `web/api/hba-architectuur-check-repository.php`
 - `ce_hba_table_has_prompt_version_column` — `web/api/hba-model-config.php`
-- `ce_hba_testmerken_matrix_payload` — `web/api/hba-testmerken-repository.php`
-- `ce_hba_testmerken_stability_payload` — `web/api/hba-testmerken-repository.php`
 - `ce_hba_v2_branche_derive_system_prompt` — `web/api/hba-v2-prompts.php`
 - `ce_hba_v2_guardrail_check_count` — `web/api/hba-v2-repository.php`
 - `ce_hba_v2_hint_uses_derived_boundary` — `web/api/hba-prompt.php`
@@ -72,7 +73,6 @@ Gecontroleerd: **1630** functies (`ce_*`, `hba_*`, … in `web/api/`).
 - `ce_objectives_validate_percentages` — `web/api/objectives-repository.php`
 - `ce_platform_cms_configured` — `web/api/platform-repository.php`
 - `ce_platform_role_allows` — `web/api/platform-guard.php`
-- `ce_provision_hba_testmerk_client` — `web/api/hba-testmerken-repository.php`
 - `ce_reset_client_pipeline_content` — `web/api/content-reset.php`
 - `ce_self_review_forbidden_correction_suffix` — `web/api/self-review-verbodslijst.php`
 - `ce_self_review_forbidden_hits_in_input` — `web/api/self-review-verbodslijst.php`

@@ -149,13 +149,32 @@ function ce_hba_pilot_after_hint_ignored(
 
 function ce_hba_pilot_resolve_test_slot_id(PDO $pdo, string $merk, int $index): ?string
 {
-    require_once __DIR__ . '/hba-testmerken-repository.php';
-    foreach (ce_hba_testmerken_collect_slot_targets($pdo) as $target) {
-        if (trim((string) ($target['merk'] ?? '')) !== $merk) {
-            continue;
+    $stmt = $pdo->prepare('SELECT id FROM clients WHERE TRIM(name) = :name LIMIT 1');
+    $stmt->execute(['name' => $merk]);
+    $clientId = (string) ($stmt->fetchColumn() ?: '');
+    if ($clientId === '') {
+        return null;
+    }
+
+    $slotStmt = $pdo->prepare(
+        "SELECT s.id AS slot_id, s.input_human
+         FROM content_slots s
+         INNER JOIN articles a ON a.slot_id = s.id
+         WHERE s.client_id = :client_id
+           AND s.theme LIKE 'HBA-test:%'
+         ORDER BY s.theme ASC"
+    );
+    $slotStmt->execute(['client_id' => $clientId]);
+    $slotRows = $slotStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    foreach ($slotRows as $i => $slotRow) {
+        $marker = json_decode((string) ($slotRow['input_human'] ?? ''), true);
+        if (!is_array($marker)) {
+            $marker = [];
         }
-        if ((int) ($target['index'] ?? -1) === $index) {
-            $id = trim((string) ($target['slotId'] ?? ''));
+        $zeroBased = max(0, (int) ($marker['index'] ?? ($i + 1)) - 1);
+        if ($zeroBased === $index) {
+            $id = trim((string) ($slotRow['slot_id'] ?? ''));
 
             return $id !== '' ? $id : null;
         }

@@ -3,9 +3,14 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/hba-prompt.php';
-require_once __DIR__ . '/hba-testmerken-repository.php';
 require_once __DIR__ . '/event-log-repository.php';
 require_once __DIR__ . '/mappers.php';
+
+/** @return list<string> Names of CE pilot test tenants (voor weekrapport). */
+function ce_hba_testmerk_client_names(): array
+{
+    return ['Brandpunt Koffie', 'Stelwerk', 'Duinroos Thuiszorg'];
+}
 
 /**
  * ISO-week (2026-W43) of huidige week in Europe/Amsterdam.
