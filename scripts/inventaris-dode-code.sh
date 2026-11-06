@@ -273,14 +273,41 @@ if not unused_tables:
     lines.append("- *(geen)*")
 lines.append("")
 
-lines.append("## 5. Server-check (Erik) — niet uit repo te halen")
+lines.append("## 5. Server-check (Erik) — cron/n8n op hosting")
 lines.append("")
-lines.append("Noteer welke `/admin/*`- endpoints **cron** of **n8n** aanroept:")
-lines.append("- `mailbox-sync`, `analytics-sync`, `scraper-sync`, `llm-visibility-sync`")
-lines.append("- `poll-n8n-failures`, `import-support-emails`, `ce02-trigger`, `hygiene`")
+lines.append("Operationele allowlist: `docs/operational-admin-routes.md`.")
 lines.append("")
-lines.append("| Endpoint | Cron/n8n | Notities |")
-lines.append("|----------|----------|----------|")
+lines.append("**In repo gevonden** (scripts/`cron-daily.sh`/`generate-*-workflow.py`):")
+lines.append("")
+repo_admin_refs: dict[str, list[str]] = defaultdict(list)
+ref_pat = re.compile(r"/admin/([a-z0-9-]+)")
+for rel in ("scripts", "docs"):
+    base = ROOT / rel
+    if not base.exists():
+        continue
+    for path in base.rglob("*"):
+        if not path.is_file() or path.suffix in {".png", ".jpg", ".gif"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for m in ref_pat.finditer(text):
+            ep = m.group(1)
+            rel_path = str(path.relative_to(ROOT))
+            if rel_path not in repo_admin_refs[ep]:
+                repo_admin_refs[ep].append(rel_path)
+for ep in sorted(repo_admin_refs):
+    refs = ", ".join(f"`{r}`" for r in repo_admin_refs[ep][:3])
+    extra = f" (+{len(repo_admin_refs[ep]) - 3})" if len(repo_admin_refs[ep]) > 3 else ""
+    lines.append(f"- `/admin/{ep}` — {refs}{extra}")
+if not repo_admin_refs:
+    lines.append("- *(geen)*")
+lines.append("")
+lines.append("**Alleen op server** (vul handmatig als endpoint weg mag):")
+lines.append("")
+lines.append("| Endpoint | Server cron/n8n | Notities |")
+lines.append("|----------|-----------------|----------|")
 for ep in [
     "mailbox-sync",
     "analytics-sync",
@@ -290,8 +317,10 @@ for ep in [
     "import-support-emails",
     "ce02-trigger",
     "hygiene",
+    "theme-refill",
 ]:
-    lines.append(f"| `/admin/{ep}` | ☐ | |")
+    in_repo = "repo" if ep in repo_admin_refs else "—"
+    lines.append(f"| `/admin/{ep}` | ☐ | script-ref: {in_repo} |")
 lines.append("")
 
 OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")

@@ -9,7 +9,7 @@
 |------|-----|
 | Fork + vangnet | `./scripts/test-all.sh`, fixtures in `tests/fixtures/` |
 | Inventaris | `docs/inventaris-dode-code.md` |
-| Opschonen | ronde A–F — zie `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
+| Opschonen | ronde A–C klaar (D–F open) — `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
 | Herontwerp | `briefing/spec/cursor-weekplan-herontwerp-2026-11-03.md` |
 
 ## Deploy
@@ -30,3 +30,7 @@ Pilotdocs, Rogier-pakketten en oude briefing verwijderd; actieve specs onder `br
 Repos alleen voor die routes weg: `hba-ijkrun-repository.php`, `hba-stroomtest-brandpunt-repository.php`. Pilot-alert/testmerken-PHP blijft zolang HBA-v2 het laadt.
 
 Scripts die `copy-client-sources` / `import-tenant-section` aanriepen: aangepast of exit — gebruik CE-Cursor voor tenant-sectie-sync tot er een Brandflocks-vervanger is.
+
+### 2026-11-06 — Ronde C operationele admin-routes
+
+Allowlist vastgelegd in `docs/operational-admin-routes.md`. Twijfelroutes zonder repo/n8n-ref verwijderd: `republish-wp`, `hba-status`, `hba-ensure-guardrail`. Inventaris §5 toont nu script-referenties uit de repo.
