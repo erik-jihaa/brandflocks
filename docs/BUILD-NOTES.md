@@ -9,7 +9,7 @@
 |------|-----|
 | Fork + vangnet | `./scripts/test-all.sh`, fixtures in `tests/fixtures/` |
 | Inventaris | `docs/inventaris-dode-code.md` |
-| Opschonen | ronde A–C klaar (D–F open) — `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
+| Opschonen | ronde A–D (deels: web/api losse pilot-helper) — `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` |
 | Herontwerp | `briefing/spec/cursor-weekplan-herontwerp-2026-11-03.md` |
 
 ## Deploy
@@ -36,3 +36,7 @@ Scripts die `copy-client-sources` / `import-tenant-section` aanriepen: aangepast
 ### 2026-11-06 — Ronde C operationele admin-routes
 
 Allowlist vastgelegd in `docs/operational-admin-routes.md`. Twijfelroutes zonder repo/n8n-ref verwijderd: `republish-wp`, `hba-status`, `hba-ensure-guardrail`. Inventaris §5 toont nu script-referenties uit de repo.
+
+### 2026-11-06 — Ronde D (deel 1) dode PHP
+
+Verwijderd: `ce03-self-review-repository.php` (geen `require`, pilot self-review rerun was al weg), `tenant-bundle-import.php` (alleen door weggehaalde `import-tenant-section`). `testset-repository.php` ingekort tot `ce_sql_exclude_testset_freeze_slots` (freeze-copy na `testset-freeze`-admin weg). Frontend-“orphans” uit inventaris bleken false positives (wel imports).
