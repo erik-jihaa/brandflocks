@@ -21,7 +21,7 @@ $path = preg_replace('#^/api#', '', $path) ?: '/';
 require_once __DIR__ . '/auth-guard.php';
 require_once __DIR__ . '/content-reset.php';
 
-$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/create-client' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/wp-diagnose' || $path === '/admin/debug-research' || $path === '/admin/hygiene' || $path === '/admin/list-slots' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
+$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/mail-test' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/create-client' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/delete-asana-sources' || $path === '/admin/wp-diagnose' || $path === '/admin/debug-research' || $path === '/admin/hygiene' || $path === '/admin/list-slots' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
     && in_array($method, ['GET', 'POST'], true)
     && ce_reset_token_valid();
 
@@ -46,18 +46,6 @@ if (preg_match('#^/sources/([0-9a-f-]{36})/blog-run#i', $path, $blogMatches)) {
     $_GET['source_id'] = $blogMatches[1];
     if ($method === 'POST' && ce_reset_token_valid()) {
         require_once __DIR__ . '/sources-blog-run.php';
-        exit;
-    }
-    if ($method === 'POST') {
-        ce_json_error('Unauthorized', 401);
-    }
-    ce_json_error('Method not allowed', 405);
-}
-
-if (preg_match('#^/sources/([0-9a-f-]{36})/asana-run#i', $path, $asanaRunMatches)) {
-    $_GET['source_id'] = $asanaRunMatches[1];
-    if ($method === 'POST' && ce_reset_token_valid()) {
-        require_once __DIR__ . '/sources-asana-run.php';
         exit;
     }
     if ($method === 'POST') {
@@ -632,16 +620,6 @@ if (preg_match('#^/research-items/([0-9a-f-]{36})$#i', $path, $matches)) {
     exit;
 }
 
-if ($path === '/sources/trello/boards' && $method === 'GET') {
-    require_once __DIR__ . '/sources-trello.php';
-    exit;
-}
-
-if ($path === '/sources/asana/discover' && $method === 'POST') {
-    require_once __DIR__ . '/sources-asana-discover.php';
-    exit;
-}
-
 if ($path === '/sources/drive/oauth/status' && $method === 'GET') {
     require_once __DIR__ . '/sources-drive-oauth-status.php';
     exit;
@@ -1045,6 +1023,11 @@ if ($path === '/admin/create-platform-user' && $method === 'POST') {
     exit;
 }
 
+if ($path === '/admin/mail-test' && $method === 'POST') {
+    require_once __DIR__ . '/admin-mail-test.php';
+    exit;
+}
+
 if ($path === '/admin/update-client' && $method === 'POST') {
     require_once __DIR__ . '/admin-update-client.php';
     exit;
@@ -1068,6 +1051,11 @@ if ($path === '/admin/reset-client-content' && $method === 'POST') {
 
 if ($path === '/admin/delete-client' && $method === 'POST') {
     require_once __DIR__ . '/admin-delete-client.php';
+    exit;
+}
+
+if ($path === '/admin/delete-asana-sources' && $method === 'POST') {
+    require_once __DIR__ . '/admin-delete-asana-sources.php';
     exit;
 }
 

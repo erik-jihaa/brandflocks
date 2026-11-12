@@ -809,7 +809,7 @@ function ce_publish_article_to_wordpress(PDO $pdo, string $slotId): array
 
         return [
             'ok' => false,
-            'error' => $statusHint . ' Geef de Content Engine-gebruiker de rol Editor met publish-rechten, of publiceer via een Administrator-app-wachtwoord.',
+            'error' => $statusHint . ' Geef de ' . ce_product_name() . '-gebruiker de rol Editor met publish-rechten, of publiceer via een Administrator-app-wachtwoord.',
             'postId' => (string) ($data['id'] ?? ''),
             'postUrl' => trim((string) ($data['link'] ?? '')),
         ];

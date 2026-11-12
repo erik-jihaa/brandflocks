@@ -110,9 +110,6 @@ const performance_summary = perfRows.length
 const trending_signals_summary = sourceRows.length
   ? sourceRows
       .map((s) => {
-        if (s.category === 'trello' && s.trello_board_id) {
-          return `- [trello] ${s.title} (board ${s.trello_board_id})`;
-        }
         if (s.category === 'url_rss') {
           return `- [rss] ${s.title} (feed — geen artikel-URL gebruiken)`;
         }
@@ -124,9 +121,6 @@ const trending_signals_summary = sourceRows.length
         }
         if (s.category === 'document') {
           return `- [document] ${s.title} (eigen PDF — interne kennis, geen extern nieuws)`;
-        }
-        if (s.category === 'asana') {
-          return `- [asana] ${s.title} (interne taken — PR-concepten)`;
         }
         if (s.category === 'drive') {
           return `- [drive] ${s.title} (eigen Drive-document — interne kennis)`;
@@ -872,7 +866,7 @@ workflow = {
     "active": False,
 }
 
-out = Path(__file__).resolve().parent.parent.parent / "JSON" / "CE-01 - Theme Director.json"
+out = Path(__file__).resolve().parent.parent / "json" / "n8n" / "CE-01 - Theme Director.json"
 from n8n_workflow_utils import write_workflow
 
 for node in nodes:

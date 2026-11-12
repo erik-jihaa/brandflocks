@@ -101,7 +101,7 @@ if (ce_table_exists($pdo, 'themes')) {
 
 $sourcesCount = null;
 if (ce_table_exists($pdo, 'sources')) {
-    $sStmt = $pdo->prepare("SELECT COUNT(*) FROM sources WHERE client_id = :client_id AND COALESCE(active, 1) = 1");
+    $sStmt = $pdo->prepare("SELECT COUNT(*) FROM sources WHERE client_id = :client_id AND COALESCE(active, 1) = 1 AND category <> 'asana'");
     $sStmt->execute(['client_id' => $clientId]);
     $sourcesCount = (int) $sStmt->fetchColumn();
 }

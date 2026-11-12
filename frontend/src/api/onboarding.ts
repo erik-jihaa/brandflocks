@@ -48,7 +48,16 @@ export function createTheme(
 export function patchTheme(
   themeId: string,
   body: Partial<
-    Pick<ThemeDto, 'title' | 'motivation' | 'rationale' | 'sourceArticleUrl' | 'feedback' | 'editorSuggested'>
+    Pick<
+      ThemeDto,
+      | 'title'
+      | 'motivation'
+      | 'rationale'
+      | 'sourceArticleUrl'
+      | 'feedback'
+      | 'editorSuggested'
+      | 'copyModus'
+    > & { copyModusOverrideActivatie?: boolean }
   >,
 ): Promise<{ theme: ThemeDto }> {
   return apiFetch(`/themes/${themeId}`, { method: 'PATCH', body: JSON.stringify(body) })

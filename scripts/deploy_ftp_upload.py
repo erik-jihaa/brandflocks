@@ -257,7 +257,8 @@ def upload_via_lftp_mirror(
     index_put = ''
     index_html = web / 'index.html'
     if index_html.is_file() and not path_matches_exclude('index.html', names, globs):
-        index_put = f'put "{index_html}" -o "{remote_rel(cfg, "index.html")}";\n'
+        # Script begint met `cd remote_root` — bestemming is relatief aan die map.
+        index_put = f'put "{index_html}" -o "index.html";\n'
     body = f"""cd {cfg['remote_root']};
 lcd "{web}";
 mirror --reverse --verbose --parallel=4 --no-perms --overwrite \\

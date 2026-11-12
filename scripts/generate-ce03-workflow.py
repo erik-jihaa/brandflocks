@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-from n8n_env import load_env, target_env  # noqa: E402
+from n8n_env import ce_api_base, load_env, target_env  # noqa: E402
 from n8n_workflow_utils import patch_workflow_file  # noqa: E402
 from prompt_fragments import (  # noqa: E402
     hba_merkbewering_definitie_js_literal,
@@ -25,11 +25,11 @@ def js_string(value: str) -> str:
 
 _env = target_env()
 load_env(_env if _env != "production" else None)
-CE_PUBLIC_BASE_URL = (os.environ.get("CE_PUBLIC_BASE_URL") or "https://ce.igisnext.com").rstrip("/")
+CE_PUBLIC_BASE_URL = ce_api_base()
 CE_RESET_TOKEN = os.environ.get("CE_RESET_TOKEN", "")
 
-JSON = ROOT.parent.parent / "JSON" / "CE-03 (Rationale & Article Writer).json"
-OUT = ROOT.parent.parent / "JSON" / "CE-03 - Rationale & Article Writer (FIXED v2 - MySQL params).json"
+JSON = ROOT.parent / "json" / "n8n" / "CE-03 (Rationale & Article Writer).json"
+OUT = ROOT.parent / "json" / "n8n" / "CE-03 - Rationale & Article Writer (FIXED v2 - MySQL params).json"
 
 PREPARE_SELF_REVIEW_JS = r"""
 const research = $('Get Research').all().map((item) => item.json);

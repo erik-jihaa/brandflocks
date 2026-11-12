@@ -290,7 +290,7 @@ function ce_platform_fetch_tenant_detail(PDO $pdo, string $clientId): array
 
     $sourcesCount = 0;
     if (ce_table_exists($pdo, 'sources')) {
-        $s = $pdo->prepare('SELECT COUNT(*) FROM sources WHERE client_id = :id AND COALESCE(active, 1) = 1');
+        $s = $pdo->prepare("SELECT COUNT(*) FROM sources WHERE client_id = :id AND COALESCE(active, 1) = 1 AND category <> 'asana'");
         $s->execute(['id' => $clientId]);
         $sourcesCount = (int) $s->fetchColumn();
     }

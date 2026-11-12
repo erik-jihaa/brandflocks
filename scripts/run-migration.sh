@@ -16,7 +16,7 @@ MIGRATION=""
 
 for arg in "$@"; do
   case "$arg" in
-    local|staging|brandflocks|production) TARGET_ENV="$arg" ;;
+    local|staging|brandflocks|brandflocks-target|production) TARGET_ENV="$arg" ;;
     --all) MIGRATION="--all" ;;
     *.sql) MIGRATION="$arg" ;;
     *) echo "Onbekend argument: $arg" >&2; exit 1 ;;
@@ -31,6 +31,10 @@ fi
 
 BASE_URL="$(ce_env_value "$ENV_FILE" CE_PUBLIC_BASE_URL)"
 BASE_URL="${BASE_URL:-https://ce.igisnext.com}"
+BASE_URL="${BASE_URL%/}"
+API_BASE="$(ce_env_value "$ENV_FILE" CE_API_BASE_URL)"
+API_BASE="${API_BASE:-$BASE_URL}"
+API_BASE="${API_BASE%/}"
 TOKEN="$(ce_env_value "$ENV_FILE" CE_RESET_TOKEN)"
 
 if [[ -z "$TOKEN" ]]; then
@@ -38,10 +42,10 @@ if [[ -z "$TOKEN" ]]; then
   exit 1
 fi
 
-echo "==> Omgeving: ${TARGET_ENV:-default}  ($BASE_URL)"
+echo "==> Omgeving: ${TARGET_ENV:-default}  (api: $API_BASE)"
 
 if [[ -z "$MIGRATION" ]]; then
-  curl -sS -H "X-CE-Reset-Token: $TOKEN" "$BASE_URL/api/admin/run-migration" | python3 -m json.tool
+  curl -sS -H "X-CE-Reset-Token: $TOKEN" "$API_BASE/api/admin/run-migration" | python3 -m json.tool
   exit 0
 fi
 
@@ -49,8 +53,8 @@ if [[ "$MIGRATION" == "--all" ]]; then
   BODY='{"all":true}'
   echo "==> Alle openstaande migraties toepassen"
 else
-  if [[ ! -f "$ROOT/scripts/migrations/$MIGRATION" ]]; then
-    echo "Migratie niet gevonden: scripts/migrations/$MIGRATION" >&2
+  if [[ ! -f "$ROOT/web/migrations/$MIGRATION" ]]; then
+    echo "Migratie niet gevonden: web/migrations/$MIGRATION" >&2
     exit 1
   fi
   BODY="$(python3 -c 'import json,sys; print(json.dumps({"filename": sys.argv[1]}))' "$MIGRATION")"
@@ -61,7 +65,7 @@ RESPONSE="$(curl -sS -X POST \
   -H "X-CE-Reset-Token: $TOKEN" \
   -H 'Content-Type: application/json' \
   -d "$BODY" \
-  "$BASE_URL/api/admin/run-migration")"
+  "$API_BASE/api/admin/run-migration")"
 
 echo "$RESPONSE" | python3 -m json.tool
 

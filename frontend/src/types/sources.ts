@@ -13,13 +13,11 @@ export type SourceTab =
   | 'Blogs'
   | 'Document'
   | 'YouTube'
-  | 'Asana'
   | 'Drive'
   | 'Linkedin'
   | 'Scraper'
   | 'Mailbox'
   | 'Analythics'
-  | 'Trello'
   | 'Calendar'
 
 export type SourceDto = {
@@ -59,11 +57,6 @@ export type SourceDto = {
   scraperLinkedinProfile?: string | null
   scraperLinkedinPasswordConfigured?: boolean
   scraperLinkedinPasswordRef?: string | null
-  asanaPatConfigured?: boolean
-  asanaWorkspaceGid?: string | null
-  asanaProjectGid?: string | null
-  asanaWorkspaceName?: string | null
-  asanaProjectName?: string | null
   documentFilename?: string | null
   documentUploadedAt?: string | null
   documentChunkCount?: number | null
@@ -99,11 +92,6 @@ export type CreateSourcePayload = {
   scraperWebhookUrl?: string
   scraperLinkedinProfile?: string
   scraperLinkedinPasswordRef?: string
-  asanaPatRef?: string
-  asanaWorkspaceGid?: string
-  asanaProjectGid?: string
-  asanaWorkspaceName?: string
-  asanaProjectName?: string
   driveFileUrl?: string
   sourceTier?: 'core' | 'supplementary'
 }

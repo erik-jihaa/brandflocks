@@ -100,7 +100,7 @@ index_php = ROOT / "web/api/index.php"
 index_src = read(index_php)
 route_paths = sorted(set(re.findall(r"\$path === '(/[^']+)'", index_src)))
 runtime_roots = [ROOT / "frontend/src", ROOT / "scripts", ROOT / "linkedin-analyse"]
-extra_json = ROOT.parent.parent / "JSON"
+extra_json = ROOT.parent / "json" / "n8n"
 if extra_json.is_dir():
     runtime_roots.append(extra_json)
 
@@ -240,7 +240,7 @@ for route in sorted(unused_routes_runtime):
 if not unused_routes_runtime:
     lines.append("- *(geen)*")
 lines.append("")
-lines.append("Zoek ook in **`../JSON/`** (n8n) vóór je een admin-route verwijdert.")
+lines.append("Zoek ook in **`json/n8n/`** (n8n) vóór je een admin-route verwijdert.")
 lines.append("")
 
 lines.append("## 2. PHP-functies met ≤1 referentie (definitie only)")

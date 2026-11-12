@@ -1,0 +1,356 @@
+{
+  "name": "CE-LLM-Visibility [Bf app]",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "llmvis-schedule",
+      "name": "Monthly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce-llm-visibility",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "llmvis-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        520
+      ],
+      "webhookId": "ce-llm-visibility-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst input = $input.first()?.json || {};\nlet clientId = '';\nconst body = input.body && typeof input.body === 'object' ? input.body : input;\nif (body.clientId) clientId = String(body.clientId).trim();\nelse if (body.client_id) clientId = String(body.client_id).trim();\nreturn [{ json: { clientId } }];\n"
+      },
+      "id": "llmvis-prepare-scope",
+      "name": "Prepare Scope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT q.id AS question_id, q.client_id, q.question, c.name AS client_name\nFROM llm_probleemvragen q\nJOIN clients c ON c.id = q.client_id\nWHERE q.active = 1 AND q.question_kind = 'geo'\n  AND ($1 = '' OR q.client_id = $1)\nORDER BY q.client_id, q.created_at",
+        "options": {
+          "queryReplacement": "={{ [ $('Prepare Scope').first().json.clientId || '' ] }}"
+        }
+      },
+      "id": "llmvis-get-questions",
+      "name": "Get LLM Questions",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        680,
+        420
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: $('Get LLM Questions').item.json.question }] }) }}",
+        "options": {}
+      },
+      "id": "llmvis-ask-chatgpt",
+      "name": "Ask ChatGPT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        420
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "KgpHNfuLruamtmGY",
+          "name": "OpenAI account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "perplexityApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'sonar', messages: [{ role: 'user', content: $('Get LLM Questions').item.json.question }] }) }}",
+        "options": {}
+      },
+      "id": "llmvis-ask-perplexity",
+      "name": "Ask Perplexity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        420
+      ],
+      "credentials": {
+        "perplexityApi": {
+          "id": "SmcFj7hyJPXlHCfV",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "anthropicApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1024, messages: [{ role: 'user', content: $('Get LLM Questions').item.json.question }] }) }}",
+        "options": {}
+      },
+      "id": "llmvis-ask-claude",
+      "name": "Ask Claude",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1340,
+        420
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "ryLnEjvd7YzjmGx4",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={{ $env.GOOGLE_GEMINI_API_KEY }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $('Get LLM Questions').item.json.question }] }] }) }}",
+        "options": {}
+      },
+      "id": "llmvis-ask-gemini",
+      "name": "Ask Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst questions = $('Get LLM Questions').all().map((i) => i.json);\nconst gptAll = $('Ask ChatGPT').all().map((i) => i.json);\nconst pplxAll = $('Ask Perplexity').all().map((i) => i.json);\nconst claudeAll = $('Ask Claude').all().map((i) => i.json);\nconst geminiAll = $('Ask Gemini').all().map((i) => i.json);\n\nfunction makeUuid() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = (Math.random() * 16) | 0;\n    const v = c === 'x' ? r : (r & 0x3) | 0x8;\n    return v.toString(16);\n  });\n}\n\nfunction mentionsClient(text, clientName) {\n  const name = String(clientName || '').trim().toLowerCase();\n  if (!name) return false;\n  return String(text || '').toLowerCase().includes(name);\n}\n\nconst results = [];\nfor (let idx = 0; idx < questions.length; idx++) {\n  const q = questions[idx] || {};\n  const gptText = gptAll[idx]?.choices?.[0]?.message?.content\n    || gptAll[idx]?.message?.content\n    || gptAll[idx]?.text\n    || '';\n  const pplxText = pplxAll[idx]?.choices?.[0]?.message?.content\n    || pplxAll[idx]?.message?.content\n    || pplxAll[idx]?.text\n    || '';\n  const claudeText = claudeAll[idx]?.content?.[0]?.text\n    || claudeAll[idx]?.text\n    || '';\n  const geminiText = geminiAll[idx]?.candidates?.[0]?.content?.parts?.[0]?.text\n    || geminiAll[idx]?.text\n    || '';\n\n  const perModel = [\n    ['chatgpt', gptText],\n    ['perplexity', pplxText],\n    ['claude', claudeText],\n    ['gemini', geminiText],\n  ];\n\n  for (const [model, text] of perModel) {\n    results.push({\n      id: makeUuid(),\n      client_id: q.client_id,\n      question_id: q.question_id,\n      model,\n      mentioned: mentionsClient(text, q.client_name) ? 1 : 0,\n      raw_response: text,\n    });\n  }\n}\n\nreturn results.map((r) => ({ json: r }));\n"
+      },
+      "id": "llmvis-build-results",
+      "name": "Build Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO llm_visibility_checks (id, client_id, question_id, model, mentioned, raw_response)\nVALUES ($1, $2, $3, $4, $5, $6)",
+        "options": {
+          "queryReplacement": "={{ [ $json.id, $json.client_id, $json.question_id, $json.model, $json.mentioned, $json.raw_response ] }}"
+        }
+      },
+      "id": "llmvis-insert",
+      "name": "Insert Visibility Check",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2000,
+        420
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Monthly Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Scope": {
+      "main": [
+        [
+          {
+            "node": "Get LLM Questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get LLM Questions": {
+      "main": [
+        [
+          {
+            "node": "Ask ChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask ChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Ask Perplexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Perplexity": {
+      "main": [
+        [
+          {
+            "node": "Ask Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Claude": {
+      "main": [
+        [
+          {
+            "node": "Ask Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Gemini": {
+      "main": [
+        [
+          {
+            "node": "Build Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Results": {
+      "main": [
+        [
+          {
+            "node": "Insert Visibility Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

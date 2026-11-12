@@ -36,7 +36,7 @@ function ce_ensure_hygiene_schema(PDO $pdo): void
     $ensured = true;
 
     if (!ce_table_exists($pdo, 'hygiene_lists')) {
-        $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_hygiene_factors.sql';
+        $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_hygiene_factors.sql';
         if (is_readable($migration)) {
             try {
                 $pdo->exec((string) file_get_contents($migration));
@@ -56,7 +56,7 @@ function ce_ensure_hygiene_schema(PDO $pdo): void
     }
 
     if (!ce_table_exists($pdo, 'hygiene_competitors')) {
-        $pipeline = dirname(__DIR__, 2) . '/scripts/migrations/add_hygiene_pipeline.sql';
+        $pipeline = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_hygiene_pipeline.sql';
         if (is_readable($pipeline)) {
             try {
                 $pdo->exec((string) file_get_contents($pipeline));

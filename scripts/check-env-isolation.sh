@@ -3,6 +3,7 @@
 #
 #   ./scripts/check-env-isolation.sh staging
 #   ./scripts/check-env-isolation.sh brandflocks   # ook versus .env.staging
+#   ./scripts/check-env-isolation.sh brandflocks-target  # Bf-staging op Antagonist (staging.brandflocks.nl)
 #   ./scripts/check-env-isolation.sh local
 #
 # Waarom dit een script is en geen instructie in de documentatie: de gevaarlijke fout is
@@ -21,16 +22,14 @@ if [[ "$TARGET_ENV" == "production" ]]; then
   echo "Productie vergelijken met zichzelf heeft geen zin." >&2
   exit 1
 fi
-if [[ ! "$TARGET_ENV" =~ ^(local|staging|brandflocks)$ ]]; then
-  echo "Onbekende omgeving: $TARGET_ENV (kies local, staging of brandflocks)" >&2
+if [[ ! "$TARGET_ENV" =~ ^(local|staging|brandflocks|brandflocks-target)$ ]]; then
+  echo "Onbekende omgeving: $TARGET_ENV (kies local, staging, brandflocks of brandflocks-target)" >&2
   exit 1
 fi
 
 ENV_FILE="$ROOT/.env.$TARGET_ENV"
 PROD_FILE="$ROOT/.env"
 STAGING_FILE="$ROOT/.env.staging"
-COMPARE_TO_FILE="$PROD_FILE"
-COMPARE_TO_LABEL="productie"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Geen .env.$TARGET_ENV gevonden." >&2
@@ -39,8 +38,16 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 if [[ ! -f "$PROD_FILE" ]]; then
-  echo "Geen .env gevonden — zonder productie-referentie valt er niets te vergelijken." >&2
-  exit 1
+  if [[ "$TARGET_ENV" == "brandflocks-target" && -f "$STAGING_FILE" ]]; then
+    echo "LET OP: geen .env (productie) in $ROOT — isolatiecheck alleen tegen staging." >&2
+    echo >&2
+  elif [[ "$TARGET_ENV" == "brandflocks" && ( -f "$STAGING_FILE" || -f "$ROOT/.env.brandflocks-target" ) ]]; then
+    echo "LET OP: geen CE .env (productie) — isolatiecheck tegen staging en/of Bf-staging." >&2
+    echo >&2
+  else
+    echo "Geen .env gevonden — zonder productie-referentie valt er niets te vergelijken." >&2
+    exit 1
+  fi
 fi
 
 RED=$'\033[31m'; GREEN=$'\033[32m'; YELLOW=$'\033[33m'; RESET=$'\033[0m'
@@ -132,18 +139,42 @@ echo "==> Isolatiecheck $TARGET_ENV — .env.$TARGET_ENV"
 echo
 
 echo "Omgevingsvlag"
-require_value CE_ENV "$TARGET_ENV"
+if [[ "$TARGET_ENV" == "brandflocks" ]]; then
+  require_value CE_ENV "brandflocks"
+elif [[ "$TARGET_ENV" == "brandflocks-target" ]]; then
+  mine_ce="$(value_of "$ENV_FILE" CE_ENV)"
+  if [[ "$mine_ce" != "staging" && "$mine_ce" != "brandflocks" ]]; then
+    fail "CE_ENV moet staging of brandflocks zijn voor brandflocks-target (nu: $mine_ce)"
+  else
+    pass "CE_ENV = $mine_ce (Bf-staging op Antagonist)"
+  fi
+else
+  require_value CE_ENV "$TARGET_ENV"
+fi
 
-COMPARE_SPECS=("productie:$PROD_FILE")
-if [[ "$TARGET_ENV" == "brandflocks" && -f "$STAGING_FILE" ]]; then
+COMPARE_SPECS=()
+if [[ -f "$PROD_FILE" ]]; then
+  COMPARE_SPECS+=("productie:$PROD_FILE")
+fi
+if [[ ("$TARGET_ENV" == "brandflocks" || "$TARGET_ENV" == "brandflocks-target") && -f "$STAGING_FILE" ]]; then
   COMPARE_SPECS+=("staging:$STAGING_FILE")
+fi
+BF_APP_FILE="$ROOT/.env.brandflocks"
+if [[ "$TARGET_ENV" == "brandflocks-target" && -f "$BF_APP_FILE" ]]; then
+  COMPARE_SPECS+=("bf-app:$BF_APP_FILE")
+fi
+if [[ "$TARGET_ENV" == "brandflocks" && -f "$ROOT/.env.brandflocks-target" ]]; then
+  COMPARE_SPECS+=("bf-staging:$ROOT/.env.brandflocks-target")
+fi
+if [[ "${#COMPARE_SPECS[@]}" -eq 0 ]]; then
+  echo "Geen referentie-.env (productie noch staging) — isolatiecheck overgeslagen." >&2
+  exit 1
 fi
 
 run_compare_pass() {
   local spec="$1"
   COMPARE_TO_LABEL="${spec%%:*}"
   COMPARE_TO_FILE="${spec#*:}"
-
   echo
   echo "── versus $COMPARE_TO_LABEL ($(basename "$COMPARE_TO_FILE")) ──"
 

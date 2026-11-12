@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 SQL
 );
 
-$migrationsDir = dirname(__DIR__, 2) . '/scripts/migrations';
+$migrationsDir = dirname(__DIR__) . '/migrations';
 if (!is_dir($migrationsDir)) {
-    $migrationsDir = dirname(__DIR__) . '/migrations';
+    $migrationsDir = dirname(__DIR__, 2) . '/scripts/migrations';
 }
 
 /** @return list<string> */

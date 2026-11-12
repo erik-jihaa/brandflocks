@@ -5,13 +5,11 @@ export const SOURCE_TABS: SourceTab[] = [
   'Blogs',
   'Document',
   'YouTube',
-  'Asana',
   'Drive',
   'Linkedin',
   'Scraper',
   'Mailbox',
   'Analythics',
-  'Trello',
   'Calendar',
 ]
 
@@ -20,13 +18,11 @@ const SLUG_TO_TAB: Record<string, SourceTab> = {
   blogs: 'Blogs',
   document: 'Document',
   youtube: 'YouTube',
-  asana: 'Asana',
   drive: 'Drive',
   linkedin: 'Linkedin',
   scraper: 'Scraper',
   mailbox: 'Mailbox',
   analytics: 'Analythics',
-  trello: 'Trello',
   calendar: 'Calendar',
 }
 

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 require __DIR__ . '/includes/layout.php';
 
-ce_render_layout_start('Content Engine', 'home', null, ['hide_header' => true]);
+ce_render_layout_start('Brandflocks', 'home', null, ['hide_header' => true]);
 ?>
-      <h1 class="app-title">Content Engine</h1>
+      <h1 class="app-title">Brandflocks</h1>
 
       <p class="section-heading">Jouw content-werkplaats</p>
 
       <p>Schrijf, plan en publiceer artikelen vanuit één plek.
-         De Content Engine koppelt strategie, research en redactie
+         Brandflocks koppelt strategie, research en redactie
          in een sluitende workflow — van Agenda tot Fastlane.</p>
 
       <p style="margin-top: 30px;">

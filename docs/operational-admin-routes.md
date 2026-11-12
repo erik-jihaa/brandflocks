@@ -28,6 +28,7 @@ Bron: `briefing/spec/cursor-plan-fork-opschonen-brandflocks-2026-11-05.md` § Ro
 | `create-client` | Nieuwe tenant |
 | `update-client` | Tenant bijwerken |
 | `delete-client` | Tenant verwijderen |
+| `delete-asana-sources` | Alle Asana-bronnen (`category = asana`) wissen |
 | `export-tenant` | Tenant export |
 | `import-tenant` | Tenant import |
 | `set-password` | Klant-login wachtwoord |

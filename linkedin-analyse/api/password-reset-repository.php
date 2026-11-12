@@ -74,7 +74,7 @@ function li_request_password_reset(PDO $pdo, string $email): array
         '',
         'Als je dit niet hebt aangevraagd, kun je deze mail negeren.',
         '',
-        '— LinkedIn Scan / ContentFlow',
+        '— LinkedIn Scan / ' . li_product_name(),
     ]);
 
     $urlEsc = li_h($url);

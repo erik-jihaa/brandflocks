@@ -32,6 +32,7 @@ import {
   textHasOpenPlaceholders,
 } from '../utils/hbaHintApply'
 import { ARTICLE_COLUMN_WIDTH } from '../layout/grid.constants'
+import { ThemeStartPanel, isThemeStartArticle } from '../components/ThemeStartPanel'
 
 export function ArticlePage() {
   const navigate = useNavigate()
@@ -108,7 +109,7 @@ export function ArticlePage() {
   const articleSyncArticleId = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!article || writing) return
+    if (!article || article.themeOnly || writing) return
     const body = stripEditorQuestionsBlock(article.contentAi ?? article.content ?? '')
     if (!body.trim()) return
     if (searchParams.get('writing') !== '1') return
@@ -128,7 +129,7 @@ export function ArticlePage() {
   }, [location.pathname, location.search, location.state, navigate, showResearchSubmitSuccess])
 
   useEffect(() => {
-    if (!article) return
+    if (!article || article.themeOnly) return
     const normalizedContent = normalizeEditorQuestionsContent(article.content)
     const fingerprint = [
       article.id,
@@ -208,7 +209,7 @@ export function ArticlePage() {
   const hbaKlantPreview = searchParams.get('hbaKlant') === '1'
 
   useEffect(() => {
-    if (!article || !slotId || usingMock || hbaKlantPreview) return
+    if (!article || article.themeOnly || !slotId || usingMock || hbaKlantPreview) return
     if (article.status === 'archived' || article.slotStatus === 'archived') {
       const archiveId = article.slotId || slotId
       navigate(`/archive/${archiveId}${location.search}`, { replace: true })
@@ -216,7 +217,7 @@ export function ArticlePage() {
   }, [article, slotId, navigate, usingMock, hbaKlantPreview, location.search])
 
   useEffect(() => {
-    if (!article || !slotId || usingMock) return
+    if (!article || article.themeOnly || !slotId || usingMock) return
     const hasPendingReview = (article.reviewEdits ?? []).some((edit) => edit.status === 'pending')
     if (article.status === 'feedback' || hasPendingReview) {
       navigate(`/article/${slotId}/feedback`, { replace: true })
@@ -354,7 +355,7 @@ export function ArticlePage() {
   )
 
   useEffect(() => {
-    if (!article || usingMock || isApprovedOrPublished || writing) {
+    if (!article || article.themeOnly || usingMock || isApprovedOrPublished || writing) {
       setHbaScoreAutoWaiting(false)
       return
     }
@@ -415,7 +416,7 @@ export function ArticlePage() {
   ])
 
   useEffect(() => {
-    if (!article?.id || usingMock || isApprovedOrPublished || writing || hbaRescoring) {
+    if (!article?.id || article.themeOnly || usingMock || isApprovedOrPublished || writing || hbaRescoring) {
       return
     }
 
@@ -489,17 +490,64 @@ export function ArticlePage() {
     (writing || article?.writingPending) &&
     !stripEditorQuestionsBlock(content || article?.contentAi || article?.content || '').trim()
 
-  async function handleRewrite() {
-    if (!slotId || usingMock) return
+  const hasArticleText = stripEditorQuestionsBlock(
+    content || article?.contentAi || article?.content || '',
+  ).trim() !== ''
+  const showThemeStart =
+    Boolean(slotId) && !expectWriting && isThemeStartArticle(article, { writing })
+
+  function confirmDiscardEditsForRewrite(): boolean {
     const hasEdits =
       headline.trim() !== (article?.headline ?? '').trim() ||
       content.trim() !== (article?.content ?? '').trim()
-    if (
-      hasEdits &&
-      !window.confirm(
-        'Handmatige wijzigingen in headline of tekst gaan verloren. Toch herschrijven met de gekozen meta?',
+    if (!hasEdits) return true
+    return window.confirm(
+      'Handmatige wijzigingen in headline of tekst gaan verloren. Toch herschrijven met de gekozen meta?',
+    )
+  }
+
+  async function pollRewriteResult(previousArticleId: string | null) {
+    if (!slotId) return
+    setRewriteNotice('AI herschrijft de tekst — dit duurt ongeveer 1–2 minuten…')
+    const fresh = await waitForRewrittenArticle(slotId, previousArticleId)
+    if (fresh) {
+      await reload(true)
+      setRewriteNotice('Klaar — nieuwe versie geladen.')
+    } else {
+      setRewriteNotice(
+        'Rewrite duurt langer dan verwacht — herlaad de pagina zodra CE-03 klaar is.',
       )
-    ) {
+    }
+  }
+
+  function rewriteStarted(saved?: { writing?: boolean; writingPending?: boolean } | null): boolean {
+    return Boolean(saved?.writing || saved?.writingPending)
+  }
+
+  async function handleRewrite() {
+    if (!slotId || usingMock) return
+    if (!confirmDiscardEditsForRewrite()) return
+
+    setRewriteNotice(null)
+    setRewriting(true)
+    const previousArticleId = article?.id ?? null
+    try {
+      await rewriteArticle(slotId, formPayload())
+      await pollRewriteResult(previousArticleId)
+    } catch (err) {
+      setRewriteNotice(err instanceof Error ? err.message : 'Rewrite mislukt')
+    } finally {
+      setRewriting(false)
+    }
+  }
+
+  async function handleToneChange(next: string) {
+    const previous = tone
+    setTone(next)
+    if (!slotId || usingMock || isApprovedOrPublished || rewriting || writing) return
+    if (next === (article?.tone ?? previous)) return
+    if (!confirmDiscardEditsForRewrite()) {
+      setTone(previous)
       return
     }
 
@@ -507,18 +555,12 @@ export function ArticlePage() {
     setRewriting(true)
     const previousArticleId = article?.id ?? null
     try {
-      await rewriteArticle(slotId, formPayload())
-      setRewriteNotice('AI herschrijft de tekst — dit duurt ongeveer 1–2 minuten…')
-      const fresh = await waitForRewrittenArticle(slotId, previousArticleId)
-      if (fresh) {
-        await reload(true)
-        setRewriteNotice('Klaar — nieuwe versie geladen.')
-      } else {
-        setRewriteNotice(
-          'Rewrite duurt langer dan verwacht — herlaad de pagina zodra CE-03 klaar is.',
-        )
+      const saved = await save({ ...formPayload(), tone: next })
+      if (rewriteStarted(saved)) {
+        await pollRewriteResult(previousArticleId)
       }
     } catch (err) {
+      setTone(previous)
       setRewriteNotice(err instanceof Error ? err.message : 'Rewrite mislukt')
     } finally {
       setRewriting(false)
@@ -548,9 +590,20 @@ export function ArticlePage() {
 
   async function handleSave() {
     clearSaveNotice()
+    const previousArticleId = article?.id ?? null
+    const toneChanged = tone !== (article?.tone ?? '')
     try {
-      await save(formPayload())
+      const saved = await save(formPayload())
       setContentBaseline(content)
+      if (toneChanged && rewriteStarted(saved)) {
+        setRewriting(true)
+        try {
+          await pollRewriteResult(previousArticleId)
+        } finally {
+          setRewriting(false)
+        }
+        return
+      }
       showSaveSuccess()
     } catch {
       // error shown via hook
@@ -904,6 +957,25 @@ export function ArticlePage() {
     )
   }
 
+  if (showThemeStart && article && slotId) {
+    return (
+      <GridShell
+        pageTitle={article.headline.trim() || 'Thema'}
+        activeNav="article"
+        mainLayout="grid2"
+        main={
+          <ThemeStartPanel
+            article={article}
+            slotId={slotId}
+            onCopyModusChange={() => {
+              void reload()
+            }}
+          />
+        }
+      />
+    )
+  }
+
   if (!article) {
     return (
       <GridShell
@@ -1050,6 +1122,7 @@ export function ArticlePage() {
               publications={article.publications}
               markingPlaced={markingPlaced}
               onMarkPlaced={(platform) => void handleMarkPlaced(platform)}
+              hasArticleText={hasArticleText}
             />
           </div>
 
@@ -1069,7 +1142,7 @@ export function ArticlePage() {
           editorSuggested={article.editorSuggested}
           imageRatioSuggested={article.imageRatioSuggested}
           platformSuggested={article.platformSuggested}
-          onToneChange={setTone}
+          onToneChange={handleToneChange}
           onEditorChange={setEditor}
           onImageRatioChange={setImageRatio}
           onPlatformChange={setPlatform}

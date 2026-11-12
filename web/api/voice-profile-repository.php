@@ -213,13 +213,16 @@ function ce_default_source_tier(string $category): string
     return in_array($category, ce_core_source_categories(), true) ? 'core' : 'supplementary';
 }
 
-function ce_client_has_core_source(PDO $pdo, string $clientId): bool
+function ce_client_has_core_source(PDO $pdo, ?string $clientId): bool
 {
+    if ($clientId === null || trim($clientId) === '') {
+        return false;
+    }
     if (!ce_table_exists($pdo, 'sources') || !ce_table_has_column($pdo, 'sources', 'source_tier')) {
         return false;
     }
     $stmt = $pdo->prepare(
-        "SELECT COUNT(*) FROM sources WHERE client_id = :client_id AND source_tier = 'core' AND active = 1"
+        "SELECT COUNT(*) FROM sources WHERE client_id = :client_id AND source_tier = 'core' AND active = 1 AND category <> 'asana'"
     );
     $stmt->execute(['client_id' => $clientId]);
 
@@ -239,7 +242,7 @@ function ce_source_context_split(PDO $pdo, string $clientId): array
         : "CASE WHEN category IN ('url_rss','blogs','document','linkedin','youtube','drive') THEN 'core' ELSE 'supplementary' END";
     $stmt = $pdo->prepare(
         "SELECT title, url, description, {$tierSql} AS source_tier
-         FROM sources WHERE client_id = :client_id AND active = 1 ORDER BY title ASC"
+         FROM sources WHERE client_id = :client_id AND active = 1 AND category <> 'asana' ORDER BY title ASC"
     );
     $stmt->execute(['client_id' => $clientId]);
     foreach ($stmt->fetchAll() ?: [] as $row) {

@@ -873,7 +873,7 @@ function ce_findability_improvement_advice(
         if ($mentioned === 0) {
             $tips[] = 'Je site staat niet in de eerste ' . CE_SEO_RESULTS_LIMIT . ' Google-resultaten voor deze zoekvragen. Schrijf een artikel per vraag met de zoekterm in titel, H1 en meta-description.';
             $tips[] = 'Link intern vanaf je homepage en gerelateerde posts naar nieuwe SEO-artikelen.';
-            $tips[] = 'Publiceer regelmatig via Content Engine op de vraag-thema\'s die je in Findability hebt staan.';
+            $tips[] = 'Publiceer regelmatig via ' . ce_product_name() . ' op de vraag-thema\'s die je in Findability hebt staan.';
         } elseif ($ratio < 0.5) {
             $tips[] = 'Deels zichtbaar — optimaliseer bestaande pagina\'s en schrijf aanvullende content voor vragen zonder ranking.';
         } else {

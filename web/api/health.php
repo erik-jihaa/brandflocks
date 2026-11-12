@@ -7,7 +7,12 @@ require_once __DIR__ . '/bootstrap.php';
 $config = ce_db_config();
 
 if ($config['host'] === '' || $config['name'] === '' || $config['user'] === '') {
-    ce_json_response(['ok' => false, 'environment' => ce_env(), 'db' => 'not_configured'], 503);
+    ce_json_response([
+        'ok' => false,
+        'environment' => ce_env(),
+        'branding' => ce_product_branding(),
+        'db' => 'not_configured',
+    ], 503);
 }
 
 try {
@@ -26,6 +31,7 @@ try {
     ce_json_response([
         'ok' => true,
         'environment' => ce_env(),
+        'branding' => ce_product_branding(),
         'db' => 'connected',
         'imap' => function_exists('imap_open'),
         'lastMigration' => $migration,
@@ -34,6 +40,7 @@ try {
     ce_json_response([
         'ok' => false,
         'environment' => ce_env(),
+        'branding' => ce_product_branding(),
         'db' => 'error',
         'message' => $e->getMessage(),
     ], 503);

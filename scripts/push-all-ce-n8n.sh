@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate JSON + push alle CE flows naar n8n
-# Usage: ./scripts/push-all-ce-n8n.sh [production|staging|local]
+# Usage: ./scripts/push-all-ce-n8n.sh [production|staging|local|brandflocks|brandflocks-target]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET="${1:-production}"
@@ -16,9 +16,7 @@ for script in \
   push-ce041bis-n8n.sh \
   push-ce07-n8n.sh \
   push-ce-llm-visibility-n8n.sh \
-  push-ce-linkedin-sync-n8n.sh \
-  push-trello-boards-n8n.sh \
-  push-trello-cards-n8n.sh
+  push-ce-linkedin-sync-n8n.sh
 do
   echo ""
   echo "==> $script ($TARGET)"

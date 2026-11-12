@@ -1,0 +1,121 @@
+{
+  "name": "CE-04.1bis (Human Review Mail)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce04-human-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce041bis-webhook-001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        480,
+        320
+      ],
+      "webhookId": "ce041bis-human-review-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst body = raw.body ?? raw;\n\nconst to = String(body.to || body.reviewer_email || 'erik@igisnext.com').trim();\nconst reviewUrl = String(body.review_url || '').trim();\n\nif (!reviewUrl) {\n  throw new Error('Missing review_url in webhook payload');\n}\n\nconst headline = String(body.headline || 'Artikel review').trim();\nconst content = String(body.content || '').trim();\nconst rationale = String(body.rationale || '').trim();\nconst resubmitted = body.resubmitted === true || body.resubmitted === 'true';\n\nconst escapeHtml = (s) => String(s)\n  .replace(/&/g, '&amp;')\n  .replace(/</g, '&lt;')\n  .replace(/>/g, '&gt;')\n  .replace(/\"/g, '&quot;');\n\nconst contentHtml = escapeHtml(content).replace(/\\n/g, '<br>');\nconst rationaleHtml = escapeHtml(rationale).replace(/\\n/g, '<br>');\nconst intro = resubmitted\n  ? 'De redacteur heeft feedback verwerkt. Hieronder staat de <strong>herziene tekst</strong> ter goedkeuring.'\n  : 'Open de reviewpagina om de tekst te bewerken en te kiezen voor <strong>Approved</strong> of <strong>Feedback</strong>.';\n\nconst emailHtml = `<!DOCTYPE html>\n<html>\n<body style=\"margin:0;padding:0;background:#eae6dc;font-family:Figtree,Arial,sans-serif;\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#eae6dc;padding:40px 16px;\">\n<tr><td align=\"center\">\n<table width=\"640\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:640px;background:#ffffff;border-radius:20px;padding:32px 36px;color:#2e2014;\">\n<tr><td>\n<p style=\"margin:0 0 8px;font-size:14px;color:#ada695;\">Content Engine · Review${resubmitted ? ' · Herzien' : ''}</p>\n<h1 style=\"margin:0 0 24px;font-size:28px;line-height:1.25;color:#033dff;\">${escapeHtml(headline)}</h1>\n${rationale ? `<p style=\"margin:0 0 20px;font-size:14px;line-height:1.5;\"><strong>Rationale</strong><br>${rationaleHtml}</p>` : ''}\n<div style=\"background:#f7eef3;border-radius:20px;padding:20px 24px;margin-bottom:28px;font-size:14px;line-height:1.6;\">${contentHtml || '<em>Geen tekst</em>'}</div>\n<p style=\"margin:0 0 20px;font-size:14px;line-height:1.5;\">${intro}</p>\n<p style=\"margin:0;\"><a href=\"${escapeHtml(reviewUrl)}\" style=\"display:inline-block;background:#52ffa8;color:#033dff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 28px;border-radius:20px;\">Open review</a></p>\n<p style=\"margin:24px 0 0;font-size:12px;color:#ada695;word-break:break-all;\">${escapeHtml(reviewUrl)}</p>\n</td></tr>\n</table>\n</td></tr>\n</table>\n</body>\n</html>`;\n\nreturn {\n  json: {\n    to,\n    review_url: reviewUrl,\n    headline,\n    article_id: body.article_id,\n    slot_id: body.slot_id,\n    subject: resubmitted ? `Review (herzien): ${headline}` : `Review: ${headline}`,\n    email_html: emailHtml,\n  },\n};"
+      },
+      "id": "ce041bis-parse-001",
+      "name": "Parse & Build Mail",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.email_html }}",
+        "options": {}
+      },
+      "id": "ce041bis-gmail-001",
+      "name": "Send Review Mail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        320
+      ],
+      "webhookId": "199e6a93-f7a4-4fe6-a6e1-b862e77b27ff",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aDZNse7CWVEKUPoX",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, to: $('Parse & Build Mail').item.json.to, review_url: $('Parse & Build Mail').item.json.review_url, article_id: $('Parse & Build Mail').item.json.article_id }) }}",
+        "options": {}
+      },
+      "id": "ce041bis-respond-001",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse & Build Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Build Mail": {
+      "main": [
+        [
+          {
+            "node": "Send Review Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Mail": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8d1f9307-9000-4108-8dd3-30e49b2b9683",
+  "meta": {
+    "instanceId": "ecb28230bd473ffb1035d1b6de149528b24a8d731bea2c5bdc9ea965ed8b1bde"
+  },
+  "nodeGroups": [],
+  "id": "8HBKNBSE1NPOtDTS",
+  "tags": []
+}

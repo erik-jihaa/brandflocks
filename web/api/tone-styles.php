@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/mappers.php';
 require_once __DIR__ . '/schema-helper.php';
+require_once __DIR__ . '/client-context.php';
 
 /** @return array<string, string> db-key => NL beschrijving */
 function ce_default_tone_styles(): array
@@ -268,8 +269,12 @@ function ce_build_article_write_directive(
     ?string $platformUi,
     ?array $objective = null,
     ?string $editorUi = null,
+    ?string $slotId = null,
+    ?array $articleRow = null,
 ): string {
     require_once __DIR__ . '/objectives-repository.php';
+    require_once __DIR__ . '/copy-modus.php';
+    require_once __DIR__ . '/channel-copy-constraints.php';
 
     $toneKey = ce_tone_to_db(ce_tone_to_ui($toneUi));
     $toneStyles = ce_client_tone_styles($pdo, $clientId);
@@ -279,9 +284,14 @@ function ce_build_article_write_directive(
     $editorLine = $editorLabel !== '' ? ce_lookup_editor_style_line($editorStyles, $editorLabel) : '';
 
     $lines = [];
-    $lines[] = 'Tone (doelgroep/kanaal): ' . ce_tone_to_ui($toneUi) . '.';
-    if ($toneLine !== '') {
-        $lines[] = $toneLine;
+    $toneUiNorm = ce_tone_to_ui($toneUi);
+    if ($toneUiNorm !== '') {
+        $lines[] = 'Tone (doelgroep/kanaal): ' . $toneUiNorm . '.';
+        if ($toneLine !== '') {
+            $lines[] = $toneLine;
+        }
+    } elseif ($toneLine === '') {
+        $lines[] = 'Schrijfstijl: standaardtoon van het merk (geen aparte doelgroep gekozen).';
     }
     if ($editorLabel !== '') {
         $lines[] = 'Redacteur: ' . $editorLabel . '.';
@@ -289,7 +299,9 @@ function ce_build_article_write_directive(
             $lines[] = $editorLine;
         }
     }
+    $platformDb = '';
     if ($platformUi !== null && trim($platformUi) !== '') {
+        $platformDb = ce_platform_to_db(ce_platform_to_ui($platformUi));
         $lines[] = 'Platform: ' . trim($platformUi) . ' — pas lengte, hook en CTA daarop aan.';
     }
 
@@ -322,6 +334,26 @@ function ce_build_article_write_directive(
             . '; foe=' . ($guardrail['foe_force'] ?? '')
             . '; nooit=' . ($guardrail['constraint_never'] ?? '')
             . '; vermijd categorietaal=' . implode(', ', $guardrail['branch_category_language'] ?? []);
+    }
+
+    if ($slotId !== null && trim($slotId) !== '') {
+        $resolved = ce_resolve_copy_modus_for_slot($pdo, trim($slotId));
+        foreach (ce_copy_modus_directive_lines($resolved['modus'], $resolved['override']) as $copyLine) {
+            $lines[] = $copyLine;
+        }
+    }
+
+    if ($platformDb !== '') {
+        $textvorm = '';
+        if (is_array($articleRow)) {
+            $textvorm = ce_resolve_article_textvorm($pdo, $articleRow);
+        } else {
+            $textvorm = ce_default_textvorm_for_platform($platformDb);
+        }
+        $channelLine = ce_channel_copy_constraint_line($platformDb, $textvorm);
+        if ($channelLine !== '') {
+            $lines[] = $channelLine;
+        }
     }
 
     return implode("\n", $lines);
@@ -366,7 +398,7 @@ function ce_persist_article_write_directive(PDO $pdo, string $slotId): void
     $angle = ce_angle_to_ui($row['angle_final'] ?? $row['angle_suggested'] ?? null);
     $platform = ce_platform_to_ui($row['platform_final'] ?? $row['platform_suggested'] ?? null);
     $editor = trim((string) ($row['editor_final'] ?? $row['editor_suggested'] ?? ''));
-    $objective = ce_resolve_article_objective($pdo, $row);
+    $objective = ce_resolve_article_objective_for_writing($pdo, $row);
 
     $directive = ce_build_article_write_directive(
         $pdo,
@@ -376,6 +408,8 @@ function ce_persist_article_write_directive(PDO $pdo, string $slotId): void
         $platform,
         $objective,
         $editor !== '' ? $editor : null,
+        $slotId,
+        $row,
     );
 
     $articleId = (string) ($row['id'] ?? '');
@@ -402,6 +436,60 @@ function ce_persist_article_write_directive(PDO $pdo, string $slotId): void
     $pdo->prepare('UPDATE articles SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);
 }
 
+/**
+ * Campagne-context voor CE-03 / rationale (content_slots-rij).
+ *
+ * @param array<string, mixed> $campSlot
+ *
+ * @return array<string, string>
+ */
+function ce_campagne_context_meta_from_slot_row(PDO $pdo, array $campSlot): array
+{
+    $meta = [];
+    $campagneId = trim((string) ($campSlot['campaign_id'] ?? ''));
+    if ($campagneId === '' || !ce_table_exists($pdo, 'campaigns')) {
+        return $meta;
+    }
+
+    $meta['campagne_id'] = $campagneId;
+
+    $campTitle = '';
+    $scope = ce_client_scope_sql($pdo, 'campaigns', 'c', null);
+    $titleStmt = $pdo->prepare(
+        'SELECT title FROM campaigns c WHERE c.id = :id' . $scope['sql'] . ' LIMIT 1'
+    );
+    $titleStmt->execute(array_merge(['id' => $campagneId], $scope['params']));
+    $titleRow = $titleStmt->fetch(PDO::FETCH_ASSOC);
+    if ($titleRow) {
+        $campTitle = trim((string) ($titleRow['title'] ?? ''));
+    }
+    if ($campTitle !== '') {
+        $meta['campagne_title'] = $campTitle;
+    }
+
+    $fase = trim((string) ($campSlot['campaign_fase'] ?? ''));
+    if ($fase !== '') {
+        $meta['campagne_fase'] = $fase;
+    }
+    $opdracht = trim((string) ($campSlot['campaign_opdracht'] ?? ''));
+    $instructie = trim((string) ($campSlot['campaign_instructie'] ?? ''));
+    if ($instructie !== '') {
+        $line = 'Aanvullende instructie: ' . $instructie;
+        $opdracht = $opdracht !== '' ? $opdracht . "\n\n" . $line : $line;
+    }
+    if ($opdracht !== '') {
+        $meta['campagne_opdracht'] = $opdracht;
+    }
+    $ankerRaw = $campSlot['campaign_anker'] ?? null;
+    if (is_string($ankerRaw) && $ankerRaw !== '') {
+        $meta['campagne_anker'] = $ankerRaw;
+    } elseif (is_array($ankerRaw)) {
+        $meta['campagne_anker'] = json_encode($ankerRaw, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+    }
+
+    return $meta;
+}
+
 /** Meta mee naar CE-03 webhook (betrouwbaarder dan alleen DB-join). @return array<string, string> */
 function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
 {
@@ -419,7 +507,7 @@ function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
     $platformUi = ce_platform_to_ui($row['platform_final'] ?? $row['platform_suggested'] ?? null);
     $editorUi = trim((string) ($row['editor_final'] ?? $row['editor_suggested'] ?? ''));
     $ratioUi = ce_resolve_article_image_ratio($row);
-    $objective = ce_resolve_article_objective($pdo, $row);
+    $objective = ce_resolve_article_objective_for_writing($pdo, $row);
     $directive = ce_build_article_write_directive(
         $pdo,
         $clientId,
@@ -428,6 +516,8 @@ function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
         $platformUi,
         $objective,
         $editorUi !== '' ? $editorUi : null,
+        $slotId,
+        $row,
     );
 
     $meta = [
@@ -443,10 +533,17 @@ function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
     }
 
     if ($objective !== null) {
-        $meta['objective_id'] = (string) ($objective['id'] ?? '');
+        $objId = trim((string) ($objective['id'] ?? ''));
+        if ($objId !== '') {
+            $meta['objective_id'] = $objId;
+        }
         $meta['objective_label'] = (string) ($objective['label'] ?? '');
         $meta['objective_description'] = (string) ($objective['description'] ?? '');
         $meta['objective_writing_style'] = (string) ($objective['writingStyle'] ?? '');
+        if (($objective['_source'] ?? '') === 'brand_architecture') {
+            $meta['objective_source'] = 'brand_architecture';
+            $meta['brand_goal'] = trim((string) ($objective['description'] ?? ''));
+        }
     }
 
     $catalog = [];
@@ -474,6 +571,12 @@ function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
         }
     }
 
+    $copyResolved = ce_resolve_copy_modus_for_slot($pdo, $slotId);
+    $meta['copy_modus'] = $copyResolved['modus'];
+    if ($copyResolved['override']) {
+        $meta['copy_modus_override'] = '1';
+    }
+
     if (ce_table_exists($pdo, 'content_slots') && ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
         $campCols = 'id, campaign_id, campaign_fase, campaign_opdracht';
         if (ce_table_has_column($pdo, 'content_slots', 'campaign_anker')) {
@@ -485,28 +588,8 @@ function ce_ce03_webhook_meta_from_slot(PDO $pdo, string $slotId): array
         $campStmt = $pdo->prepare("SELECT {$campCols} FROM content_slots WHERE id = :id LIMIT 1");
         $campStmt->execute(['id' => $slotId]);
         $campSlot = $campStmt->fetch(PDO::FETCH_ASSOC) ?: [];
-        $campagneId = trim((string) ($campSlot['campaign_id'] ?? ''));
-        if ($campagneId !== '') {
-            $meta['campagne_id'] = $campagneId;
-            $fase = trim((string) ($campSlot['campaign_fase'] ?? ''));
-            if ($fase !== '') {
-                $meta['campagne_fase'] = $fase;
-            }
-            $opdracht = trim((string) ($campSlot['campaign_opdracht'] ?? ''));
-            $instructie = trim((string) ($campSlot['campaign_instructie'] ?? ''));
-            if ($instructie !== '') {
-                $line = 'Aanvullende instructie: ' . $instructie;
-                $opdracht = $opdracht !== '' ? $opdracht . "\n\n" . $line : $line;
-            }
-            if ($opdracht !== '') {
-                $meta['campagne_opdracht'] = $opdracht;
-            }
-            $ankerRaw = $campSlot['campaign_anker'] ?? null;
-            if (is_string($ankerRaw) && $ankerRaw !== '') {
-                $meta['campagne_anker'] = $ankerRaw;
-            } elseif (is_array($ankerRaw)) {
-                $meta['campagne_anker'] = json_encode($ankerRaw, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-            }
+        foreach (ce_campagne_context_meta_from_slot_row($pdo, $campSlot) as $k => $v) {
+            $meta[$k] = $v;
         }
     }
 

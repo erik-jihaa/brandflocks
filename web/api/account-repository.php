@@ -735,6 +735,82 @@ function ce_update_client_admin(PDO $pdo, array $body): array
         $pdo->prepare('UPDATE clients SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);
     }
 
+    $savedNarrative = null;
+    if (array_key_exists('brandNarrative', $body) && is_array($body['brandNarrative'])) {
+        require_once __DIR__ . '/hba-repository.php';
+        $narrative = ce_brand_narrative_from_request($body['brandNarrative']);
+        $saved = ce_save_brand_narrative($pdo, $clientId, $narrative, 'admin-brandNarrative-import');
+        $savedNarrative = ce_brand_narrative_dto($saved);
+    }
+
+    $importedGuardrailId = null;
+    if (array_key_exists('importHbaGuardrail', $body) && is_array($body['importHbaGuardrail'])) {
+        require_once __DIR__ . '/hba-repository.php';
+        require_once __DIR__ . '/hba-contentflow-schema.php';
+        require_once __DIR__ . '/hba-identity-gate.php';
+        require_once __DIR__ . '/uuid-helper.php';
+        ce_ensure_hba_contentflow_schema($pdo);
+
+        $import = $body['importHbaGuardrail'];
+        $decision = strtoupper(trim((string) ($import['decision'] ?? 'PASS')));
+        if (!in_array($decision, ['PASS', 'FAIL', 'WARN'], true)) {
+            throw new InvalidArgumentException('importHbaGuardrail.decision ongeldig');
+        }
+        $scoreRaw = $import['check_score'] ?? $import['checkScore'] ?? null;
+        $score = $scoreRaw === null || $scoreRaw === '' ? null : (int) $scoreRaw;
+        $payload = $import['payload'] ?? null;
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+            $payload = is_array($decoded) ? $decoded : null;
+        }
+        if (!is_array($payload)) {
+            throw new InvalidArgumentException('importHbaGuardrail.payload is verplicht');
+        }
+
+        $archVersion = (int) ($import['architecture_version'] ?? $import['architectureVersion'] ?? 1);
+        $current = ce_fetch_current_brand_narrative($pdo, $clientId);
+        if (is_array($current)) {
+            $archVersion = max(1, (int) ($current['version'] ?? $archVersion));
+        }
+
+        $branchId = trim((string) ($import['branch_id'] ?? $import['branchId'] ?? ''));
+        $branchVersion = isset($import['branch_version']) || isset($import['branchVersion'])
+            ? (int) ($import['branch_version'] ?? $import['branchVersion'])
+            : null;
+        if ($branchId === '' && is_array($current)) {
+            $code = trim((string) ($current['branche_code'] ?? ''));
+            if ($code !== '' && ce_table_exists($pdo, 'branche_library')) {
+                $bStmt = $pdo->prepare('SELECT id FROM branche_library WHERE branche_code = :code LIMIT 1');
+                $bStmt->execute(['code' => $code]);
+                $branchRow = $bStmt->fetch();
+                if ($branchRow) {
+                    $branchId = (string) ($branchRow['id'] ?? '');
+                }
+            }
+        }
+        if ($branchId === '') {
+            $branchId = null;
+        }
+
+        $pdo->prepare('DELETE FROM hba_guardrail_objects WHERE client_id = :id')->execute(['id' => $clientId]);
+        $importedGuardrailId = ce_hba_store_guardrail(
+            $pdo,
+            $clientId,
+            $payload,
+            $decision,
+            $score,
+            $branchId,
+            $branchVersion,
+            $archVersion,
+        );
+    }
+
+    if (!empty($body['markHbaArchitectureComplete']) && ce_table_has_column($pdo, 'clients', 'hba_architecture_completed_at')) {
+        $pdo->prepare(
+            'UPDATE clients SET hba_architecture_completed_at = COALESCE(hba_architecture_completed_at, NOW()) WHERE id = :id'
+        )->execute(['id' => $clientId]);
+    }
+
     $galleryCopied = 0;
     $copyGalleryFrom = trim((string) ($body['copyGalleryFromClientId'] ?? ''));
     if ($copyGalleryFrom !== '') {
@@ -757,6 +833,19 @@ function ce_update_client_admin(PDO $pdo, array $body): array
     ];
     if ($copyGalleryFrom !== '') {
         $result['galleryCopied'] = $galleryCopied;
+    }
+    if ($savedNarrative !== null) {
+        $result['brandNarrative'] = $savedNarrative;
+        $updatedStmt = $pdo->prepare('SELECT * FROM clients WHERE id = :id LIMIT 1');
+        $updatedStmt->execute(['id' => $clientId]);
+        $refreshed = $updatedStmt->fetch();
+        if ($refreshed) {
+            $result['strategy'] = ce_strategy_dto($pdo, $refreshed);
+        }
+    }
+    if ($importedGuardrailId !== null) {
+        $result['hbaGuardrailId'] = $importedGuardrailId;
+        $result['guardrailActive'] = ce_hba_active_guardrail($pdo, $clientId) !== null;
     }
 
     return $result;

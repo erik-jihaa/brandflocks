@@ -5,7 +5,6 @@ declare(strict_types=1);
 require_once __DIR__ . '/schema-helper.php';
 require_once __DIR__ . '/uuid-helper.php';
 require_once __DIR__ . '/source-folders-repository.php';
-require_once __DIR__ . '/trello-helper.php';
 require_once __DIR__ . '/credential-crypto.php';
 require_once __DIR__ . '/mailbox-helper.php';
 require_once __DIR__ . '/scrape-repository.php';
@@ -175,11 +174,6 @@ function ce_ensure_sources_columns(PDO $pdo): void
         'last_checked_at' => 'DATETIME NULL',
         'active' => 'TINYINT(1) NOT NULL DEFAULT 1',
         'folder_id' => 'CHAR(36) NULL',
-        'asana_pat_ref' => 'VARCHAR(255) NULL',
-        'asana_workspace_gid' => 'VARCHAR(100) NULL',
-        'asana_project_gid' => 'VARCHAR(100) NULL',
-        'asana_workspace_name' => 'VARCHAR(255) NULL',
-        'asana_project_name' => 'VARCHAR(255) NULL',
         'drive_file_url' => 'VARCHAR(500) NULL',
         'drive_oauth_refresh_token' => 'TEXT NULL',
         'drive_oauth_email' => 'VARCHAR(255) NULL',
@@ -268,7 +262,6 @@ function ce_ensure_sources_category_enum(PDO $pdo): void
         'blogs',
         'document',
         'youtube',
-        'asana',
         'drive',
         'linkedin',
         'scraper',
@@ -293,7 +286,6 @@ function ce_ui_category_to_db(string $uiCategory): string
         'Blogs' => 'blogs',
         'Document' => 'document',
         'YouTube' => 'youtube',
-        'Asana' => 'asana',
         'Drive' => 'drive',
         'Linkedin' => 'linkedin',
         'Scraper' => 'scraper',
@@ -312,7 +304,6 @@ function ce_db_category_to_ui(string $dbCategory): string
         'blogs' => 'Blogs',
         'document' => 'Document',
         'youtube' => 'YouTube',
-        'asana' => 'Asana',
         'drive' => 'Drive',
         'linkedin' => 'Linkedin',
         'scraper' => 'Scraper',
@@ -357,11 +348,13 @@ function ce_fetch_all_sources(PDO $pdo): array
             FROM sources s
             LEFT JOIN source_folders sf ON sf.id = s.folder_id
             WHERE s.client_id = :client_id
+            AND s.category <> 'asana'
+            AND s.category <> 'trello'
             ORDER BY
               CASE WHEN s.folder_id IS NULL THEN 1 ELSE 0 END,
               COALESCE(sf.sort_order, 9999),
               COALESCE(sf.name, ''),
-              FIELD(s.category, 'url_rss', 'blogs', 'document', 'youtube', 'asana', 'drive', 'linkedin', 'scraper', 'mailbox', 'analytics', 'trello', 'calendar'),
+              FIELD(s.category, 'url_rss', 'blogs', 'document', 'youtube', 'drive', 'linkedin', 'scraper', 'mailbox', 'analytics', 'trello', 'calendar'),
               s.title ASC
             SQL
         );
@@ -370,7 +363,9 @@ function ce_fetch_all_sources(PDO $pdo): array
             <<<'SQL'
             SELECT * FROM sources
             WHERE client_id = :client_id
-            ORDER BY FIELD(category, 'url_rss', 'blogs', 'document', 'youtube', 'asana', 'drive', 'linkedin', 'scraper', 'mailbox', 'analytics', 'trello', 'calendar'), title ASC
+            AND category <> 'asana'
+            AND category <> 'trello'
+            ORDER BY FIELD(category, 'url_rss', 'blogs', 'document', 'youtube', 'drive', 'linkedin', 'scraper', 'mailbox', 'analytics', 'trello', 'calendar'), title ASC
             SQL
         );
     }
@@ -454,11 +449,6 @@ function ce_format_source_row(array $row, array $folderNames = []): array
         'scraperLinkedinProfile' => $row['scraper_linkedin_profile'] ?? null,
         'scraperLinkedinPasswordConfigured' => trim((string) ($row['scraper_linkedin_password_ref'] ?? '')) !== '',
         'scraperLinkedinPasswordRef' => null,
-        'asanaPatConfigured' => trim((string) ($row['asana_pat_ref'] ?? '')) !== '',
-        'asanaWorkspaceGid' => $row['asana_workspace_gid'] ?? null,
-        'asanaProjectGid' => $row['asana_project_gid'] ?? null,
-        'asanaWorkspaceName' => $row['asana_workspace_name'] ?? null,
-        'asanaProjectName' => $row['asana_project_name'] ?? null,
         'documentFilename' => $row['document_filename'] ?? null,
         'documentUploadedAt' => $row['document_uploaded_at'] ?? null,
         'documentChunkCount' => $row['document_chunk_count'] !== null ? (int) $row['document_chunk_count'] : null,
@@ -489,7 +479,14 @@ function ce_fetch_source(PDO $pdo, string $sourceId, ?string $clientId = null): 
     $stmt->execute(['id' => $sourceId, 'client_id' => $clientId]);
     $row = $stmt->fetch();
 
-    return $row ? ce_format_source_row($row, ce_source_folder_name_map($pdo, $clientId)) : null;
+    if (!$row) {
+        return null;
+    }
+    if ((string) ($row['category'] ?? '') === 'asana') {
+        return null;
+    }
+
+    return ce_format_source_row($row, ce_source_folder_name_map($pdo, $clientId));
 }
 
 /** @param array<string, mixed> $body */
@@ -500,6 +497,10 @@ function ce_create_source(PDO $pdo, string $category, array $body): array
     $clientId = ce_default_client_id($pdo);
     if ($clientId === null) {
         throw new RuntimeException('Geen client gevonden — voeg een rij toe in clients.');
+    }
+
+    if ($category === 'trello') {
+        throw new InvalidArgumentException('Trello is niet meer beschikbaar als source.');
     }
 
     $title = trim((string) ($body['title'] ?? ''));
@@ -577,9 +578,6 @@ function ce_create_source(PDO $pdo, string $category, array $body): array
         null,
     ) ?: null;
 
-    if ($category === 'trello' && $trelloBoardId === null) {
-        throw new InvalidArgumentException('Trello board ID is verplicht.');
-    }
     if ($category === 'mailbox' && $mailboxEmail === null) {
         throw new InvalidArgumentException('Mailbox e-mailadres is verplicht.');
     }
@@ -588,9 +586,6 @@ function ce_create_source(PDO $pdo, string $category, array $body): array
     }
     if ($category === 'youtube' && $url === null) {
         throw new InvalidArgumentException('YouTube-kanaal-URL is verplicht.');
-    }
-    if ($category === 'asana' && trim((string) ($body['asanaProjectGid'] ?? '')) === '') {
-        throw new InvalidArgumentException('Asana-project is verplicht.');
     }
     if ($category === 'drive' && trim((string) ($body['driveFileUrl'] ?? '')) === '') {
         throw new InvalidArgumentException('Google Drive-bestands-URL is verplicht.');
@@ -691,7 +686,7 @@ function ce_update_source(PDO $pdo, string $sourceId, array $body): ?array
 
     $existingStmt = $pdo->prepare(
         'SELECT mailbox_password_ref, trello_api_token_ref, scraper_api_token_ref,
-                scraper_linkedin_password_ref, analytics_api_secret_ref, asana_pat_ref
+                scraper_linkedin_password_ref, analytics_api_secret_ref
          FROM sources WHERE id = :id AND client_id = :client_id LIMIT 1'
     );
     $existingStmt->execute(['id' => $sourceId, 'client_id' => $clientId]);
@@ -704,7 +699,6 @@ function ce_update_source(PDO $pdo, string $sourceId, array $body): ?array
     $existingScraperToken = (string) ($existingRow['scraper_api_token_ref'] ?? '');
     $existingLinkedinPassword = (string) ($existingRow['scraper_linkedin_password_ref'] ?? '');
     $existingAnalyticsSecret = (string) ($existingRow['analytics_api_secret_ref'] ?? '');
-    $existingAsanaPat = (string) ($existingRow['asana_pat_ref'] ?? '');
 
     if (array_key_exists('url', $body) || array_key_exists('scraperActorOrTaskId', $body)) {
         $body = ce_sources_normalize_scraper_apify($body);
@@ -732,10 +726,6 @@ function ce_update_source(PDO $pdo, string $sourceId, array $body): ?array
         'scraperActorOrTaskId' => 'scraper_actor_or_task_id',
         'scraperWebhookUrl' => 'scraper_webhook_url',
         'scraperLinkedinProfile' => 'scraper_linkedin_profile',
-        'asanaWorkspaceGid' => 'asana_workspace_gid',
-        'asanaProjectGid' => 'asana_project_gid',
-        'asanaWorkspaceName' => 'asana_workspace_name',
-        'asanaProjectName' => 'asana_project_name',
         'driveFileUrl' => 'drive_file_url',
         'folderId' => 'folder_id',
         'sourceTier' => 'source_tier',
@@ -825,14 +815,6 @@ function ce_update_source(PDO $pdo, string $sourceId, array $body): ?array
         }
     }
 
-    if (array_key_exists('asanaPatRef', $body)) {
-        $incomingPat = ce_credential_prepare_for_storage((string) ($body['asanaPatRef'] ?? ''), $existingAsanaPat);
-        if ($incomingPat !== '') {
-            $fields[] = 'asana_pat_ref = :asana_pat_ref';
-            $params['asana_pat_ref'] = $incomingPat;
-        }
-    }
-
     if ($fields === []) {
         return ce_fetch_source($pdo, $sourceId);
     }
@@ -861,11 +843,13 @@ function ce_delete_source_dependencies(PDO $pdo, string $sourceId): void
     }
 }
 
-function ce_delete_source(PDO $pdo, string $sourceId): bool
+function ce_delete_source(PDO $pdo, string $sourceId, ?string $clientId = null): bool
 {
     ce_ensure_sources_schema($pdo);
 
-    $clientId = ce_default_client_id($pdo);
+    if ($clientId === null) {
+        $clientId = ce_default_client_id($pdo);
+    }
     if ($clientId === null) {
         return false;
     }
@@ -1005,33 +989,14 @@ function ce_check_source(PDO $pdo, string $sourceId, ?array $body = null): ?arra
         $probe = ce_probe_document_source($pdo, $sourceId);
         $status = ($probe['ok'] ?? false) ? 'reachable' : 'unreachable';
         $checkMessage = $probe['message'] ?? null;
-    } elseif ($category === 'asana') {
-        require_once __DIR__ . '/asana-helper.php';
-        $plainPat = is_array($body) ? trim((string) ($body['asanaPatRef'] ?? '')) : '';
-        $probe = ce_probe_asana_source($pdo, $sourceId, $plainPat !== '' ? $plainPat : null);
-        $status = ($probe['ok'] ?? false) ? 'reachable' : 'unreachable';
-        $checkMessage = $probe['message'] ?? null;
     } elseif ($category === 'drive') {
         require_once __DIR__ . '/drive-repository.php';
         $probe = ce_probe_drive_source($pdo, $sourceId);
         $status = ($probe['ok'] ?? false) ? 'reachable' : 'unreachable';
         $checkMessage = $probe['message'] ?? null;
     } elseif ($category === 'trello') {
-        $boardStmt = $pdo->prepare(
-            'SELECT trello_board_id, trello_api_token_ref FROM sources WHERE id = :id LIMIT 1'
-        );
-        $boardStmt->execute(['id' => $sourceId]);
-        $boardRow = $boardStmt->fetch();
-        $boardId = trim((string) ($boardRow['trello_board_id'] ?? ''));
-        $sourceToken = trim((string) ($boardRow['trello_api_token_ref'] ?? ''));
-        if ($boardId === '') {
-            $status = 'unreachable';
-            $checkMessage = 'Board-ID ontbreekt.';
-        } else {
-            $probe = ce_probe_trello_board_content($boardId, $sourceToken);
-            $status = ($probe['ok'] ?? false) ? 'reachable' : 'unreachable';
-            $checkMessage = $probe['message'] ?? null;
-        }
+        $status = 'unreachable';
+        $checkMessage = 'Trello is uitgeschakeld.';
     } elseif ($category === 'analytics') {
         require_once __DIR__ . '/analytics-oauth-helper.php';
         $status = ce_analytics_verify_connection($pdo, $sourceId) ? 'reachable' : 'unreachable';
@@ -1630,7 +1595,7 @@ function ce_probe_webpage_url(string $url): array
     if (ce_url_looks_like_local_path($url)) {
         return [
             'ok' => false,
-            'message' => 'Gebruik een web-URL (https://…). Een RSS-bestand op je computer kan Content Engine niet ophalen.',
+            'message' => 'Gebruik een web-URL (https://…). Een RSS-bestand op je computer kan ' . ce_product_name() . ' niet ophalen.',
             'itemCount' => 0,
         ];
     }
@@ -1685,7 +1650,7 @@ function ce_probe_rss_feed(string $url, bool $allowDiscover = true): array
     if (ce_url_looks_like_local_path($url)) {
         return [
             'ok' => false,
-            'message' => 'Gebruik een web-URL (https://…). Een RSS-bestand op je computer kan Content Engine niet ophalen.',
+            'message' => 'Gebruik een web-URL (https://…). Een RSS-bestand op je computer kan ' . ce_product_name() . ' niet ophalen.',
             'itemCount' => 0,
         ];
     }
@@ -1865,6 +1830,9 @@ function ce_copy_client_sources(PDO $pdo, string $fromClientId, string $toClient
     $copied = [];
 
     foreach ($rows as $row) {
+        if ((string) ($row['category'] ?? '') === 'asana') {
+            continue;
+        }
         $newId = ce_uuid_v4();
         $insert = [
             'id' => $newId,
@@ -1923,35 +1891,6 @@ function ce_sources_apply_category_fields(PDO $pdo, string $sourceId, string $ca
 {
     ce_ensure_sources_schema($pdo);
 
-    if ($category === 'asana') {
-        $fields = [];
-        $params = ['id' => $sourceId];
-        if (array_key_exists('asanaPatRef', $body)) {
-            $pat = ce_credential_prepare_for_storage((string) ($body['asanaPatRef'] ?? ''), null);
-            if ($pat !== '') {
-                $fields[] = 'asana_pat_ref = :asana_pat_ref';
-                $params['asana_pat_ref'] = $pat;
-            }
-        }
-        $map = [
-            'asanaWorkspaceGid' => 'asana_workspace_gid',
-            'asanaProjectGid' => 'asana_project_gid',
-            'asanaWorkspaceName' => 'asana_workspace_name',
-            'asanaProjectName' => 'asana_project_name',
-        ];
-        foreach ($map as $key => $column) {
-            if (!array_key_exists($key, $body) || !ce_table_has_column($pdo, 'sources', $column)) {
-                continue;
-            }
-            $fields[] = "`$column` = :$column";
-            $params[$column] = trim((string) $body[$key]) ?: null;
-        }
-        if ($fields !== []) {
-            $pdo->prepare('UPDATE sources SET ' . implode(', ', $fields) . ' WHERE id = :id')
-                ->execute($params);
-        }
-    }
-
     if ($category === 'drive' && array_key_exists('driveFileUrl', $body)
         && ce_table_has_column($pdo, 'sources', 'drive_file_url')) {
         $pdo->prepare('UPDATE sources SET drive_file_url = :url WHERE id = :id')
@@ -1960,4 +1899,61 @@ function ce_sources_apply_category_fields(PDO $pdo, string $sourceId, string $ca
                 'id' => $sourceId,
             ]);
     }
+}
+
+/**
+ * Verwijder alle bronnen met category `asana` (Asana-integratie is uitgefaseerd).
+ * Per rij: zelfde afhankelijkheden als ce_delete_source (FK / scrape_runs).
+ *
+ * @return array{deleted: int, failed: list<string>, clientIds: list<string>}
+ */
+function ce_delete_all_asana_sources(PDO $pdo, ?string $clientId = null): array
+{
+    ce_ensure_sources_schema($pdo);
+
+    if (!ce_table_exists($pdo, 'sources')) {
+        return ['deleted' => 0, 'failed' => [], 'clientIds' => []];
+    }
+
+    $clientFilter = null;
+    if ($clientId !== null) {
+        $clientFilter = trim($clientId);
+        if ($clientFilter === '' || !preg_match('/^[0-9a-f-]{36}$/i', $clientFilter)) {
+            throw new InvalidArgumentException('clientId ontbreekt of is ongeldig.');
+        }
+        $stmt = $pdo->prepare(
+            'SELECT id FROM sources WHERE category = :category AND client_id = :client_id ORDER BY id ASC'
+        );
+        $stmt->execute(['category' => 'asana', 'client_id' => $clientFilter]);
+    } else {
+        $stmt = $pdo->prepare('SELECT id, client_id FROM sources WHERE category = :category ORDER BY client_id ASC, id ASC');
+        $stmt->execute(['category' => 'asana']);
+    }
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $deleted = 0;
+    /** @var list<string> $failed */
+    $failed = [];
+    /** @var array<string, true> $clientSeen */
+    $clientSeen = [];
+
+    foreach ($rows as $row) {
+        $sourceId = trim((string) ($row['id'] ?? ''));
+        $ownerId = $clientFilter ?? trim((string) ($row['client_id'] ?? ''));
+        if ($sourceId === '' || $ownerId === '') {
+            continue;
+        }
+        $clientSeen[$ownerId] = true;
+        if (ce_delete_source($pdo, $sourceId, $ownerId)) {
+            $deleted++;
+        } else {
+            $failed[] = $sourceId;
+        }
+    }
+
+    return [
+        'deleted' => $deleted,
+        'failed' => $failed,
+        'clientIds' => array_keys($clientSeen),
+    ];
 }

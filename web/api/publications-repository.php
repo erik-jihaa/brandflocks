@@ -13,7 +13,7 @@ function ce_ensure_agenda_scheduling_schema(PDO $pdo): void
     }
     $ensured = true;
 
-    $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_agenda_scheduling.sql';
+    $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_agenda_scheduling.sql';
     if (!is_readable($migration)) {
         $migration = dirname(__DIR__) . '/migrations/add_agenda_scheduling.sql';
     }

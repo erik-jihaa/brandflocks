@@ -3,19 +3,14 @@
 # Gebruik: ./scripts/create-client.sh "Bedrijfsnaam" "contact@email.nl" [wachtwoord]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-if [[ ! -f "$ROOT/.env" ]]; then
-  echo "Missing $ROOT/.env" >&2
-  exit 1
-fi
-
 # shellcheck disable=SC1091
-set -a
-source "$ROOT/.env"
-set +a
+source "$ROOT/scripts/ce-env.sh"
 
-BASE_URL="${CE_PUBLIC_BASE_URL:-https://ce.igisnext.com}"
-TOKEN="${CE_RESET_TOKEN:-}"
+TARGET_ENV="${4:-}"
+ENV_FILE="$(ce_env_file "$ROOT" "$TARGET_ENV")"
+BASE_URL="$(ce_env_value "$ENV_FILE" CE_PUBLIC_BASE_URL)"
+BASE_URL="${BASE_URL:-https://ce.igisnext.com}"
+TOKEN="$(ce_env_value "$ENV_FILE" CE_RESET_TOKEN)"
 
 if [[ -z "$TOKEN" ]]; then
   echo "CE_RESET_TOKEN ontbreekt in .env" >&2
@@ -23,7 +18,7 @@ if [[ -z "$TOKEN" ]]; then
 fi
 
 COMPANY="${1:-Demo BV}"
-EMAIL="${2:-demo@igisnext.com}"
+EMAIL="${2:-erik@brandflocks.nl}"
 PASSWORD="${3:-}"
 
 JSON=$(COMPANY="$COMPANY" EMAIL="$EMAIL" PASSWORD="$PASSWORD" python3 - <<'PY'

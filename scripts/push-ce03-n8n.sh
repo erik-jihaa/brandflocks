@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$ROOT/scripts/n8n-push-common.sh" "${1:-production}"
 
-JSON="$ROOT/../JSON/CE-03 - Rationale & Article Writer (FIXED v2 - MySQL params).json"
+JSON="$ROOT/json/n8n/CE-03 - Rationale & Article Writer (FIXED v2 - MySQL params).json"
 
 python3 "$ROOT/scripts/generate-ce03-workflow.py"
 

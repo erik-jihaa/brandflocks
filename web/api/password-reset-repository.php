@@ -119,10 +119,11 @@ function ce_request_password_reset(PDO $pdo, string $email): array
     }
 
     $base = ce_public_base_url();
+    $product = ce_product_name();
     $lines = [
         'Hallo,',
         '',
-        'Je hebt een nieuw wachtwoord aangevraagd voor de Content Engine.',
+        'Je hebt een nieuw wachtwoord aangevraagd voor ' . $product . '.',
         '',
     ];
 
@@ -141,10 +142,10 @@ function ce_request_password_reset(PDO $pdo, string $email): array
 
     $lines[] = 'Als je dit niet hebt aangevraagd, kun je deze mail negeren.';
     $lines[] = '';
-    $lines[] = '— Content Engine';
+    $lines[] = '— ' . $product;
     $textBody = implode("\n", $lines);
 
-    $htmlParts = ['<p>Hallo,</p><p>Je hebt een nieuw wachtwoord aangevraagd voor de Content Engine.</p>'];
+    $htmlParts = ['<p>Hallo,</p><p>Je hebt een nieuw wachtwoord aangevraagd voor ' . htmlspecialchars($product, ENT_QUOTES, 'UTF-8') . '.</p>'];
     if (count($links) === 1) {
         $url = htmlspecialchars($links[0]['url'], ENT_QUOTES, 'UTF-8');
         $htmlParts[] = '<p><a href="' . $url . '">Nieuw wachtwoord instellen</a> (geldig 1 uur)</p>';
@@ -160,7 +161,7 @@ function ce_request_password_reset(PDO $pdo, string $email): array
     $htmlParts[] = '<p>Als je dit niet hebt aangevraagd, kun je deze mail negeren.</p>';
     $htmlBody = implode("\n", $htmlParts);
 
-    $mail = ce_send_mail($email, 'Content Engine — wachtwoord resetten', $textBody, $htmlBody);
+    $mail = ce_send_mail($email, $product . ' — wachtwoord resetten', $textBody, $htmlBody);
     if (!$mail['ok']) {
         error_log('CE password reset mail failed: ' . ($mail['error'] ?? 'unknown'));
         require_once __DIR__ . '/event-log-repository.php';

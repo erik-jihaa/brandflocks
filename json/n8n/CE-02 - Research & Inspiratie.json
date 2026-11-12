@@ -1,0 +1,475 @@
+{
+  "name": "CE-02 (Research & Inspiratie) [staging]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce02-research-staging",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "ce02-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        400
+      ],
+      "webhookId": "ce02-research-staging-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = $input.first()?.json ?? {};\nlet body = raw.body ?? raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = {};\n  }\n}\n\nif (body && typeof body === 'object' && body.body && typeof body.body === 'object') {\n  body = body.body;\n}\n\nconst query = raw.query && typeof raw.query === 'object' ? raw.query : {};\n\nfunction pick(obj, ...keys) {\n  if (!obj || typeof obj !== 'object') return '';\n  for (const key of keys) {\n    const value = obj[key];\n    if (value !== undefined && value !== null && String(value).trim() !== '') {\n      return String(value).trim();\n    }\n  }\n  return '';\n}\n\nconst themeId =\n  pick(body, 'theme_id', 'themeId') ||\n  pick(query, 'theme_id', 'themeId') ||\n  pick(raw, 'theme_id', 'themeId');\nconst slotId =\n  pick(body, 'slot_id', 'slotId') ||\n  pick(query, 'slot_id', 'slotId') ||\n  pick(raw, 'slot_id', 'slotId');\n\nif (!themeId && !slotId) {\n  throw new Error(\n    'Missing theme_id or slot_id. Stuur JSON: {\"theme_id\":\"...\"} of {\"slot_id\":\"...\"} (n8n: pin testdata op Webhook-node).'\n  );\n}\n\nreturn { json: { theme_id: themeId, slot_id: slotId } };\n"
+      },
+      "id": "ce02-parse",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  COALESCE(t.id, th2.id) AS theme_id,\n  CASE WHEN NULLIF($2, '') IS NOT NULL THEN $2 ELSE NULL END AS slot_id,\n  COALESCE(t.title, th2.title, s.theme) AS theme_title,\n  COALESCE(t.motivation, '') AS motivation,\n  COALESCE(t.rationale, s.goal, '') AS theme_rationale,\n  COALESCE(t.client_id, s.client_id) AS client_id,\n  c.name AS client_name,\n  c.archetype,\n  c.adversary,\n  c.brand_goal,\n  COALESCE(c.max_research_items_per_theme, 8) AS max_items,\n  COALESCE(t.title, s.theme, s.search_terms) AS search_label,\n  COALESCE(NULLIF(s.objective_id, ''), NULLIF(t.objective_id, ''), NULLIF(th2.objective_id, '')) AS objective_id,\n  obj.source_folder_id AS objective_source_folder_id\nFROM clients c\nLEFT JOIN themes t ON t.id = NULLIF($1, '') AND t.client_id = c.id\nLEFT JOIN content_slots s ON s.id = NULLIF($2, '') AND s.client_id = c.id\nLEFT JOIN themes th2 ON th2.id = s.theme_id\nLEFT JOIN objectives obj ON obj.id = COALESCE(NULLIF(s.objective_id, ''), NULLIF(t.objective_id, ''), NULLIF(th2.objective_id, ''))\n  AND obj.client_id = COALESCE(t.client_id, s.client_id)\nWHERE (NULLIF($1, '') IS NOT NULL AND t.id IS NOT NULL)\n   OR (NULLIF($2, '') IS NOT NULL AND s.id IS NOT NULL)\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Parse Input').item.json.theme_id, $('Parse Input').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce02-load-context",
+      "name": "Load Context",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1060,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first()?.json ?? {};\nif (!row.client_id) {\n  throw new Error('Theme or slot not found');\n}\nreturn { json: row };"
+      },
+      "id": "ce02-validate-context",
+      "name": "Validate Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DISTINCT ri.invalshoek AS invalshoek\nFROM research_items ri\nLEFT JOIN themes t ON t.id = ri.theme_id\nLEFT JOIN content_slots s ON s.id = ri.slot_id\nWHERE ri.invalshoek IS NOT NULL\n  AND TRIM(ri.invalshoek) != ''\n  AND ri.created_at > DATE_SUB(NOW(), INTERVAL 6 WEEK)\n  AND COALESCE(t.client_id, s.client_id) = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Context').item.json.client_id ] }}"
+        }
+      },
+      "id": "ce02-load-recent-invalshoeken",
+      "name": "Load Recent Invalshoeken",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1390,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Validate Context').item.json;\nconst recent = $('Load Recent Invalshoeken').all()\n  .map((item) => String(item.json.invalshoek || '').trim())\n  .filter(Boolean);\nreturn { json: { ...ctx, recente_invalshoeken: recent } };\n"
+      },
+      "id": "ce02-merge-context",
+      "name": "Merge Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM research_items WHERE COALESCE(source_type, '') != 'manual_fastlane' AND (($1 != '' AND theme_id = $1) OR ($2 != '' AND slot_id = $2))",
+        "options": {
+          "queryReplacement": "={{ [ $('Merge Context').item.json.theme_id || '', $('Merge Context').item.json.slot_id || '' ] }}"
+        }
+      },
+      "id": "ce02-clear-old",
+      "name": "Clear Old Research",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1610,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, title, url, category, source_kind, trello_board_id, asana_project_gid, drive_file_url, max_units_per_run, folder_id\nFROM sources\nWHERE client_id = $1 AND COALESCE(active, 1) = 1\n  AND (\n    (category = 'url_rss' AND url IS NOT NULL AND url != '')\n    OR (category = 'youtube' AND url IS NOT NULL AND url != '')\n    OR (category = 'blogs' AND url IS NOT NULL AND url != '')\n    OR (category = 'document' AND document_chunk_count IS NOT NULL AND document_chunk_count > 0)    OR (category = 'asana' AND asana_project_gid IS NOT NULL AND asana_project_gid != '')\n    OR (category = 'drive' AND drive_file_url IS NOT NULL AND drive_file_url != '')\n    OR (category IN ('scraper', 'linkedin') AND scraper_api_token_ref IS NOT NULL AND scraper_api_token_ref != '')\n    OR (category = 'linkedin' AND scraper_linkedin_profile IS NOT NULL AND scraper_linkedin_profile != '')\n  )\nORDER BY\n  CASE WHEN NULLIF($2, '') IS NOT NULL AND folder_id = $2 THEN 0 ELSE 1 END,\n  category ASC, title ASC\nLIMIT 20",
+        "options": {
+          "queryReplacement": "={{ [ $('Merge Context').item.json.client_id, $('Merge Context').item.json.objective_source_folder_id || '' ] }}"
+        }
+      },
+      "id": "ce02-get-sources",
+      "name": "Get Sources",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1720,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT ni.subject AS title, ni.body_text AS contentSnippet, ni.source_id, s.title AS source_title\nFROM newsletter_items ni\nINNER JOIN sources s ON s.id = ni.source_id AND s.category = 'mailbox'\nWHERE s.client_id = $1\n  AND COALESCE(s.active, 1) = 1\nORDER BY ni.received_at DESC\nLIMIT 15",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Context').item.json.client_id ] }}"
+        }
+      },
+      "id": "ce02-get-newsletters",
+      "name": "Get Newsletter Items",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1940,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      },
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Load Context').item.json;\nconst preferredFolder = String(ctx.objective_source_folder_id || '').trim();\nconst rows = $('Get Sources').all()\n  .map((i) => i.json)\n  .sort((a, b) => {\n    const aMatch = preferredFolder && String(a.folder_id || '') === preferredFolder ? 0 : 1;\n    const bMatch = preferredFolder && String(b.folder_id || '') === preferredFolder ? 0 : 1;\n    return aMatch - bMatch;\n  });\nconst feedUrls = rows\n  .filter((row) => (row.category === 'url_rss' || row.category === 'youtube') && row.url)\n  .map((row) => ({\n    url: String(row.url).trim(),\n    source_id: row.id || null,\n    source_title: row.title || (row.category === 'youtube' ? 'YouTube' : 'RSS'),\n    source_kind: String(row.source_kind || (row.category === 'youtube' ? 'rss' : 'rss')).trim().toLowerCase(),\n  }));\nconst trelloBoards = [];\nconst scraperSources = rows\n  .filter((row) => row.category === 'scraper')\n  .map((row) => ({\n    source_id: row.id || null,\n    source_title: row.title || 'Scraper',\n    max_units_per_run: row.max_units_per_run,\n  }));\nconst blogSources = rows\n  .filter((row) => row.category === 'blogs' && row.url)\n  .map((row) => ({\n    source_id: row.id || null,\n    source_title: row.title || 'Blogs',\n    url: String(row.url).trim(),\n  }));\nconst documentSources = rows\n  .filter((row) => row.category === 'document')\n  .map((row) => ({\n    source_id: row.id || null,\n    source_title: row.title || 'Document',\n  }));\nconst asanaSources = rows\n  .filter((row) => row.category === 'asana' && row.asana_project_gid)\n  .map((row) => ({\n    source_id: row.id || null,\n    source_title: row.title || 'Asana',\n  }));\nconst driveSources = rows\n  .filter((row) => row.category === 'drive' && row.drive_file_url)\n  .map((row) => ({\n    source_id: row.id || null,\n    source_title: row.title || 'Google Drive',\n  }));\nconst themeOnly = Boolean(String(ctx.theme_id || '').trim()) && !String(ctx.slot_id || '').trim();\nconst searchLabel = String(ctx.search_label || ctx.theme_title || 'nieuws').trim();\nconst googleNewsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchLabel)}&hl=nl&gl=NL&ceid=NL:nl`;\nconst alreadyHasGoogleNews = feedUrls.some((f) =>\n  String(f.url || '').toLowerCase().includes('news.google.com/rss/search'),\n);\n// Backup wanneer de klant geen bronnen heeft, of wel bronnen maar geen RSS/YouTube-feeds.\nif (!alreadyHasGoogleNews && (rows.length === 0 || feedUrls.length === 0)) {\n  feedUrls.push({\n    url: googleNewsUrl,\n    source_id: null,\n    source_title: 'Google News',\n    source_kind: 'rss',\n  });\n}\nreturn {\n  json: {\n    ...ctx,\n    feed_urls: feedUrls.slice(0, 6),\n    trello_boards: trelloBoards,\n    scraper_sources: themeOnly ? [] : scraperSources,\n    blog_sources: blogSources,\n    document_sources: documentSources,\n    asana_sources: asanaSources,\n    drive_sources: driveSources,\n    theme_only: themeOnly,\n  },\n};\n"
+      },
+      "id": "ce02-prepare-feeds",
+      "name": "Prepare Feed URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Prepare Feed URLs').item.json;\nconst feedUrls = ctx.feed_urls || [];\nconst trelloBoards = [];\nconst items = [];\n\nfunction envVar(name) {\n  try {\n    return String($env[name] || '').trim();\n  } catch (e) {\n    return '';\n  }\n}\n\nconst ceBase = envVar('CE_PUBLIC_BASE_URL') || 'https://app.brandflocks.nl';\nconst ceResetToken = envVar('CE_RESET_TOKEN');\n\nasync function loadScraperItems(source) {\n  const sourceId = String(source?.source_id || '').trim();\n  if (!sourceId) return [];\n  if (!ceResetToken) return [];\n\n  const payload = {\n    theme_id: ctx.theme_id || null,\n    slot_id: ctx.slot_id || null,\n    search_label: ctx.search_label || ctx.theme_title || '',\n  };\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `${ceBase.replace(/\\/$/, '')}/api/sources/${encodeURIComponent(sourceId)}/scraper-run`,\n      timeout: 180000,\n      headers: {\n        'User-Agent': 'ContentEngine/1.0',\n        'Content-Type': 'application/json',\n        'X-CE-Reset-Token': ceResetToken,\n      },\n      body: payload,\n      json: true,\n    });\n\n    if (!res?.ok || !Array.isArray(res.items)) {\n      return [];\n    }\n\n    return res.items.map((row) => ({\n      title: String(row.title || '').trim(),\n      link: String(row.url || row.link || '').trim(),\n      contentSnippet: String(row.contentSnippet || row.snippet || '').trim().slice(0, 500),\n      source_id: row.source_id || sourceId,\n      source_title: row.source_title || source.source_title || 'Scraper',\n      source_type: String(row.source_type || 'scraper'),\n    })).filter((row) => row.title);\n  } catch (e) {\n    return [];\n  }\n}\n\nasync function loadBlogItems(source) {\n  const sourceId = String(source?.source_id || '').trim();\n  if (!sourceId) return [];\n  if (!ceResetToken) return [];\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `${ceBase.replace(/\\/$/, '')}/api/sources/${encodeURIComponent(sourceId)}/blog-run`,\n      timeout: 180000,\n      headers: {\n        'User-Agent': 'ContentEngine/1.0',\n        'Content-Type': 'application/json',\n        'X-CE-Reset-Token': ceResetToken,\n      },\n      body: {},\n      json: true,\n    });\n\n    if (!res?.ok || !Array.isArray(res.items)) {\n      return [];\n    }\n\n    return res.items.map((row) => ({\n      title: String(row.title || '').trim(),\n      link: String(row.url || row.link || '').trim(),\n      contentSnippet: String(row.contentSnippet || row.snippet || '').trim().slice(0, 500),\n      source_id: row.source_id || sourceId,\n      source_title: row.source_title || source.source_title || 'Blogs',\n      source_type: String(row.source_type || 'blog'),\n    })).filter((row) => row.title);\n  } catch (e) {\n    return [];\n  }\n}\n\nasync function loadDocumentItems(source) {\n  const sourceId = String(source?.source_id || '').trim();\n  if (!sourceId) return [];\n  if (!ceResetToken) return [];\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `${ceBase.replace(/\\/$/, '')}/api/sources/${encodeURIComponent(sourceId)}/document-run`,\n      timeout: 180000,\n      headers: {\n        'User-Agent': 'ContentEngine/1.0',\n        'Content-Type': 'application/json',\n        'X-CE-Reset-Token': ceResetToken,\n      },\n      body: {},\n      json: true,\n    });\n\n    if (!res?.ok || !Array.isArray(res.items)) {\n      return [];\n    }\n\n    return res.items.map((row) => ({\n      title: String(row.title || '').trim(),\n      link: String(row.url || row.link || '').trim(),\n      contentSnippet: String(row.contentSnippet || row.snippet || '').trim().slice(0, 500),\n      source_id: row.source_id || sourceId,\n      source_title: row.source_title || source.source_title || 'Document',\n      source_type: String(row.source_type || 'document'),\n    })).filter((row) => row.title);\n  } catch (e) {\n    return [];\n  }\n}\n\nasync function loadAsanaItems(source) {\n  const sourceId = String(source?.source_id || '').trim();\n  if (!sourceId) return [];\n  if (!ceResetToken) return [];\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `${ceBase.replace(/\\/$/, '')}/api/sources/${encodeURIComponent(sourceId)}/asana-run`,\n      timeout: 180000,\n      headers: {\n        'User-Agent': 'ContentEngine/1.0',\n        'Content-Type': 'application/json',\n        'X-CE-Reset-Token': ceResetToken,\n      },\n      body: {},\n      json: true,\n    });\n\n    if (!res?.ok || !Array.isArray(res.items)) {\n      return [];\n    }\n\n    return res.items.map((row) => ({\n      title: String(row.title || '').trim(),\n      link: String(row.url || row.link || '').trim(),\n      contentSnippet: String(row.contentSnippet || row.snippet || '').trim().slice(0, 500),\n      source_id: row.source_id || sourceId,\n      source_title: row.source_title || source.source_title || 'Asana',\n      source_type: String(row.source_type || 'asana'),\n    })).filter((row) => row.title);\n  } catch (e) {\n    return [];\n  }\n}\n\nasync function loadDriveItems(source) {\n  const sourceId = String(source?.source_id || '').trim();\n  if (!sourceId) return [];\n  if (!ceResetToken) return [];\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `${ceBase.replace(/\\/$/, '')}/api/sources/${encodeURIComponent(sourceId)}/drive-run`,\n      timeout: 180000,\n      headers: {\n        'User-Agent': 'ContentEngine/1.0',\n        'Content-Type': 'application/json',\n        'X-CE-Reset-Token': ceResetToken,\n      },\n      body: {},\n      json: true,\n    });\n\n    if (!res?.ok || !Array.isArray(res.items)) {\n      return [];\n    }\n\n    return res.items.map((row) => ({\n      title: String(row.title || '').trim(),\n      link: String(row.url || row.link || '').trim(),\n      contentSnippet: String(row.contentSnippet || row.snippet || '').trim().slice(0, 500),\n      source_id: row.source_id || sourceId,\n      source_title: row.source_title || source.source_title || 'Google Drive',\n      source_type: String(row.source_type || 'drive'),\n    })).filter((row) => row.title);\n  } catch (e) {\n    return [];\n  }\n}\n\nfunction trelloCardsWebhookUrl(boardId) {\n  let base = '';\n  try {\n    base = String($env.N8N_API_URL || '').replace(/\\/$/, '');\n  } catch (e) {\n    // n8n Cloud blocks env access in Code nodes\n  }\n  if (!base) {\n    base = 'https://erikjihaa.app.n8n.cloud';\n  }\n  return `${base}/webhook/ce-trello-cards-staging?board_id=${encodeURIComponent(boardId)}`;\n}\n\nasync function loadTrelloCards(boardId) {\n  if (key && token) {\n    try {\n      const url = `https://api.trello.com/1/boards/${encodeURIComponent(boardId)}/cards?key=${encodeURIComponent(key)}&token=${encodeURIComponent(token)}&fields=name,desc,url,shortUrl&filter=open`;\n      const cards = await this.helpers.httpRequest({\n        method: 'GET',\n        url,\n        timeout: 15000,\n        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },\n      });\n      if (Array.isArray(cards) && cards.length > 0) {\n        return cards;\n      }\n    } catch (e) {\n      // fallback to n8n webhook\n    }\n  }\n\n  const res = await this.helpers.httpRequest({\n    method: 'GET',\n    url: trelloCardsWebhookUrl(boardId),\n    timeout: 15000,\n    headers: { 'User-Agent': 'ContentEngine/1.0' },\n  });\n  if (Array.isArray(res?.cards)) {\n    return res.cards;\n  }\n  return [];\n}\n\nfunction between(text, startTag, endTag) {\n  const start = text.indexOf(startTag);\n  if (start < 0) return '';\n  const from = start + startTag.length;\n  const end = text.indexOf(endTag, from);\n  if (end < 0) return '';\n  return text.slice(from, end).replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n}\n\nfunction unescapeXml(text) {\n  return String(text || '')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\");\n}\n\nfunction isFeedOrSearchUrl(url) {\n  const u = String(url || '').trim().toLowerCase();\n  if (!u) return true;\n  if (u.includes('news.google.com/rss/search')) return true;\n  if (u.includes('news.google.com/rss/feeds')) return true;\n  if (/\\/rss(\\?|$)/.test(u) && !u.includes('/rss/articles/')) return true;\n  if (/\\.(xml|rss)(\\?|$)/.test(u)) return true;\n  return false;\n}\n\nfunction extractArticleLink(block, rawLink) {\n  const link = unescapeXml(rawLink).trim();\n  const desc = unescapeXml(\n    between(block, '<description>', '</description>') || between(block, '<summary>', '</summary>'),\n  );\n\n  if (desc) {\n    const hrefs = [...desc.matchAll(/href=[\"'](https?:\\/\\/[^\"']+)[\"']/gi)].map((m) => m[1]);\n    for (const href of hrefs) {\n      if (!href.toLowerCase().includes('google.com')) return href;\n    }\n  }\n\n  if (link && !isFeedOrSearchUrl(link)) return link;\n  return link;\n}\n\nfunction metaContent(html, attr, value) {\n  const re1 = new RegExp(`<meta[^>]+${attr}=[\"']${value}[\"'][^>]+content=[\"']([^\"']+)`, 'i');\n  const m1 = html.match(re1);\n  if (m1) return m1[1].replace(/\\\\s+/g, ' ').trim();\n  const re2 = new RegExp(`<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+${attr}=[\"']${value}[\"']`, 'i');\n  const m2 = html.match(re2);\n  if (m2) return m2[1].replace(/\\\\s+/g, ' ').trim();\n  return '';\n}\n\nfunction webpageTitle(html) {\n  let t = metaContent(html, 'property', 'og:title');\n  if (t) return t;\n  t = between(html, '<title>', '</title>');\n  if (t) return t;\n  t = between(html, '<h1>', '</h1>');\n  return t;\n}\n\nfunction webpageSnippet(html, fallbackUrl) {\n  let s = metaContent(html, 'property', 'og:description');\n  if (!s) s = metaContent(html, 'name', 'description');\n  if (!s) s = metaContent(html, 'name', 'twitter:description');\n  return s || `Webpagina: ${fallbackUrl}`;\n}\n\nfor (const row of $('Get Newsletter Items').all().map((i) => i.json)) {\n  const title = String(row.title || row.subject || '').trim();\n  if (!title) continue;\n  items.push({\n    title,\n    link: '',\n    contentSnippet: String(row.contentSnippet || row.body_text || '').trim().slice(0, 500),\n    source_id: row.source_id || null,\n    source_title: row.source_title || 'Mailbox',\n    source_type: 'mailbox',\n  });\n  if (items.length >= 24) break;\n}\n\nfor (const feed of feedUrls) {\n  const kind = String(feed.source_kind || 'rss').toLowerCase();\n  if (kind === 'webpage') {\n    try {\n      const html = String(await this.helpers.httpRequest({\n        method: 'GET',\n        url: feed.url,\n        timeout: 15000,\n        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },\n      }));\n      const title = webpageTitle(html);\n      if (!title) continue;\n      items.push({\n        title,\n        link: feed.url,\n        contentSnippet: webpageSnippet(html, feed.url).slice(0, 500),\n        source_id: feed.source_id,\n        source_title: feed.source_title,\n        source_type: 'webpage',\n      });\n    } catch (e) {\n      // skip broken page\n    }\n    continue;\n  }\n\n  try {\n    const xml = await this.helpers.httpRequest({\n      method: 'GET',\n      url: feed.url,\n      timeout: 15000,\n      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },\n    });\n    const text = String(xml);\n    let pos = 0;\n    while (items.length < 24) {\n      const itemStart = text.indexOf('<item', pos);\n      if (itemStart < 0) break;\n      const itemEnd = text.indexOf('</item>', itemStart);\n      if (itemEnd < 0) break;\n      const block = text.slice(itemStart, itemEnd + 7);\n      pos = itemEnd + 7;\n      const title = between(block, '<title>', '</title>');\n      const rawLink = between(block, '<link>', '</link>');\n      const link = extractArticleLink(block, rawLink);\n      const snippet = between(block, '<description>', '</description>') || between(block, '<summary>', '</summary>');\n      if (!title) continue;\n      items.push({\n        title,\n        link,\n        contentSnippet: snippet,\n        source_id: feed.source_id,\n        source_title: feed.source_title,\n        source_type: 'rss',\n      });\n    }\n  } catch (e) {\n    // skip broken feed\n  }\n}\n\nconst scraperSources = ctx.scraper_sources || [];\nfor (const source of scraperSources) {\n  try {\n    const scraped = await loadScraperItems.call(this, source);\n    for (const row of scraped) {\n      items.push(row);\n      if (items.length >= 24) break;\n    }\n  } catch (e) {\n    // skip broken scraper\n  }\n  if (items.length >= 24) break;\n}\n\nconst blogSources = ctx.blog_sources || [];\nfor (const source of blogSources) {\n  try {\n    const posts = await loadBlogItems.call(this, source);\n    for (const row of posts) {\n      items.push(row);\n      if (items.length >= 24) break;\n    }\n  } catch (e) {\n    // skip broken blog overview\n  }\n  if (items.length >= 24) break;\n}\n\nconst documentSources = ctx.document_sources || [];\nfor (const source of documentSources) {\n  try {\n    const chunks = await loadDocumentItems.call(this, source);\n    for (const row of chunks) {\n      items.push(row);\n      if (items.length >= 24) break;\n    }\n  } catch (e) {\n    // skip broken document source\n  }\n  if (items.length >= 24) break;\n}\n\nconst asanaSources = ctx.asana_sources || [];\nfor (const source of asanaSources) {\n  try {\n    const tasks = await loadAsanaItems.call(this, source);\n    for (const row of tasks) {\n      items.push(row);\n      if (items.length >= 24) break;\n    }\n  } catch (e) {\n    // skip broken asana source\n  }\n  if (items.length >= 24) break;\n}\n\nconst driveSources = ctx.drive_sources || [];\nfor (const source of driveSources) {\n  try {\n    const chunks = await loadDriveItems.call(this, source);\n    for (const row of chunks) {\n      items.push(row);\n      if (items.length >= 24) break;\n    }\n  } catch (e) {\n    // skip broken drive source\n  }\n  if (items.length >= 24) break;\n}\n\nasync function appendGoogleNewsRssItems() {\n  const query = String(ctx.search_label || ctx.theme_title || 'nieuws').trim();\n  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=nl&gl=NL&ceid=NL:nl`;\n  try {\n    const xml = await this.helpers.httpRequest({\n      method: 'GET',\n      url,\n      timeout: 15000,\n      headers: {\n        'User-Agent':\n          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',\n      },\n    });\n    const text = String(xml);\n    let pos = 0;\n    while (items.length < 24) {\n      const itemStart = text.indexOf('<item', pos);\n      if (itemStart < 0) break;\n      const itemEnd = text.indexOf('</item>', itemStart);\n      if (itemEnd < 0) break;\n      const block = text.slice(itemStart, itemEnd + 7);\n      pos = itemEnd + 7;\n      const title = between(block, '<title>', '</title>');\n      const rawLink = between(block, '<link>', '</link>');\n      const link = extractArticleLink(block, rawLink);\n      const snippet =\n        between(block, '<description>', '</description>') || between(block, '<summary>', '</summary>');\n      if (!title) continue;\n      items.push({\n        title,\n        link,\n        contentSnippet: snippet,\n        source_id: null,\n        source_title: 'Google News',\n        source_type: 'rss',\n      });\n    }\n  } catch (e) {\n    // backup mislukt — lege lijst blijft\n  }\n}\n\nif (items.length === 0) {\n  await appendGoogleNewsRssItems.call(this);\n}\n\nif (items.length === 0) {\n  return [{ json: { title: '', link: '', contentSnippet: '' } }];\n}\n\nreturn items.map((row) => ({ json: row }));\n"
+      },
+      "id": "ce02-fetch-rss",
+      "name": "Fetch Source Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2380,
+        400
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Merge Context').item.json;\nconst packSize = 5;\nconst maxItems = packSize;\nconst limit = Math.max(Number(ctx.max_items || 8), packSize) * 2;\nconst themeOnly = Boolean(String(ctx.theme_id || '').trim()) && !String(ctx.slot_id || '').trim();\nconst preferredFolder = String(ctx.objective_source_folder_id || '').trim();\nconst sourceRows = $('Get Sources').all().map((item) => item.json);\nconst folderBySource = new Map(\n  sourceRows.map((row) => [String(row.id || ''), String(row.folder_id || '').trim()])\n);\nconst seen = new Set();\nconst tierBuckets = [\n  { trello: [], asana: [], mailbox: [], scraper: [], linkedin: [], blog: [], document: [], drive: [], rss: [], other: [] },\n  { trello: [], asana: [], mailbox: [], scraper: [], linkedin: [], blog: [], document: [], drive: [], rss: [], other: [] },\n  { trello: [], asana: [], mailbox: [], scraper: [], linkedin: [], blog: [], document: [], drive: [], rss: [], other: [] },\n];\n\nfunction tierFor(row, type) {\n  const folderId = folderBySource.get(String(row.source_id || '')) || '';\n  if (preferredFolder && folderId === preferredFolder) return 0;\n  if (type === 'mailbox') return 1;\n  return 2;\n}\n\nconst bucketOrder = ['trello', 'asana', 'mailbox', 'scraper', 'linkedin', 'blog', 'document', 'drive', 'rss', 'other'];\n\nfor (const item of $input.all()) {\n  const row = item.json;\n  const title = String(row.title || row.headline || '').trim();\n  const url = String(row.link || row.url || row.guid || '').trim();\n  if (!title || title.toLowerCase() === 'untitled') continue;\n  const snippet = String(row.contentSnippet || row.summary || row.description || row.content || '').trim().slice(0, 500);\n  if (snippet.length < 80) continue;\n  const key = (title + '|' + url).toLowerCase();\n  if (seen.has(key)) continue;\n  seen.add(key);\n  const type = String(row.source_type || 'rss').toLowerCase();\n  if (type === 'linkedin') continue;\n  if (themeOnly && (type === 'scraper' || type === 'linkedin')) continue;\n  const tier = tierFor(row, type);\n  const bucket = tierBuckets[tier][type] || tierBuckets[tier].other;\n  bucket.push({\n    title,\n    url,\n    snippet,\n    source_id: row.source_id || null,\n    source_title: row.source_title || type,\n    source_type: row.source_type || 'rss',\n  });\n}\n\nconst ordered = [];\nfor (const buckets of tierBuckets) {\n  for (const key of bucketOrder) {\n    ordered.push(...buckets[key]);\n  }\n}\nconst candidates = ordered.slice(0, limit).map((c, index) => ({\n  id: `c${index + 1}`,\n  ...c,\n}));\n\nif (candidates.length === 0) {\n  candidates.push({\n    id: 'c1',\n    title: String(ctx.theme_title || 'Thema'),\n    url: '',\n    snippet: String(ctx.theme_rationale || ctx.motivation || '').slice(0, 500),\n    source_id: null,\n    source_title: 'theme',\n    source_type: 'theme',\n  });\n}\n\nreturn {\n  json: {\n    ...ctx,\n    candidates,\n    max_items: maxItems,\n    pack_size: packSize,\n  },\n};\n"
+      },
+      "id": "ce02-collect",
+      "name": "Collect Candidates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 4096,\n  system: \"Je bent research-analist voor \\n\\nNEDERLANDS — VERMIJD CALQUE-WOORDEN\\n\\nSchrijf natuurlijk, spreektalig Nederlands. Let specifiek op woorden die grammaticaal correct\\nzijn maar ontstaan zijn als letterlijke vertaling van een Engels begrip, en daardoor net anders\\nklinken dan hoe een Nederlandse schrijver het zou zeggen. Herken dit patroon zelf en kies het\\nalledaagse alternatief, ook als het gevraagde woord niet op onderstaande lijst staat.\\n\\nBekende voorbeelden (vermijd, tenzij het vaktaal in de tekst zelf is):\\n- \\\"expliciteren / geëxpliciteerd\\\" (van \\\"make explicit\\\") → gebruik \\\"vastleggen\\\", \\\"opschrijven\\\",\\n  \\\"onder woorden brengen\\\", \\\"duidelijk maken\\\"\\n- \\\"additioneel\\\" (van \\\"additional\\\") → \\\"extra\\\"\\n- \\\"faciliteren\\\" (van \\\"facilitate\\\") → \\\"mogelijk maken\\\", \\\"helpen\\\"\\n- \\\"actioneren\\\" (van \\\"action\\\" als werkwoord) → \\\"oppakken\\\", \\\"uitvoeren\\\"\\n- \\\"leveren\\\" als vertaling van \\\"deliver\\\" in abstracte zin (\\\"waarde leveren\\\") → concreter maken:\\n  wat gebeurt er dan precies\\n\\nVuistregel: als een woord vaker in een vertaald Engels rapport voorkomt dan in een gesprek aan de\\nkeukentafel, kies dan het keukentafel-woord — tenzij het een vakterm is die in deze tekst bewust\\nwordt gebruikt (zoals HBA-begrippen: Hero, Foe, hygiënefactor — die blijven staan).\" + $json.client_name + \". Archetype: \" + $json.archetype + \". Adversary: \" + $json.adversary + \". Merkdoel: \" + $json.brand_goal + \". Stel een gevarieerde researchset samen voor het thema. Niet de vijf meest voor de hand liggende bronnen, maar vijf verschillende INVALSHOEKEN op hetzelfde thema.\\n\\nBESCHIKBARE INVALSHOEKEN (kies er precies vijf, elk maximaal één keer):\\n  tegenkracht      — het thema vanuit waar dit merk tegen vecht\\n  bewijs           — een concreet geval, cijfer of meting\\n  contra_intuitief — de stelling die de meeste vakgenoten niet zouden innemen\\n  aanpalend        — hetzelfde mechanisme in een andere sector of vakgebied\\n  praktijk         — hoe dit er op een gewone werkdag uitziet, voor een mens\\n  tijd             — een historische parallel, of wat hier over drie jaar anders is\\n  systeem          — de bredere keten of maatschappelijke context\\n\\nPer item vul je ook stance en reliability in:\\n- stance: bevestigt | nuanceert | spreekt_tegen (verhouding tot het thema)\\n- reliability: high (onderzoek/cijfers/primaire bron) | medium (vakmedia) | low (mening/blog/ongedateerd)\\nLever minstens één item met stance = spreekt_tegen als de kandidaten dat toelaten.\\n\\nREGELS:\\n- Elke invalshoek precies één keer. Vijf verschillende, geen dubbele.\\n- Geen item zonder titel of met snippet korter dan 80 tekens.\\n- Gebruik een kandidaat-bron waar die past bij de invalshoek. Past er geen enkele bron bij een invalshoek die het thema sterker maakt, formuleer die invalshoek dan zelf en laat url leeg — dat is een aanzet voor de redactie, geen bron.\\n- Avontuurlijk in invalshoek, streng in merk. Een verrassende hoek die niet bij dit archetype, dit merkdoel of deze tegenkracht past, is geen goede hoek. Schrap hem dan.\\n- Vermijd invalshoeken die de afgelopen weken al gebruikt zijn (zie RECENT).\\n- Trello- en Asana-items zijn interne PR-concepten — neem minimaal 1 op als het past. Document- en Drive-fragmenten zijn eigen kennis — gebruik ze als achtergrond, niet als extern nieuws. Output via tool.\",\n  messages: [{\n    role: \"user\",\n    content: \"THEMA: \" + $json.theme_title + \"\\nMotivation: \" + ($json.motivation || \"\") + \"\\nRationale: \" + ($json.theme_rationale || \"\") + \"\\n\\nRECENT GEBRUIKTE INVALSHOEKEN (laatste 6 weken):\\n  \" + ((($json.recente_invalshoeken || []).length) ? ($json.recente_invalshoeken || []).join(\", \") : \"(geen)\") + \"\\n\\nKANDIDATEN:\\n\" + ($json.candidates || []).map(c => \"[\" + c.id + \"] (\" + (c.source_type || \"rss\") + \") \" + c.title + \"\\nURL: \" + c.url + \"\\nRAW: \" + (c.snippet || \"\").slice(0, 300)).join(\"\\n\\n\") + \"\\n\\nLever exact vijf items, elk met een andere invalshoek. Minimaal drie ervan moeten op een echte kandidaat-bron rusten; de rest mag een zelf geformuleerde aanzet zijn. Gebruik kandidaat-id's waar mogelijk.\"\n  }],\n  tools: [{\n    name: \"pack_research_items\",\n    description: \"Geselecteerde research items met snippet, rationale en invalshoek\",\n    input_schema: {\n      type: \"object\",\n      properties: {\n        items: {\n          type: \"array\",\n          items: {\n            type: \"object\",\n            properties: {\n              id: { type: \"string\" },\n              title: { type: \"string\" },\n              url: { type: \"string\" },\n              snippet: { type: \"string\" },\n              item_rationale: { type: \"string\" },\n              invalshoek: { type: \"string\", enum: [\"tegenkracht\",\"bewijs\",\"contra_intuitief\",\"aanpalend\",\"praktijk\",\"tijd\",\"systeem\"] },\n              stance: { type: \"string\", enum: [\"bevestigt\",\"nuanceert\",\"spreekt_tegen\"] },\n              reliability: { type: \"string\", enum: [\"low\",\"medium\",\"high\"] }\n            },\n            required: [\"id\", \"title\", \"snippet\", \"item_rationale\", \"invalshoek\", \"stance\", \"reliability\"]\n          }\n        }\n      },\n      required: [\"items\"]\n    }\n  }],\n  tool_choice: { type: \"tool\", name: \"pack_research_items\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce02-claude",
+      "name": "Claude Research Pack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2600,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Collect Candidates').item.json;\nconst claude = $('Claude Research Pack').item.json;\nconst input = claude?.content?.[0]?.input ?? {};\nconst items = Array.isArray(input.items) ? input.items : [];\nconst allowedInvalshoeken = new Set([\n  'tegenkracht', 'bewijs', 'contra_intuitief', 'aanpalend', 'praktijk', 'tijd', 'systeem',\n]);\nconst allowedStance = new Set(['bevestigt', 'nuanceert', 'spreekt_tegen']);\nconst allowedReliability = new Set(['low', 'medium', 'high']);\nconst byId = new Map((ctx.candidates || []).map((c) => [c.id, c]));\n\nfunction makeUuid() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = (Math.random() * 16) | 0;\n    const v = c === 'x' ? r : (r & 0x3) | 0x8;\n    return v.toString(16);\n  });\n}\n\nconst out = [];\nfor (const item of items) {\n  const base = byId.get(item.id) || {};\n  const title = String(item.title || base.title || '').trim();\n  const invalshoek = String(item.invalshoek || '').trim();\n  const snippet = String(item.snippet || base.snippet || '').trim();\n  const stance = String(item.stance || 'bevestigt').trim();\n  const reliability = String(item.reliability || 'medium').trim();\n  if (!title || title.toLowerCase() === 'untitled') continue;\n  if (snippet.length < 80) continue;\n  if (!allowedInvalshoeken.has(invalshoek)) {\n    throw new Error('Invalid or missing invalshoek on item: ' + title);\n  }\n  if (!allowedStance.has(stance)) {\n    throw new Error('Invalid stance on item: ' + title);\n  }\n  if (!allowedReliability.has(reliability)) {\n    throw new Error('Invalid reliability on item: ' + title);\n  }\n  out.push({\n    json: {\n      id: makeUuid(),\n      theme_id: ctx.theme_id || null,\n      slot_id: ctx.slot_id || null,\n      source_id: base.source_id || null,\n      source_type: base.source_type || (base.source_type === 'mailbox' ? 'mailbox' : (String(base.source_title || '').toLowerCase() === 'trello' ? 'trello' : 'rss')),\n      title,\n      snippet,\n      url: String(item.url || base.url || '').trim() || null,\n      item_rationale: String(item.item_rationale || '').trim(),\n      invalshoek,\n      stance,\n      reliability,\n    },\n  });\n}\n\nconst angles = out.map((row) => row.json.invalshoek);\nif (out.length !== 5 || new Set(angles).size !== 5) {\n  throw new Error('Expected exactly 5 unique invalshoek values, got: ' + angles.join(', '));\n}\n\nconst grounded = out.filter((row) => {\n  if (String(row.json.url || '').trim() !== '') return true;\n  return row.json.source_id != null;\n}).length;\nif (grounded < 2) {\n  throw new Error('Expected at least 2 items grounded in a candidate source, got: ' + grounded);\n}\n\nif (out.length === 0) {\n  throw new Error('Claude returned no research items');\n}\n\nreturn out;\n"
+      },
+      "id": "ce02-prepare-inserts",
+      "name": "Prepare Inserts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO research_items (id, theme_id, slot_id, source_id, source_type, title, snippet, url, item_rationale, invalshoek, stance, reliability, feedback)\nVALUES ($1, NULLIF($2, ''), NULLIF($3, ''), NULLIF($4, ''), $5, $6, $7, NULLIF($8, ''), $9, NULLIF($10, ''), NULLIF($11, ''), NULLIF($12, ''), 'none')",
+        "options": {
+          "queryReplacement": "={{ [ $json.id, $json.theme_id || '', $json.slot_id || '', $json.source_id || '', $json.source_type, $json.title, $json.snippet, $json.url || '', $json.item_rationale, $json.invalshoek || '', $json.stance || '', $json.reliability || '' ] }}"
+        }
+      },
+      "id": "ce02-insert",
+      "name": "Insert Research Item",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        3260,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content Engine [staging]"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Load Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Context": {
+      "main": [
+        [
+          {
+            "node": "Validate Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Context": {
+      "main": [
+        [
+          {
+            "node": "Load Recent Invalshoeken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Recent Invalshoeken": {
+      "main": [
+        [
+          {
+            "node": "Merge Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Context": {
+      "main": [
+        [
+          {
+            "node": "Clear Old Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Old Research": {
+      "main": [
+        [
+          {
+            "node": "Get Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sources": {
+      "main": [
+        [
+          {
+            "node": "Get Newsletter Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Newsletter Items": {
+      "main": [
+        [
+          {
+            "node": "Prepare Feed URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Feed URLs": {
+      "main": [
+        [
+          {
+            "node": "Fetch Source Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Source Items": {
+      "main": [
+        [
+          {
+            "node": "Collect Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Candidates": {
+      "main": [
+        [
+          {
+            "node": "Claude Research Pack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Research Pack": {
+      "main": [
+        [
+          {
+            "node": "Prepare Inserts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Inserts": {
+      "main": [
+        [
+          {
+            "node": "Insert Research Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Research Item": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {
+    "Webhook Trigger": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "slot_id": "3eef1d6b-0a3f-4073-9e7e-bdde7d4740be"
+          }
+        }
+      }
+    ]
+  }
+}

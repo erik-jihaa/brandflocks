@@ -282,7 +282,7 @@ workflow = {
     "active": False,
 }
 
-out = Path(__file__).resolve().parent.parent.parent / "JSON" / "CE-LLM-Visibility.json"
+out = Path(__file__).resolve().parent.parent / "json" / "n8n" / "CE-LLM-Visibility.json"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from n8n_workflow_utils import write_workflow
 

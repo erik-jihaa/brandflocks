@@ -35,17 +35,10 @@ if (ce_fetch_review_edits($pdo, $slotId, 'pending') !== []) {
 $body = ce_read_json_body();
 ce_apply_article_patch($pdo, (string) $row['id'], $body);
 
-// CE-03 leest draft-meta; zorg dat status + directive kloppen vóór webhook.
-if ($status === 'feedback') {
-    $pdo->prepare("UPDATE articles SET status = 'draft' WHERE id = :id")->execute(['id' => (string) $row['id']]);
-}
-
-$ce03Meta = ce_ce03_webhook_meta_from_slot($pdo, $slotId);
-
-$trigger = ce_trigger_ce03_write($slotId, true, $ce03Meta);
+$trigger = ce_start_article_ce03_rewrite($pdo, $slotId, $row);
 if (($trigger['ok'] ?? false) !== true) {
     $message = (string) ($trigger['error'] ?? 'CE-03 kon niet worden gestart.');
-    ce_json_error($message, 503);
+    ce_json_error($message, (int) ($trigger['http'] ?? 503));
 }
 
 ce_json_response([

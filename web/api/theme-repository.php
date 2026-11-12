@@ -8,6 +8,7 @@ require_once __DIR__ . '/client-repository.php';
 require_once __DIR__ . '/mappers.php';
 require_once __DIR__ . '/event-log-repository.php';
 require_once __DIR__ . '/tone-styles.php';
+require_once __DIR__ . '/copy-modus.php';
 
 /** Aantal theme-voorstellen per week op Theme (keuze uit meerdere opties). */
 function ce_theme_proposal_count(): int
@@ -43,6 +44,9 @@ function ce_ensure_themes_schema(PDO $pdo): void
             // Kolom bestaat al.
         }
     }
+
+    require_once __DIR__ . '/copy-modus.php';
+    ce_ensure_theme_copy_modus_columns($pdo);
 }
 
 function ce_ensure_research_items_schema(PDO $pdo): void
@@ -423,6 +427,13 @@ function ce_theme_dto(PDO $pdo, array $row): array
         'researchItems' => $items,
         'rhythmRole' => $rhythmRole,
         'rhythmRoleLabel' => $rhythmRoleLabel,
+        'copyModus' => ce_copy_modus_is_valid((string) ($row['copy_modus'] ?? ''))
+            ? (string) $row['copy_modus']
+            : null,
+        'copyModusOverride' => ((int) ($row['copy_modus_override'] ?? 0)) === 1,
+        'copyModusLabel' => ce_copy_modus_is_valid((string) ($row['copy_modus'] ?? ''))
+            ? ce_copy_modus_ui_label((string) $row['copy_modus'])
+            : null,
     ];
 }
 
@@ -1463,6 +1474,9 @@ function ce_patch_theme(PDO $pdo, string $themeId, array $body): array
     require_once __DIR__ . '/client-context.php';
     ce_require_resource_access($pdo, 'theme', $themeId);
 
+    require_once __DIR__ . '/copy-modus.php';
+    ce_ensure_theme_copy_modus_columns($pdo);
+
     $map = [
         'title' => 'title',
         'motivation' => 'motivation',
@@ -1497,6 +1511,30 @@ function ce_patch_theme(PDO $pdo, string $themeId, array $body): array
         }
         $sets[] = "$dbCol = :$dbCol";
         $params[$dbCol] = $value;
+    }
+
+    if (array_key_exists('copyModusOverrideActivatie', $body)
+        && ce_table_has_column($pdo, 'themes', 'copy_modus')
+        && ce_table_has_column($pdo, 'themes', 'copy_modus_override')) {
+        if ($body['copyModusOverrideActivatie'] === true || $body['copyModusOverrideActivatie'] === 1
+            || $body['copyModusOverrideActivatie'] === '1' || $body['copyModusOverrideActivatie'] === 'true') {
+            $sets[] = 'copy_modus = :copy_modus';
+            $sets[] = 'copy_modus_override = 1';
+            $params['copy_modus'] = CE_COPY_MODUS_SELL;
+        } elseif ($body['copyModusOverrideActivatie'] === false || $body['copyModusOverrideActivatie'] === 0
+            || $body['copyModusOverrideActivatie'] === '0' || $body['copyModusOverrideActivatie'] === 'false') {
+            $sets[] = 'copy_modus_override = 0';
+            $modus = CE_COPY_MODUS_MERK;
+            if (array_key_exists('copyModus', $body) && ce_copy_modus_is_valid((string) $body['copyModus'])) {
+                $modus = (string) $body['copyModus'];
+            }
+            $sets[] = 'copy_modus = :copy_modus';
+            $params['copy_modus'] = $modus;
+        }
+    } elseif (array_key_exists('copyModus', $body) && ce_copy_modus_is_valid((string) $body['copyModus'])
+        && ce_table_has_column($pdo, 'themes', 'copy_modus')) {
+        $sets[] = 'copy_modus = :copy_modus';
+        $params['copy_modus'] = (string) $body['copyModus'];
     }
 
     if ($sets === []) {

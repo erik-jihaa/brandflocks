@@ -468,6 +468,10 @@ export function ArticleFeedbackPage() {
     }
   }
 
+  function rewriteStarted(saved?: { writing?: boolean; writingPending?: boolean } | null): boolean {
+    return Boolean(saved?.writing || saved?.writingPending)
+  }
+
   async function handleRewrite() {
     if (!slotId || usingMock) return
     if (trackedDoc && pendingCount(trackedDoc) > 0) {
@@ -504,6 +508,49 @@ export function ArticleFeedbackPage() {
     }
   }
 
+  async function handleToneChange(next: string) {
+    const previous = tone
+    setTone(next)
+    if (!slotId || usingMock || rewriting) return
+    if (next === (article?.tone ?? previous)) return
+    if (trackedDoc && pendingCount(trackedDoc) > 0) {
+      setRewriteNotice('Verwerk eerst open feedback-wijzigingen voordat je herschrijft.')
+      setTone(previous)
+      return
+    }
+    if (
+      !window.confirm(
+        'Herschrijven slaat meta op en genereert rationale + tekst opnieuw. Open feedback blijft staan; de tekst wordt vervangen. Doorgaan?',
+      )
+    ) {
+      setTone(previous)
+      return
+    }
+
+    setRewriteNotice(null)
+    setRewriting(true)
+    const previousArticleId = article?.id ?? null
+    try {
+      const { content: _content, ...metaOnly } = formPayload()
+      const saved = await save({ ...metaOnly, tone: next })
+      if (!rewriteStarted(saved)) return
+      setRewriteNotice('AI herschrijft de tekst — dit duurt ongeveer 1–2 minuten…')
+      const fresh = await waitForRewrittenArticle(slotId, previousArticleId)
+      if (fresh) {
+        navigate(`/article/${slotId}`, { replace: true })
+      } else {
+        setRewriteNotice(
+          'Herschrijven duurt langer dan verwacht — herlaad de pagina zodra de schrijver klaar is.',
+        )
+      }
+    } catch (err) {
+      setTone(previous)
+      setRewriteNotice(err instanceof Error ? err.message : 'Herschrijven mislukt')
+    } finally {
+      setRewriting(false)
+    }
+  }
+
   async function handleReedit() {
     if (!slotId || usingMock) return
     if (trackedDoc && pendingCount(trackedDoc) > 0) {
@@ -529,13 +576,33 @@ export function ArticleFeedbackPage() {
 
   async function handleSave() {
     clearSaveNotice()
+    const previousArticleId = article?.id ?? null
+    const toneChanged = tone !== (article?.tone ?? '')
     try {
       const payload = formPayload()
+      let saved
       if (trackedDoc && pendingCount(trackedDoc) > 0) {
         const { content: _content, ...metaOnly } = payload
-        await save(metaOnly)
+        saved = await save(metaOnly)
       } else {
-        await save(payload)
+        saved = await save(payload)
+      }
+      if (toneChanged && rewriteStarted(saved) && slotId) {
+        setRewriting(true)
+        try {
+          setRewriteNotice('AI herschrijft de tekst — dit duurt ongeveer 1–2 minuten…')
+          const fresh = await waitForRewrittenArticle(slotId, previousArticleId)
+          if (fresh) {
+            navigate(`/article/${slotId}`, { replace: true })
+            return
+          }
+          setRewriteNotice(
+            'Herschrijven duurt langer dan verwacht — herlaad de pagina zodra de schrijver klaar is.',
+          )
+        } finally {
+          setRewriting(false)
+        }
+        return
       }
       showSaveSuccess()
     } catch {
@@ -826,7 +893,7 @@ export function ArticleFeedbackPage() {
           editorSuggested={article.editorSuggested}
           imageRatioSuggested={article.imageRatioSuggested}
           platformSuggested={article.platformSuggested}
-          onToneChange={setTone}
+          onToneChange={handleToneChange}
           onEditorChange={setEditor}
           onImageRatioChange={setImageRatio}
           onPlatformChange={setPlatform}

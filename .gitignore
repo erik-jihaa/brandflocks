@@ -3,6 +3,7 @@
 !.env.example
 !.env.staging.example
 !.env.brandflocks.example
+!.env.brandflocks-target.example
 tenants/*.env
 !tenants/tenant.env.example
 web/includes/db.local.php

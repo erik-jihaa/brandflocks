@@ -1,0 +1,132 @@
+{
+  "name": "CE-Trello Boards",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "ce-trello-boards",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "trello-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        304
+      ],
+      "webhookId": "ce-trello-boards-webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://api.trello.com/1/members/me/boards",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "name,url"
+            },
+            {
+              "name": "filter",
+              "value": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "trello-boards",
+      "name": "Fetch Boards",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        304
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "GIhZmS4y4uS16HQB",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst boards = $input.all().map((i) => i.json).filter((b) => b && b.id && b.name);\nreturn {\n  json: {\n    ok: true,\n    boards: boards.map((b) => ({\n      id: String(b.id),\n      name: String(b.name),\n      url: String(b.url || ''),\n    })),\n  },\n};\n"
+      },
+      "id": "trello-format",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "trello-respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Boards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Boards": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1a28f730-7b12-4609-b0f3-cb7d0e7d9306",
+  "meta": {
+    "instanceId": "ecb28230bd473ffb1035d1b6de149528b24a8d731bea2c5bdc9ea965ed8b1bde"
+  },
+  "nodeGroups": [],
+  "id": "penuoAsaE9LganeX",
+  "tags": []
+}

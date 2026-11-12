@@ -102,13 +102,32 @@ export function useArticle(slotId?: string, options?: UseArticleOptions) {
 
       try {
         const data = await fetchArticle(slotId)
+        setUsingMock(false)
+        if (data.themeOnly) {
+          setArticle((prev) => {
+            if (prev && !prev.themeOnly && !articleLooksEmpty(prev)) {
+              // Campagneslot zonder rij tijdens CE-03 DELETE+INSERT — houd het bestaande artikel.
+              return prev
+            }
+            return data
+          })
+          if (expectWriting) {
+            setWriting(true)
+            setWritingSlow(false)
+            setError(null)
+            return data
+          }
+          setWriting(false)
+          setWritingSlow(false)
+          setError(null)
+          return data
+        }
         setArticle((prev) => {
           if (prev && articleContentFingerprint(prev) === articleContentFingerprint(data)) {
             return prev
           }
           return data
         })
-        setUsingMock(false)
         const stillEmpty = articleLooksEmpty(data)
         setWriting((expectWriting && stillEmpty) || (Boolean(data.writingPending) && stillEmpty))
         if (!stillEmpty) {
@@ -175,10 +194,10 @@ export function useArticle(slotId?: string, options?: UseArticleOptions) {
   const buildPayload = (payload: ArticleSavePayload): ArticleSavePayload => payload
 
   const save = useCallback(
-    async (payload: ArticleSavePayload) => {
+    async (payload: ArticleSavePayload): Promise<ArticleDto | undefined> => {
       if (!slotId || usingMock) {
         setArticle((current) => (current ? { ...current, ...payload } : current))
-        return
+        return undefined
       }
 
       setSaving(true)
@@ -187,6 +206,7 @@ export function useArticle(slotId?: string, options?: UseArticleOptions) {
         const data = await saveArticle(slotId, buildPayload(payload))
         // PATCH-response bevat geen reviewEdits/feedback — merge met huidig artikel
         setArticle((current) => (current ? { ...current, ...data } : data))
+        return data
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Opslaan mislukt')
         throw err

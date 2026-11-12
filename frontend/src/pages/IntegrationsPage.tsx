@@ -289,7 +289,7 @@ export function IntegrationsPage() {
           setTestOk((prev) => ({ ...prev, [key]: false }))
           setTestNotes((prev) => ({ ...prev, [key]: 'Kies WordPress, Joomla of FTP en sla op.' }))
         }
-      } else if (key === 'ga4' || key === 'calendar' || key === 'mailbox' || key === 'trello' || key === 'apify_scraper') {
+      } else if (key === 'ga4' || key === 'calendar' || key === 'mailbox' || key === 'apify_scraper') {
         const { sources } = await fetchAllSources()
         const category =
           key === 'ga4'
@@ -298,9 +298,7 @@ export function IntegrationsPage() {
               ? 'Calendar'
               : key === 'mailbox'
                 ? 'Mailbox'
-                : key === 'trello'
-                  ? 'Trello'
-                  : null
+                : null
         const matches = category
           ? sources.filter((s) => s.category === category)
           : sources.filter((s) => s.category === 'Scraper' || s.category === 'Linkedin')
@@ -497,7 +495,6 @@ export function IntegrationsPage() {
               def.key === 'calendar' ||
               def.key === 'ga4' ||
               def.key === 'mailbox' ||
-              def.key === 'trello' ||
               def.key === 'apify_scraper'
             const sourcesPrimary =
               sourceIntegration &&

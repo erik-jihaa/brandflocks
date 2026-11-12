@@ -4,7 +4,6 @@ export type IntegrationKey =
   | 'calendar'
   | 'mailbox'
   | 'apify_scraper'
-  | 'trello'
   | 'website_cms'
   | 'ga4'
 
@@ -45,13 +44,6 @@ export const INTEGRATIONS: IntegrationDef[] = [
     group: 'input',
     purpose: 'Haalt LinkedIn-profielen en websites op voor Theme.',
     settingsHref: '/sources/new/scraper',
-  },
-  {
-    key: 'trello',
-    name: 'Trello',
-    group: 'input',
-    purpose: 'Trello-bord als source voor contentideeën.',
-    settingsHref: '/sources/new/trello',
   },
   {
     key: 'website_cms',

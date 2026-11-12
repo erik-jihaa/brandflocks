@@ -38,7 +38,7 @@ function li_report_logo_img_html(): string
         if (is_string($bytes) && $bytes !== '') {
             $b64 = base64_encode($bytes);
             // 945×179 bron → 180px breed
-            return '<img src="data:image/png;base64,' . $b64 . '" alt="iGiSNext" width="180" height="34" style="display:block;border:0;max-width:180px;height:auto;" />';
+            return '<img src="data:image/png;base64,' . $b64 . '" alt="Brandflocks" width="180" height="34" style="display:block;border:0;max-width:180px;height:auto;" />';
         }
     }
 
@@ -108,7 +108,7 @@ function li_metrics_apply_repeatable_best_post(array $metrics): array
         $newBody .= ' Dit concept versterkt meteen ook de eigen positionering. Dat is een sterk punt.';
     } elseif ($reinforces === 'nee') {
         $newBody .= ' Let wel: dit concept is op zichzelf nog generiek — herhaalbaar, maar het '
-            . 'zegt nog niet wat het merk onderscheidt. Dat is precies waar ContentFlow bij helpt.';
+            . 'zegt nog niet wat het merk onderscheidt. Dat is precies waar Brandflocks bij helpt.';
     }
 
     $benefits = is_array($metrics['benefits'] ?? null) ? $metrics['benefits'] : [];
@@ -473,7 +473,7 @@ function li_render_report_body_rows(
         . '<tr><td style="padding:24px 8px 8px;background-color:#EAE6DC;">'
         . '<p style="margin:0 0 8px;color:#2E2014;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.35;font-weight:bold;">Tot slot</p>'
         . '<p style="margin:0;color:#2E2014;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.35;">'
-        . 'Deze scan laat zien waar de kans ligt. Concreet doet ContentFlow dit vervolgens: elke post wordt vóór publicatie getoetst aan één vastgelegd merkprofiel, met een aanwijzing als een post terugzakt naar iets wat elk ander merk ook had kunnen zeggen. Hoe dat er voor dit merk uitziet, bespreken we graag in een kort gesprek.'
+        . 'Deze scan laat zien waar de kans ligt. Concreet doet Brandflocks dit vervolgens: elke post wordt vóór publicatie getoetst aan één vastgelegd merkprofiel, met een aanwijzing als een post terugzakt naar iets wat elk ander merk ook had kunnen zeggen. Hoe dat er voor dit merk uitziet, bespreken we graag in een kort gesprek.'
         . '</p>'
         . '</td></tr>';
 }
@@ -520,7 +520,7 @@ function li_render_email_shell(string $logoImg, string $companyName, string $dat
         . '<p style="margin:0;color:#033DFF;font-family:Arial,Helvetica,sans-serif;font-size:23px;line-height:1.25;">Social Media Scan — '
         . li_h($companyName) . ' op LinkedIn</p>'
         . '<p style="margin:8px 0 0;color:#2E2014;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.35;">'
-        . li_h($dateLabel) . ' · ContentFlow, een product van iGiSNext</p>'
+        . li_h($dateLabel) . ' · Brandflocks</p>'
         . '</td></tr>'
         . $bodyRows
         . '</table></td></tr></table>';
@@ -628,14 +628,14 @@ function li_render_activity_timeline_html(array $metrics): string
  * Opbouw is Hook → Insight → Pivot (advies GPT-review + Gemini-second-opinion, aug 2026):
  * (1) de op-maat-gemaakte case-line eerst — het merk-specifieke ego-boost + pijnpunt-cijfer
  * uit hun eigen scan, dat is de haak die maakt dat iemand doorleest; (2) pas daarna de
- * korte ContentFlow-uitleg (wat ContentFlow doet, en waarom onderscheid ook voor zoek- en
+ * korte Brandflocks-uitleg (wat Brandflocks doet, en waarom onderscheid ook voor zoek- en
  * AI-systemen helpt) als pivot naar de rest van de mail. Volgorde in de mail als geheel: hook/case-line →
- * korte pitch → score-samenvatting → cijfers/analyse → waar ContentFlow bij kan helpen.
+ * korte pitch → score-samenvatting → cijfers/analyse → waar Brandflocks bij kan helpen.
  *
  * Eerder stond de generieke pitch vooraan en de case-line pas als derde alinea — dat
  * begroef de sterkste, meest persoonlijke zin van de hele mail onder twee alinea's
  * algemeenheden. Nu leest de ontvanger eerst iets over zíchzelf, pas daarna over
- * ContentFlow.
+ * Brandflocks.
  *
  * De pitch zelf opent met de twee-delige USP (unieke positionering vinden + die
  * consistent communiceren) in plaats van eerst uit te leggen waarom consistentie alleen
@@ -651,7 +651,7 @@ function li_render_intro_html(array $metrics): string
 {
     $caseLine = li_render_case_line($metrics);
 
-    $pitch = 'ContentFlow helpt merken twee dingen goed doen: een unieke positionering vinden, en die '
+    $pitch = 'Brandflocks helpt merken twee dingen goed doen: een unieke positionering vinden, en die '
         . 'daarna consistent communiceren in alles wat ze posten. De meeste merken missen één van de '
         . 'twee — ze weten niet precies wat hun onderscheid is, of ze weten het wel en verwateren het '
         . 'toch in de uitvoering.';
@@ -659,7 +659,7 @@ function li_render_intro_html(array $metrics): string
     // Was: "Dat onderscheid is wat AI beloont" — te stellig als causale claim (feedback op
     // Doornvogel-scan, aug 2026). Herschreven naar een voorzichtiger, verdedigbare formulering.
     $pitchHba = 'Ook voor zoek- en AI-systemen helpt een duidelijke, onderscheidende positionering om beter te '
-        . 'begrijpen waar een merk voor staat. Daarom checkt ContentFlow bij elke post niet alleen &ldquo;gaat '
+        . 'begrijpen waar een merk voor staat. Daarom checkt Brandflocks bij elke post niet alleen &ldquo;gaat '
         . 'dit over ons merk&rdquo;, maar of hij de unieke positie van het merk draagt, of terugzakt naar iets wat iedereen '
         . 'had kunnen zeggen.';
 
@@ -678,7 +678,7 @@ function li_render_intro_html(array $metrics): string
 
 /**
  * Score-samenvatting, direct ná de intro-pitch en vóór "De cijfers" — de intro belooft
- * letterlijk "ContentFlow doet twee dingen: positionering vinden + consistent
+ * letterlijk "Brandflocks doet twee dingen: positionering vinden + consistent
  * communiceren", dus die twee dingen horen als score bovenaan te staan, niet alleen
  * los in het "Het verhaal in de posts"-blok verderop (waar iemand die niet
  * doorscrollt ze nooit ziet). "De cijfers" blijft puur kwantitatief (engagement,
@@ -776,9 +776,9 @@ function li_render_score_summary_html(?array $narrative): string
 /**
  * De op-maat-gemaakte tweede alinea: past de pitch hierboven concreet toe op deze
  * pagina. Gebruikt bij voorkeur de merkverhaal-analyse (§ narrative) — dat is het
- * meest onderscheidende en meest ContentFlow-relevante wat deze scan kan laten
+ * meest onderscheidende en meest Brandflocks-relevante wat deze scan kan laten
  * zien. Zonder narrative-analyse (uitgeschakeld/mislukt) valt terug op de sterkste
- * kwantitatieve observatie, met een expliciete ContentFlow-brug aan het eind zodat
+ * kwantitatieve observatie, met een expliciete Brandflocks-brug aan het eind zodat
  * de mail nooit eindigt in kale cijfers zonder verkoophaak.
  *
  * @param array<string, mixed> $metrics
@@ -841,7 +841,7 @@ function li_render_case_line(array $metrics): string
 
             return 'Bij ' . li_h($companyName) . ' ' . $consistent
                 . ': “' . li_h($firstCliche) . '”. Dat is niet zozeer een kwestie van de posts zelf, als van '
-                . 'positionering, en dat is precies waar ContentFlow bij helpt: hieronder staat waar het '
+                . 'positionering, en dat is precies waar Brandflocks bij helpt: hieronder staat waar het '
                 . 'overlapt en waar de ruimte zit om zich te onderscheiden.';
         }
 
@@ -882,7 +882,7 @@ function li_render_case_line(array $metrics): string
 
             return 'Bij ' . li_h($companyName) . ' is de kernboodschap deels eigen taal, deels iets wat vaker klinkt in deze '
                 . 'branche: “' . li_h($quote) . '”. De helft van een onderscheidende positionering hebben ze dus '
-                . 'al te pakken; de andere helft is precies waar ContentFlow om draait: elke post automatisch '
+                . 'al te pakken; de andere helft is precies waar Brandflocks om draait: elke post automatisch '
                 . 'toetsen aan één vastgelegd merkprofiel, zodat de posts het onderscheidende deel versterken in '
                 . 'plaats van het generieke deel.';
         }
@@ -901,14 +901,14 @@ function li_render_case_line(array $metrics): string
     if ($label === 'laag' && $coreMessage !== '') {
         return 'Bij ' . li_h($companyName) . ' wisselt de boodschap per post — daardoor is een vaste rode draad lastig '
             . 'te herkennen, voor lezers én voor AI-modellen. Dat is niet zozeer een kwestie van hoeveel er '
-            . 'gepost wordt, als van herkenning, en dat is precies waar ContentFlow bij helpt: hieronder staat wat er wél '
+            . 'gepost wordt, als van herkenning, en dat is precies waar Brandflocks bij helpt: hieronder staat wat er wél '
             . 'consequent terugkomt — en waar het uiteenloopt.';
     }
 
     if ($label !== '' && $coreMessage !== '') {
         return 'Bij ' . li_h($companyName) . ' is de kern van het verhaal te herkennen — “' . li_h($coreMessage) . '” '
             . '— maar niet elke post draagt hem even scherp uit. De helft van een consistent merk hebben ze '
-            . 'dus al te pakken; de andere helft is precies waar ContentFlow om draait: elke post automatisch '
+            . 'dus al te pakken; de andere helft is precies waar Brandflocks om draait: elke post automatisch '
             . 'toetsen aan één vastgelegd merkprofiel, zodat lezers, zoekmachines én AI-modellen steeds hetzelfde '
             . 'beeld van het merk krijgen.';
     }
@@ -925,7 +925,7 @@ function li_render_case_line(array $metrics): string
             . 'x het gemiddelde van ' . $avgReactions . '.';
 
         $line .= isset($obsById['recent_decline'])
-            ? ' Dat momentum is niet vastgehouden: de meest recente posts scoren juist duidelijk lager. Dat is precies waar ContentFlow bij helpt: hieronder staat waar het verschil zit.'
+            ? ' Dat momentum is niet vastgehouden: de meest recente posts scoren juist duidelijk lager. Dat is precies waar Brandflocks bij helpt: hieronder staat waar het verschil zit.'
             : ' Dat is geen toeval — het laat zien waar op dit moment het meeste potentieel ligt. Hieronder staat waarom.';
 
         return $line;
@@ -933,22 +933,22 @@ function li_render_case_line(array $metrics): string
 
     if (isset($obsById['one_way'])) {
         return li_h((string) ($obsById['one_way']['body'] ?? ''))
-            . ' Dat is precies waar ContentFlow bij helpt — hieronder staat wat dat over de pagina zegt.';
+            . ' Dat is precies waar Brandflocks bij helpt — hieronder staat wat dat over de pagina zegt.';
     }
 
     if (isset($obsById['no_rhythm'])) {
         return li_h((string) ($obsById['no_rhythm']['body'] ?? ''))
-            . ' Dat is precies waar ContentFlow bij helpt — hieronder de volledige scan.';
+            . ' Dat is precies waar Brandflocks bij helpt — hieronder de volledige scan.';
     }
 
     if (isset($obsById['low_engagement'])) {
         return li_h((string) ($obsById['low_engagement']['body'] ?? ''))
-            . ' Dat is precies waar ContentFlow bij helpt — hieronder staat waar dat vandaan komt.';
+            . ' Dat is precies waar Brandflocks bij helpt — hieronder staat waar dat vandaan komt.';
     }
 
     if ($observations !== [] && is_array($observations[0] ?? null)) {
         return li_h((string) ($observations[0]['body'] ?? ''))
-            . ' Hieronder de volledige scan, inclusief waar ContentFlow bij kan helpen.';
+            . ' Hieronder de volledige scan, inclusief waar Brandflocks bij kan helpen.';
     }
 
     return 'We hebben de openbare LinkedIn-posts van ' . li_h($companyName)
@@ -1114,7 +1114,7 @@ function li_render_outreach_plaintext(
 
     $lines = [
         "Social Media Scan — {$companyName} op LinkedIn",
-        "{$dateLabel} · ContentFlow, een product van iGiSNext",
+        "{$dateLabel} · Brandflocks",
         '',
         $hook,
     ];
@@ -1139,7 +1139,7 @@ function li_render_report_plaintext(array $metrics, ?string $scanDate = null): s
     );
 
     return "Social Media Scan — {$companyName} op LinkedIn\n"
-        . "{$dateLabel} · ContentFlow, een product van iGiSNext\n\n"
+        . "{$dateLabel} · Brandflocks\n\n"
         . "Periode: {$period}\n"
         . 'Posts: ' . (int) ($metrics['posts_count'] ?? 0) . "\n\n"
         . '(Open de HTML-bijlage of plak de opgemaakte versie uit de scan-tool.)';
@@ -1382,7 +1382,7 @@ function li_narrative_benefit_block(?array $narrative): ?array
         return [
             'title' => 'Herkenbaar voor mens én machine',
             'body' => 'De kernboodschap komt al consequent terug in de posts. Een consistente kernboodschap helpt '
-                . 'mensen en digitale systemen beter begrijpen waar het merk voor staat. ContentFlow toetst elke post '
+                . 'mensen en digitale systemen beter begrijpen waar het merk voor staat. Brandflocks toetst elke post '
                 . 'vooraf aan één vastgelegd merkprofiel, zodat die consistentie geborgd blijft terwijl het bedrijf groeit.',
         ];
     }
@@ -1390,7 +1390,7 @@ function li_narrative_benefit_block(?array $narrative): ?array
     return [
         'title' => 'Herkenbaar voor mens én machine',
         'body' => 'Een consistente kernboodschap helpt mensen en digitale systemen beter begrijpen waar het merk voor '
-            . 'staat. ContentFlow toetst elke post vooraf aan één vastgelegd merkprofiel, zodat die consistentie niet '
+            . 'staat. Brandflocks toetst elke post vooraf aan één vastgelegd merkprofiel, zodat die consistentie niet '
             . 'van het toeval afhangt.',
     ];
 }
@@ -1411,7 +1411,7 @@ function li_render_benefits_html(array $benefits): string
     }
 
     return '<tr><td style="padding:20px 8px 8px;background-color:#EAE6DC;">'
-        . '<p style="margin:0 0 12px;color:#2E2014;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.35;font-weight:bold;">Waar ContentFlow bij kan helpen</p>'
+        . '<p style="margin:0 0 12px;color:#2E2014;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.35;font-weight:bold;">Waar Brandflocks bij kan helpen</p>'
         . $items
         . '</td></tr>';
 }

@@ -1,0 +1,454 @@
+{
+  "name": "CE-03 (Rationale & Article Writer)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce03-write-article",
+        "options": {}
+      },
+      "id": "0859af5b-2bee-4180-8fd3-223b9bc652bb",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        1248
+      ],
+      "webhookId": "ba78567f-e85a-4509-91ec-f77a3a493df3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst slotId = body.slot_id ?? body?.body?.slot_id ?? $json.slot_id ?? null;\n\nif (!slotId || String(slotId).trim() === '') {\n  throw new Error('Missing slot_id. Stuur { \"slot_id\": \"<uuid>\" } of { \"body\": { \"slot_id\": \"<uuid>\" } }.');\n}\n\nreturn { json: { slot_id: String(slotId).trim() } };"
+      },
+      "id": "ed37c9bb-fc16-4613-8e72-a3cec0a0fc40",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT s.*, c.name as client_name, c.archetype, c.archetype_traits, c.adversary, c.brand_goal, c.tone_of_voice, c.writing_guide, c.default_tone, c.default_angle, c.default_image_ratio, c.default_platform\nFROM content_slots s\nJOIN clients c ON s.client_id = c.id\nWHERE s.id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $json.slot_id ] }}"
+        }
+      },
+      "id": "fbc99d01-a1d2-49c5-b934-b37b7aff80bc",
+      "name": "Get Slot",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1808,
+        1248
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const slot = $input.first()?.json ?? {};\n\nif (!slot.id) {\n  const requested = $('Parse Input').first().json.slot_id;\n  throw new Error(`Geen content_slot gevonden voor slot_id: ${requested}`);\n}\n\nreturn { json: slot };"
+      },
+      "id": "167dd3a8-2f50-43fc-87f0-af425c95215c",
+      "name": "Validate Slot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM research_items WHERE (slot_id = $1 OR theme_id = $2) AND (feedback = 'liked' OR source_type = 'manual_fastlane');",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Slot').item.json.id, $('Validate Slot').item.json.theme_id ] }}"
+        }
+      },
+      "id": "45d373b5-0292-4cfc-b8f4-9e214eed3ea2",
+      "name": "Get Research",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2032,
+        1248
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const slot = $('Validate Slot').first().json;\nconst research = $input.all().map(item => item.json);\n\nlet research_summary = research.map(r => `[${r.id}] ${r.title}: ${r.snippet} (Rationale: ${r.item_rationale || 'N/A'})`).join('\\n\\n');\nif (!research_summary) research_summary = \"Geen specifieke research items gekoppeld.\";\n\nreturn {\n  json: {\n    slot: slot,\n    research_summary: research_summary\n  }\n};"
+      },
+      "id": "0c8ad43c-3aa0-4e67-ae2d-68a994eeb468",
+      "name": "Format Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 1024,\n  system: \"Je bent strategisch merkadviseur en werkt volgens de Hero Brand-methode: een merkverhaal ontstaat uit de combinatie van archetype + doel + tegenstander/tegenkracht. Spanning tussen archetype en tegenstander geeft richting aan het verhaal.\\n\\nMERK:\\nArchetype: \" + $json.slot.archetype + \" -- \" + $json.slot.archetype_traits + \"\\nTegenstander/adversary: \" + $json.slot.adversary + \"\\nMerkdoel: \" + $json.slot.brand_goal,\n  messages: [\n    {\n      role: \"user\",\n      content: \"ONDERWERP:\\nFase: \" + $json.slot.phase_key + \"\\nThema: \" + $json.slot.theme + \"\\nDoel: \" + $json.slot.goal + \"\\nInput redactie: \" + $json.slot.input_human + \"\\n\\nINSPIRATIE:\\n\" + $json.research_summary + \"\\n\\nOPDRACHT:\\nSchrijf een rationale van maximaal 4 zinnen die uitlegt: (1) hoe dit onderwerp de tegenstander/adversary van het merk raakt, (2) hoe het archetype hier logisch op reageert, (3) waarom dit nu relevant is gezien de verzamelde inspiratie en de input van de redactie. Output als JSON.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"generate_rationale\",\n      description: \"Slaat de rationale op als JSON\",\n      input_schema: {\n        type: \"object\",\n        properties: { rationale: { type: \"string\" } },\n        required: [\"rationale\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"generate_rationale\" }\n}) }}",
+        "options": {}
+      },
+      "id": "2f2ff436-22a8-42d5-9ed7-2c5a9c760dfe",
+      "name": "Claude Step A",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2480,
+        1248
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 2048,\n  system: \"Je bent copywriter voor \" + $('Format Data').item.json.slot.client_name + \".\\nSchrijfwijzer (leidend voor toon en stijl):\\n\" + $('Format Data').item.json.slot.writing_guide + \"\\n\\nAanvullende schrijfstijl-instructies: \" + $('Format Data').item.json.slot.tone_of_voice,\n  messages: [\n    {\n      role: \"user\",\n      content: \"STRATEGISCHE RATIONALE:\\n\" + $json.content[0].input.rationale + \"\\n\\nONDERWERP: \" + $('Format Data').item.json.slot.theme + \"\\nDoel: \" + $('Format Data').item.json.slot.goal + \"\\nInput van de redactie: \" + $('Format Data').item.json.slot.input_human + \"\\nINSPIRATIE:\\n\" + $('Format Data').item.json.research_summary + \"\\n\\nOPDRACHT:\\nSchrijf een LinkedIn-post die de rationale vertaalt naar een concreet verhaal voor het gekozen onderwerp. Output als JSON.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"write_article\",\n      description: \"Slaat het artikel op als JSON\",\n      input_schema: {\n        type: \"object\",\n        properties: { headline: { type: \"string\" }, content: { type: \"string\" } },\n        required: [\"headline\", \"content\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"write_article\" }\n}) }}",
+        "options": {}
+      },
+      "id": "13eaad55-83fe-4905-ab0f-ddb654112ba5",
+      "name": "Claude Step B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2704,
+        1248
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 500,\n  system: \"Je adviseert over de vorm van een post, niet over de inhoud.\\n\\nKlantbrede defaults: tone=\" + $('Format Data').item.json.slot.default_tone + \", angle=\" + $('Format Data').item.json.slot.default_angle + \", image_ratio=\" + $('Format Data').item.json.slot.default_image_ratio + \", platform=\" + $('Format Data').item.json.slot.default_platform + \"\\n\\nOutput ALLEEN geldige JSON via de tool. Waarden voor tone: b2b, b2c, internal, partners, personal. Waarden voor angle: archetype, adversary, general. Waarden voor image_ratio: square, landscape. Waarden voor platform: linkedin, instagram, x, facebook, blog.\",\n  messages: [\n    {\n      role: \"user\",\n      content: \"RATIONALE:\\n\" + $('Claude Step A').item.json.content[0].input.rationale + \"\\n\\nARTIKEL:\\n\" + $('Claude Step B').item.json.content[0].input.content + \"\\n\\nOPDRACHT: Stel voor elk van de vier dimensies de meest passende waarde voor, gebaseerd op de klantbrede default tenzij de rationale/het artikel duidelijk een andere keuze rechtvaardigt. Stel daarnaast 3-5 relevante hashtags voor, gebaseerd op de kernonderwerpen van het artikel.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"generate_suggestions\",\n      description: \"Slaat de tone/angle/image_ratio/platform/hashtags-suggestie op als JSON\",\n      input_schema: {\n        type: \"object\",\n        properties: {\n          tone: { type: \"string\", enum: [\"b2b\", \"b2c\", \"internal\", \"partners\", \"personal\"] },\n          angle: { type: \"string\", enum: [\"archetype\", \"adversary\", \"general\"] },\n          image_ratio: { type: \"string\", enum: [\"square\", \"landscape\"] },\n          platform: { type: \"string\", enum: [\"linkedin\", \"instagram\", \"x\", \"facebook\", \"blog\"] },\n          hashtags: { type: \"array\", items: { type: \"string\" } }\n        },\n        required: [\"tone\", \"angle\", \"image_ratio\", \"platform\", \"hashtags\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"generate_suggestions\" }\n}) }}",
+        "options": {}
+      },
+      "id": "31660562-563e-4060-a357-68e145f633ee",
+      "name": "Claude Step C",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2928,
+        1248
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM articles WHERE slot_id = $1 AND status = 'draft'",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Data').item.json.slot_id ] }}"
+        }
+      },
+      "id": "86e42e0c-669b-4a8e-be54-370e5aa1c79f",
+      "name": "Delete Existing Draft",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        3264,
+        1248
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO articles (id, slot_id, rationale, headline, content_ai, tone_suggested, angle_suggested, image_ratio_suggested, platform_suggested, hashtags_suggested, status) VALUES (UUID(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Data').item.json.slot_id, $('Validate Data').item.json.rationale, $('Validate Data').item.json.headline, $('Validate Data').item.json.content_ai, $('Validate Data').item.json.tone_suggested, $('Validate Data').item.json.angle_suggested, $('Validate Data').item.json.image_ratio_suggested, $('Validate Data').item.json.platform_suggested, $('Validate Data').item.json.hashtags_suggested, $('Validate Data').item.json.status ] }}"
+        }
+      },
+      "id": "da50d96a-0c91-4da3-9d78-4f9a28ff7190",
+      "name": "Insert Article",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        3376,
+        1248
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE content_slots SET status = $1 WHERE id = $2",
+        "options": {
+          "queryReplacement": "={{ [ 'written', $('Validate Data').item.json.slot_id ] }}"
+        }
+      },
+      "id": "121da747-9819-44bf-a8db-7d015a2b9ae1",
+      "name": "Update Slot",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        3600,
+        1248
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Haal de data op uit de vorige nodes\nconst slot = $('Format Data').first().json.slot;\nconst stepA = $('Claude Step A').first().json;\nconst stepB = $('Claude Step B').first().json;\nconst stepC = $('Claude Step C').first().json;\n\n// 2. Extractie met fallback (indien missing) -- alle drie stappen gebruiken tool use,\n//    dus de output staat altijd in content[0].input, nooit in content[0].text\nconst rationale = stepA?.content?.[0]?.input?.rationale || '';\nconst headline = stepB?.content?.[0]?.input?.headline || '';\nconst content = stepB?.content?.[0]?.input?.content || '';\nconst suggestions = stepC?.content?.[0]?.input || {};\n\nif (!rationale || !headline || !content) {\n  throw new Error('Claude Step A of B miste input data.');\n}\n\n// 3. Return de definitieve objecten voor de Insert node\nreturn {\n  json: {\n    slot_id: String(slot.id),\n    rationale: String(rationale),\n    headline: String(headline),\n    content_ai: String(content),\n    tone_suggested: String(suggestions.tone || 'b2b'),\n    angle_suggested: String(suggestions.angle || 'general'),\n    image_ratio_suggested: String(suggestions.image_ratio || 'landscape'),\n    platform_suggested: String(suggestions.platform || 'linkedin'),\n    hashtags_suggested: Array.isArray(suggestions.hashtags) ? suggestions.hashtags.join(', ') : '',\n    status: 'draft'\n  }\n};\n"
+      },
+      "id": "33fbb451-2b79-40d9-b028-cca819ad52b7",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        1248
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Slot": {
+      "main": [
+        [
+          {
+            "node": "Validate Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Research": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Claude Step A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Step A": {
+      "main": [
+        [
+          {
+            "node": "Claude Step B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Step B": {
+      "main": [
+        [
+          {
+            "node": "Claude Step C",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Step C": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Article": {
+      "main": [
+        [
+          {
+            "node": "Update Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Delete Existing Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Get Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Slot": {
+      "main": [
+        [
+          {
+            "node": "Get Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Existing Draft": {
+      "main": [
+        [
+          {
+            "node": "Insert Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f6880ff1-d632-4be2-afba-000cb7604717",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ecb28230bd473ffb1035d1b6de149528b24a8d731bea2c5bdc9ea965ed8b1bde"
+  },
+  "nodeGroups": [],
+  "id": "uXPINdIVb6RO7aj8",
+  "tags": []
+}

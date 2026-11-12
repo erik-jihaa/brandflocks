@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# CE-02 generator verwijderd in Brandflocks ronde A.
-# Opnieuw opzetten: kopieer generate-ce02-workflow.py uit CE-Cursor, of bouw een Brandflocks-variant.
+# CE-02 naar n8n (Brandflocks app).
 set -euo pipefail
-echo "scripts/generate-ce02-workflow.py ontbreekt (Brandflocks ronde A)." >&2
-echo "CE-02 n8n-push: gebruik CE-Cursor tot Brandflocks een eigen generator heeft." >&2
-exit 1
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+export CE_N8N_TARGET="${CE_N8N_TARGET:-brandflocks}"
+exec python3 "$ROOT/scripts/push-n8n-workflow.py" \
+  "$ROOT/json/n8n/CE-02 - Research & Inspiratie.json" \
+  ce02-research

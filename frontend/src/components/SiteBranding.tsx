@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiFetch, isApiConfigured } from '../api/client'
+import {
+  DEFAULT_PRODUCT_BRANDING,
+  parseProductBranding,
+  type ProductBranding,
+} from '../config/productBranding'
 
 type HealthResponse = {
   environment?: string
+  branding?: ProductBranding
 }
 
 export type SiteBrand = {
@@ -11,20 +17,25 @@ export type SiteBrand = {
   favicon: string
 }
 
-/** Browser-tab label + favicon per subsite (productie / platform / staging). */
-export function resolveSiteBrand(environment: string | null, isPlatformRoute: boolean): SiteBrand {
+/** Browser-tab label + favicon per subsite (productie / platform / niet-productie). */
+export function resolveSiteBrand(
+  environment: string | null,
+  isPlatformRoute: boolean,
+  branding: ProductBranding = DEFAULT_PRODUCT_BRANDING,
+): SiteBrand {
   if (isPlatformRoute) {
-    return { title: 'CF_Platform', favicon: '/favicon-white.svg' }
+    return { title: branding.platformLabel, favicon: '/favicon-white.svg' }
   }
-  if (environment === 'staging' || environment === 'local') {
-    return { title: 'CF_Staging', favicon: '/favicon-green.svg' }
+  if (environment !== null && environment !== 'production') {
+    return { title: branding.stagingLabel, favicon: '/favicon-green.svg' }
   }
-  return { title: 'ContentFlow', favicon: '/favicon-blue.svg' }
+  return { title: branding.siteTitle, favicon: '/favicon-blue.svg' }
 }
 
 export function SiteBranding() {
   const { pathname } = useLocation()
   const [environment, setEnvironment] = useState<string | null>(null)
+  const [branding, setBranding] = useState<ProductBranding>(DEFAULT_PRODUCT_BRANDING)
 
   useEffect(() => {
     if (!isApiConfigured()) {
@@ -35,7 +46,9 @@ export function SiteBranding() {
     let cancelled = false
     void apiFetch<HealthResponse>('/health')
       .then((data) => {
-        if (!cancelled) setEnvironment(data.environment ?? 'production')
+        if (cancelled) return
+        setEnvironment(data.environment ?? 'production')
+        setBranding(parseProductBranding(data.branding))
       })
       .catch(() => {
         if (!cancelled) setEnvironment(null)
@@ -47,8 +60,8 @@ export function SiteBranding() {
   }, [])
 
   const brand = useMemo(
-    () => resolveSiteBrand(environment, pathname.startsWith('/platform')),
-    [environment, pathname],
+    () => resolveSiteBrand(environment, pathname.startsWith('/platform'), branding),
+    [environment, pathname, branding],
   )
 
   useEffect(() => {

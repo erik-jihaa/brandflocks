@@ -6,12 +6,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from n8n_env import load_env, target_env
+from n8n_env import ce_api_base, load_env, target_env
 from n8n_workflow_utils import write_workflow
 
 _env = target_env()
 load_env(_env if _env != "production" else None)
-CE_PUBLIC_BASE_URL = (os.environ.get("CE_PUBLIC_BASE_URL") or "https://ce.igisnext.com").rstrip("/")
+CE_PUBLIC_BASE_URL = ce_api_base()
 CE_RESET_TOKEN = os.environ.get("CE_RESET_TOKEN", "")
 
 nodes = [
@@ -64,6 +64,6 @@ workflow = {
     "active": False,
 }
 
-out = Path(__file__).resolve().parent.parent.parent / "JSON" / "CE-LinkedIn Sync.json"
+out = Path(__file__).resolve().parent.parent / "json" / "n8n" / "CE-LinkedIn Sync.json"
 write_workflow(workflow, out)
 print("Wrote", out)

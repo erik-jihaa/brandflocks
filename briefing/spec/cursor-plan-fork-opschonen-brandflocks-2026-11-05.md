@@ -110,7 +110,7 @@ Wat het inventarisscript als "geen aanroep" meldt aan PHP-functies, frontend-com
 
 ### Ronde F — Database-basis
 - Maak één geconsolideerde `web/schema/brandflocks-baseline.sql` uit de huidige migraties, zonder de tabellen en kolommen die in ronde B tot D zijn weggevallen. Een nieuwe Brandflocks-installatie start daarmee, niet met het afspelen van alle CE-migraties.
-- Migraties ná de baseline beginnen opnieuw in `web/migrations/`.
+- Migraties ná de baseline beginnen opnieuw in `web/migrations/` (historisch: `web/migrations/archive/pre-baseline-2026-11/`).
 - **Niet droppen** van tabellen die nog data kunnen bevatten bij een import uit CE. Weglaten uit de baseline is genoeg.
 
 ## Stap 5 — Beslissen vóór schrappen (Erik / Rogier)
@@ -132,7 +132,7 @@ Mijn advies: LinkedIn voorlopig **houden** (te groot om blind te schrappen, en w
 ## Stap 6 — Daarna
 
 - Het herontwerp (weekplan stap 1–11) bouwen op de opgeschoonde fork.
-- Deploy-doel: een omgeving `brandflocks` toevoegen aan `scripts/deploy-ftp.sh`, met `.env.brandflocks.example` en de bestaande isolatiecontrole. Dat is voor de gedeelde testserver bij Antagonist; vaste klanten krijgen later een eigen VPS.
+- Deploy-doel: omgevingen `brandflocks` en `brandflocks-target` in `scripts/deploy-ftp.sh`, met `.env.brandflocks.example` / `.env.brandflocks-target.example` en de bestaande isolatiecontrole. `brandflocks-target` = fork-rooktest als submap op staging; `brandflocks` = eigen subdomein (Antagonist-testserver); vaste klanten krijgen later een eigen VPS.
 
 ---
 

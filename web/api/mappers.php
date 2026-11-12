@@ -78,6 +78,25 @@ function ce_tone_to_db(string $value): string
     return $map[$value] ?? strtolower(str_replace(' ', '', $value));
 }
 
+/**
+ * PATCH-body wijzigt de schrijfvorm (Toon: ik-vorm / je-vorm / zakelijk).
+ * Headline/content-save telt niet; alleen dan moet CE-03 opnieuw schrijven.
+ */
+function ce_article_patch_changes_schrijfvorm(array $row, array $body): bool
+{
+    if (!array_key_exists('tone', $body)) {
+        return false;
+    }
+    $incoming = trim((string) $body['tone']);
+    if ($incoming === '') {
+        return false;
+    }
+    $current = ce_tone_to_db(ce_tone_to_ui($row['tone_final'] ?? $row['tone_suggested'] ?? null));
+    $next = ce_tone_to_db($incoming);
+
+    return $current !== $next;
+}
+
 function ce_platform_to_ui(?string $value): string
 {
     if ($value === null || $value === '') {
@@ -131,11 +150,93 @@ function ce_status_to_ui(?string $value): string
     return $key !== '' ? $key : 'draft';
 }
 
+function ce_article_row_has_real_body(?array $row): bool
+{
+    if ($row === null) {
+        return false;
+    }
+
+    require_once __DIR__ . '/editor-questions.php';
+    $human = trim((string) ($row['content_human'] ?? ''));
+    if ($human !== '') {
+        return true;
+    }
+
+    return ce_article_has_real_body((string) ($row['content_ai'] ?? ''));
+}
+
+function ce_slot_is_campaign_theme(array $slot): bool
+{
+    $origin = strtolower(trim((string) ($slot['origin'] ?? '')));
+    $campaignId = trim((string) ($slot['campaign_id'] ?? ''));
+
+    return $origin === 'campagne_preview' || $campaignId !== '';
+}
+
+/** @param array<string, mixed> $slot */
+function ce_build_theme_start_api_payload(PDO $pdo, array $slot): array
+{
+    require_once __DIR__ . '/theme-repository.php';
+    require_once __DIR__ . '/tone-styles.php';
+    require_once __DIR__ . '/campagne-preview-templates.php';
+    require_once __DIR__ . '/copy-modus.php';
+
+    $slotId = (string) ($slot['id'] ?? '');
+    $ctx = ce_resolve_slot_research_context($pdo, $slotId);
+    $camp = ce_campagne_context_meta_from_slot_row($pdo, $slot);
+    $title = trim((string) ($ctx['slotTheme'] ?? $slot['theme'] ?? ''));
+    $rationale = trim((string) ($ctx['themeRationale'] ?? ''));
+    if ($rationale === '') {
+        $rationale = trim((string) ($camp['campagne_opdracht'] ?? ''));
+    }
+    $platformRaw = trim((string) ($slot['campaign_platform'] ?? ''));
+    $faseKey = trim((string) ($slot['campaign_fase'] ?? $camp['campagne_fase'] ?? ''));
+    $templateKey = trim((string) ($slot['campaign_template_key'] ?? ''));
+    $faseLabel = $faseKey !== '' ? ce_campagne_preview_fase_label($templateKey !== '' ? $templateKey : null, $faseKey) : null;
+    $publishDate = trim((string) ($slot['publish_date'] ?? ''));
+    $campaignId = trim((string) ($camp['campagne_id'] ?? $slot['campaign_id'] ?? ''));
+    $copyResolved = ce_resolve_copy_modus_for_slot($pdo, $slotId);
+
+    return [
+        'ok' => true,
+        'themeOnly' => true,
+        'id' => '',
+        'slotId' => $slotId,
+        'themeId' => trim((string) ($ctx['themeId'] ?? $slot['theme_id'] ?? '')),
+        'weekLabel' => ce_week_label($slot['phase_key'] ?? null, null),
+        'headline' => $title,
+        'headlineAi' => $title,
+        'content' => '',
+        'contentAi' => '',
+        'hashtags' => '',
+        'rationale' => $rationale,
+        'sourceUrl' => null,
+        'tone' => '',
+        'angle' => 'general',
+        'imageRatio' => 'square',
+        'platform' => $platformRaw !== '' ? ce_platform_to_ui($platformRaw) : '',
+        'status' => 'themed',
+        'slotStatus' => ce_status_to_ui($slot['status'] ?? null),
+        'campaignId' => $campaignId !== '' ? $campaignId : null,
+        'campaignTitle' => $camp['campagne_title'] ?? null,
+        'campaignFaseLabel' => $faseLabel,
+        'publishDate' => $publishDate !== '' ? $publishDate : null,
+        'slotOrigin' => trim((string) ($slot['origin'] ?? '')) ?: null,
+        'copyModus' => $copyResolved['modus'],
+        'copyModusOverride' => $copyResolved['override'],
+        'copyModusLabel' => ce_copy_modus_ui_label($copyResolved['modus']),
+    ];
+}
+
 /** Pipeline-fase voor Agenda (§8.3.5): Theme / Research / Article. */
-function ce_resolve_agenda_phase(?string $slotStatus, ?string $articleId): string
+function ce_resolve_agenda_phase(?string $slotStatus, ?string $articleId, ?string $slotOrigin = null): string
 {
     if (trim((string) $articleId) !== '') {
         return 'article';
+    }
+
+    if (strtolower(trim((string) $slotOrigin)) === 'campagne_preview') {
+        return 'theme';
     }
 
     $slotUi = ce_status_to_ui($slotStatus);
@@ -381,6 +482,29 @@ function ce_phase_key_from_date(?string $isoDate): ?string
     }
 
     return (string) (int) $dt->format('W');
+}
+
+/** Maandag (Y-m-d) van de week waarin de gegeven kalenderdatum valt. */
+function ce_monday_of_calendar_date(string $isoDate): string
+{
+    $tz = ce_ce_timezone();
+    try {
+        $dt = new DateTimeImmutable(trim($isoDate), $tz);
+    } catch (Throwable) {
+        $dt = new DateTimeImmutable('now', $tz);
+        $dowFallback = (int) $dt->format('N');
+        if ($dowFallback !== 1) {
+            $dt = $dt->modify('-' . ($dowFallback - 1) . ' days');
+        }
+
+        return $dt->format('Y-m-d');
+    }
+    $dow = (int) $dt->format('N');
+    if ($dow !== 1) {
+        $dt = $dt->modify('-' . ($dow - 1) . ' days');
+    }
+
+    return $dt->format('Y-m-d');
 }
 
 /** ISO-week 1–53 uit phase_key; jaartallen (bv. 2026) worden genegeerd. */

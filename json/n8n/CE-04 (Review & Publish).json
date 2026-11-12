@@ -1,0 +1,321 @@
+{
+  "name": "CE-04 (Review & Publish)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce04-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce04-webhook-001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        1488
+      ],
+      "webhookId": "ce04-review-webhook-id"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst slotId = body.slot_id ?? body?.body?.slot_id ?? $json.slot_id ?? null;\n\nif (!slotId || String(slotId).trim() === '') {\n  throw new Error('Missing slot_id. Stuur { \"slot_id\": \"<uuid>\" }.');\n}\n\nreturn { json: { slot_id: String(slotId).trim() } };"
+      },
+      "id": "ce04-parse-001",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT a.*, s.phase_key, s.theme, s.goal, s.status AS slot_status, c.name AS client_name, c.archetype, c.archetype_traits, c.adversary, c.brand_goal, c.tone_of_voice, c.writing_guide\nFROM articles a\nJOIN content_slots s ON s.id = a.slot_id\nJOIN clients c ON c.id = s.client_id\nWHERE a.slot_id = $1\nORDER BY a.id DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Parse Input').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-get-article",
+      "name": "Get Article",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first()?.json ?? {};\nconst slotId = $('Parse Input').first().json.slot_id;\n\nif (!row.id) {\n  throw new Error(`Geen artikel gevonden voor slot_id: ${slotId}`);\n}\n\nconst contentHuman = row.content_human || '';\nconst contentAi = row.content_ai || '';\nconst contentForReview = contentHuman || contentAi;\n\nif (!contentForReview.trim()) {\n  throw new Error('Artikel heeft geen content om te reviewen.');\n}\n\nreturn {\n  json: {\n    ...row,\n    slot_id: slotId,\n    article_id: row.id,\n    content_for_review: contentForReview,\n    content_baseline: contentAi,\n    hashtags: row.hashtags_final || row.hashtags_suggested || '',\n    tone: row.tone_final || row.tone_suggested || 'b2b',\n    angle: row.angle_final || row.angle_suggested || 'general',\n    platform: row.platform_final || row.platform_suggested || 'linkedin'\n  }\n};"
+      },
+      "id": "ce04-validate-article",
+      "name": "Validate Article",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 1500,\n  system: \"Je bent senior redacteur voor \" + $json.client_name + \".\\n\\nMERK:\\nArchetype: \" + $json.archetype + \" — \" + $json.archetype_traits + \"\\nTegenstander: \" + $json.adversary + \"\\nMerkdoel: \" + $json.brand_goal + \"\\n\\nSchrijfwijzer:\\n\" + $json.writing_guide + \"\\n\\nTone of voice:\\n\" + $json.tone_of_voice + \"\\n\\nGeef constructieve redactionele feedback op ingediende posts. Wees concreet: citeer korte fragmenten. Max 4 tekstpunten. Geef optioneel 1 beeld-feedback als er geen afbeelding is geüpload.\",\n  messages: [\n    {\n      role: \"user\",\n      content: \"THEMA: \" + $json.theme + \"\\nFase: \" + $json.phase_key + \"\\n\\nHEADLINE:\\n\" + $json.headline + \"\\n\\nTEKST (human edit):\\n\" + $json.content_for_review + \"\\n\\nORIGINELE AI-TEKST:\\n\" + $json.content_baseline + \"\\n\\nHASHTAGS: \" + $json.hashtags + \"\\nTone: \" + $json.tone + \" | Angle: \" + $json.angle + \" | Platform: \" + $json.platform + \"\\n\\nReview deze ingediende post. Focus op merkfit, helderheid, tone, en afwijkingen t.o.v. het AI-concept. Output via tool.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"submit_review\",\n      description: \"Redactionele feedback voor de Content Engine UI\",\n      input_schema: {\n        type: \"object\",\n        properties: {\n          summary: { type: \"string\" },\n          text_feedback: {\n            type: \"array\",\n            items: {\n              type: \"object\",\n              properties: {\n                comment: { type: \"string\" },\n                excerpt: { type: \"string\" },\n                action_label: { type: \"string\" }\n              },\n              required: [\"comment\"]\n            }\n          },\n          image_feedback: {\n            type: \"object\",\n            properties: {\n              comment: { type: \"string\" },\n              action_label: { type: \"string\" }\n            }\n          }\n        },\n        required: [\"summary\", \"text_feedback\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"submit_review\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce04-claude-review",
+      "name": "Claude Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2256,
+        1488
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const article = $('Validate Article').first().json;\nconst claude = $input.first().json;\nconst input = claude?.content?.[0]?.input ?? {};\n\nconst textItems = Array.isArray(input.text_feedback) ? input.text_feedback : [];\nconst imageFb = input.image_feedback?.comment ? input.image_feedback : null;\n\nconst rows = [];\n\nfor (const item of textItems) {\n  if (!item?.comment) continue;\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'text',\n    reviewer_name: 'Hoofdredacteur',\n    comment: String(item.comment).trim(),\n    action_label: item.action_label ? String(item.action_label) : 'Remove',\n    excerpt: item.excerpt ? String(item.excerpt) : null,\n  });\n}\n\nif (imageFb) {\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'image',\n    reviewer_name: 'Hoofdredacteur',\n    comment: String(imageFb.comment).trim(),\n    action_label: imageFb.action_label ? String(imageFb.action_label) : 'New image',\n    excerpt: null,\n  });\n}\n\nif (rows.length === 0) {\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'text',\n    reviewer_name: 'Hoofdredacteur',\n    comment: String(input.summary || 'Geen specifieke feedback.'),\n    action_label: null,\n    excerpt: null,\n  });\n}\n\nreturn rows.map((row) => ({ json: row }));"
+      },
+      "id": "ce04-build-rows",
+      "name": "Build Feedback Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM article_feedback WHERE slot_id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Article').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-clear-feedback",
+      "name": "Clear Old Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2368,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO article_feedback (id, slot_id, article_id, reviewer_name, feedback_type, comment, action_label, excerpt, status) VALUES (UUID(), $1, $2, $3, $4, $5, $6, $7, 'open')",
+        "options": {
+          "queryReplacement": "={{ [ $json.slot_id, $json.article_id, $json.reviewer_name, $json.feedback_type, $json.comment, $json.action_label, $json.excerpt ] }}"
+        }
+      },
+      "id": "ce04-insert-feedback",
+      "name": "Insert Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2592,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE articles SET status = 'feedback' WHERE slot_id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Article').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-set-status-api",
+      "name": "Set Status Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2704,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, slot_id: $('Validate Article').item.json.slot_id, status: 'feedback', feedback_count: $('Insert Feedback').all().length }) }}",
+        "options": {}
+      },
+      "id": "ce04-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2816,
+        1488
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Get Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Article": {
+      "main": [
+        [
+          {
+            "node": "Validate Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Article": {
+      "main": [
+        [
+          {
+            "node": "Claude Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Review": {
+      "main": [
+        [
+          {
+            "node": "Clear Old Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Old Feedback": {
+      "main": [
+        [
+          {
+            "node": "Build Feedback Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Feedback Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Feedback": {
+      "main": [
+        [
+          {
+            "node": "Set Status Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Feedback": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "747f0e47-7bea-4f03-beea-c9a343b35659",
+  "meta": {
+    "instanceId": "ecb28230bd473ffb1035d1b6de149528b24a8d731bea2c5bdc9ea965ed8b1bde"
+  },
+  "nodeGroups": [],
+  "id": "ucFfC6Kzmopql1kM",
+  "tags": []
+}

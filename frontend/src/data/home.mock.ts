@@ -95,11 +95,6 @@ export const homeMock: HomeDashboard = {
       total: 3,
       expandTips: [
         {
-          id: 'expand-trello',
-          label: 'Koppel Trello',
-          reason: 'Eigen PR-concepten wegen mee in research',
-        },
-        {
           id: 'expand-mailbox',
           label: 'Voeg mailbox toe',
           reason: 'Nieuwsbrieven worden inspiration in research',

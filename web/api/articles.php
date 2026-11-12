@@ -74,31 +74,48 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $pdo = ce_db();
 
 if ($method === 'GET') {
+    require_once __DIR__ . '/fastlane-repository.php';
+    require_once __DIR__ . '/slot-repository.php';
+    require_once __DIR__ . '/research-quality.php';
     $row = ce_fetch_article_for_api($pdo, $slotId);
-    if (!$row) {
-        require_once __DIR__ . '/fastlane-repository.php';
-        require_once __DIR__ . '/slot-repository.php';
-        require_once __DIR__ . '/research-quality.php';
-        $resolvedSlotId = ce_resolve_article_route_slot_id($pdo, $slotId) ?? $slotId;
-        $slot = ce_fetch_fastlane_slot_row($pdo, $resolvedSlotId);
-        if ($slot !== null) {
-            $slotUi = ce_status_to_ui((string) ($slot['status'] ?? ''));
-            $researchReady = ce_research_slot_ready_for_write($pdo, $resolvedSlotId);
-            if (
-                in_array($slotUi, ['research_done', 'themed'], true)
-                && ($researchReady['ok'] ?? false) === true
-            ) {
-                ce_prepare_fastlane_write_after_research($pdo, $resolvedSlotId);
-                $row = ce_fetch_article_by_slot($pdo, $resolvedSlotId);
-            } elseif (
-                in_array($slotUi, ['research_done', 'themed'], true)
-                && ($researchReady['ok'] ?? false) !== true
-            ) {
-                ce_json_error(
-                    (string) ($researchReady['message'] ?? ce_research_insufficient_message()),
-                    409,
-                );
-            }
+    $resolvedSlotId = ce_resolve_article_route_slot_id($pdo, $slotId) ?? $slotId;
+    $slot = ce_fetch_fastlane_slot_row($pdo, $resolvedSlotId);
+    $hasBody = ce_article_row_has_real_body($row);
+
+    // Campagnethema zonder artikeltekst: thema-start, geen auto-CE-03 op GET.
+    // Recente stub (< 3 min) = schrijven onderweg na onderzoek-indienen.
+    if (!$hasBody && $slot !== null && ce_slot_is_campaign_theme($slot)) {
+        $recentStub = false;
+        if ($row !== null) {
+            $updatedAt = strtotime((string) ($row['updated_at'] ?? $row['created_at'] ?? ''));
+            $recentStub = $updatedAt !== false && (time() - $updatedAt) < 180;
+        }
+        if (!$recentStub) {
+            ce_json_response(ce_build_theme_start_api_payload($pdo, $slot));
+        }
+    }
+
+    $preparedWrite = false;
+
+    if (!$hasBody && $slot !== null) {
+        $slotUi = ce_status_to_ui((string) ($slot['status'] ?? ''));
+        $researchReady = ce_research_slot_ready_for_write($pdo, $resolvedSlotId);
+        if (
+            in_array($slotUi, ['research_done', 'themed'], true)
+            && ($researchReady['ok'] ?? false) === true
+        ) {
+            ce_prepare_fastlane_write_after_research($pdo, $resolvedSlotId);
+            $row = ce_fetch_article_by_slot($pdo, $resolvedSlotId);
+            $hasBody = ce_article_row_has_real_body($row);
+            $preparedWrite = true;
+        } elseif (
+            in_array($slotUi, ['research_done', 'themed'], true)
+            && ($researchReady['ok'] ?? false) !== true
+        ) {
+            ce_json_error(
+                (string) ($researchReady['message'] ?? ce_research_insufficient_message()),
+                409,
+            );
         }
     }
     if (!$row) {
@@ -117,15 +134,43 @@ if ($method === 'PATCH') {
     $body = ce_read_json_body();
     $row = ce_fetch_article_for_api($pdo, $slotId);
     if (!$row) {
+        require_once __DIR__ . '/fastlane-repository.php';
+        require_once __DIR__ . '/slot-repository.php';
+        $resolvedSlotId = ce_resolve_article_route_slot_id($pdo, $slotId) ?? $slotId;
+        $slotRow = ce_fetch_fastlane_slot_row($pdo, $resolvedSlotId);
+        if ($slotRow !== null
+            && strtolower(trim((string) ($slotRow['origin'] ?? ''))) === 'campagne_preview') {
+            $row = ce_ensure_article_stub_for_slot($pdo, $resolvedSlotId);
+        }
+    }
+    if (!$row) {
         ce_json_error('Article not found', 404);
     }
 
+    $schrijfvormChanged = ce_article_patch_changes_schrijfvorm($row, $body);
     ce_apply_article_patch($pdo, (string) $row['id'], $body);
     $updated = ce_fetch_article_for_api($pdo, (string) ($row['id'] ?? $slotId));
     if (!$updated) {
         ce_json_error('Article not found', 404);
     }
-    ce_json_response(ce_build_article_api_payload($pdo, $updated));
+    $payload = ce_build_article_api_payload($pdo, $updated);
+
+    if ($schrijfvormChanged) {
+        require_once __DIR__ . '/fastlane-repository.php';
+        $rewriteSlotId = trim((string) ($updated['slot_id'] ?? ''));
+        if ($rewriteSlotId === '') {
+            $rewriteSlotId = ce_resolve_article_route_slot_id($pdo, $slotId) ?? $slotId;
+        }
+        $rewrite = ce_start_article_ce03_rewrite($pdo, $rewriteSlotId, $updated);
+        if (($rewrite['ok'] ?? false) === true) {
+            $payload['writing'] = true;
+            $payload['writingPending'] = true;
+        } elseif ((int) ($rewrite['http'] ?? 0) === 503) {
+            ce_json_error((string) ($rewrite['error'] ?? 'CE-03 kon niet worden gestart.'), 503);
+        }
+    }
+
+    ce_json_response($payload);
 }
 
 ce_json_error('Method not allowed', 405);

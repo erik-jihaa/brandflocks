@@ -9,8 +9,9 @@ import { SaveNotice } from '../../components/ui/SaveNotice'
 import { useSaveNotice } from '../../hooks/useSaveNotice'
 import { usePlatformData } from '../../components/platform/PlatformDataContext'
 import { createPlatformTenant } from '../../api/platform'
+import { DEFAULT_REVIEWER_EMAIL } from '../../config/installContact'
 
-const ERIK_REVIEWER_EMAIL = 'erik@igisnext.com'
+const ERIK_REVIEWER_EMAIL = DEFAULT_REVIEWER_EMAIL
 
 export function PlatformCreateTenantView() {
   const navigate = useNavigate()

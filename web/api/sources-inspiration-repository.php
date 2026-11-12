@@ -285,7 +285,7 @@ function ce_sources_inspiration_build_prompt(
     $invalshoeken = ce_sources_inspiration_allowed_invalshoeken();
 
     $prompt = <<<PROMPT
-Je bent content-strateeg voor de Content Engine. Stel {{REQUEST_COUNT}} nieuwe research-sources voor die passen bij dit merk.
+Je bent content-strateeg voor Brandflocks. Stel {{REQUEST_COUNT}} nieuwe research-sources voor die passen bij dit merk.
 
 ## Bestaande sources
 {{EXISTING_SOURCES}}
@@ -618,7 +618,7 @@ function ce_sources_inspiration_build_claim_prompt(
     array $hba,
     string $claimContext,
 ): string {
-    return "Je bent content-strateeg voor de Content Engine. Een artikel doet een claim die niet goed onderbouwd is.\n\n"
+    return "Je bent content-strateeg voor Brandflocks. Een artikel doet een claim die niet goed onderbouwd is.\n\n"
         . "## Claim in het artikel\n"
         . $claimContext
         . "\n\n## Bestaande sources\n"

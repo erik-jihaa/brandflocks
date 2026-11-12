@@ -38,6 +38,13 @@ function li_config(string $key, mixed $default = null): mixed
     return $LI_CONFIG[$key] ?? $default;
 }
 
+function li_product_name(): string
+{
+    $name = trim((string) li_config('product_name', 'Brandflocks'));
+
+    return $name !== '' ? $name : 'Brandflocks';
+}
+
 function li_pdo(): PDO
 {
     static $pdo = null;
@@ -114,7 +121,7 @@ function li_platform_logo_path(): string
 function li_brand_logo(string $extraClass = ''): void
 {
     $class = trim('platform-logo ' . $extraClass);
-    echo '      <img src="' . li_h(li_platform_logo_path()) . '" alt="iGiSNext" class="' . li_h($class) . '">' . "\n";
+    echo '      <img src="' . li_h(li_platform_logo_path()) . '" alt="' . li_h(li_product_name()) . '" class="' . li_h($class) . '">' . "\n";
 }
 
 function li_is_logged_in(): bool

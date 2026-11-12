@@ -2,19 +2,14 @@
 # Werk een bestaande tenant bij via POST /api/admin/update-client
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-if [[ ! -f "$ROOT/.env" ]]; then
-  echo "Missing $ROOT/.env" >&2
-  exit 1
-fi
-
 # shellcheck disable=SC1091
-set -a
-source "$ROOT/.env"
-set +a
+source "$ROOT/scripts/ce-env.sh"
 
-BASE_URL="${CE_PUBLIC_BASE_URL:-https://ce.igisnext.com}"
-TOKEN="${CE_RESET_TOKEN:-}"
+TARGET_ENV="${3:-}"
+ENV_FILE="$(ce_env_file "$ROOT" "$TARGET_ENV")"
+BASE_URL="$(ce_env_value "$ENV_FILE" CE_PUBLIC_BASE_URL)"
+BASE_URL="${BASE_URL:-https://app.brandflocks.nl}"
+TOKEN="$(ce_env_value "$ENV_FILE" CE_RESET_TOKEN)"
 CLIENT_ID="${1:-}"
 JSON="${2:-}"
 

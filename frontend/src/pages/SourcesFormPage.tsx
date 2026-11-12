@@ -14,14 +14,12 @@ import {
   checkSource,
   createSource,
   deleteSource,
-  discoverAsanaProjects,
   fetchSource,
   fetchAllSources,
   fetchAnalyticsOAuthStatus,
   fetchCalendarList,
   fetchCalendarOAuthStatus,
   fetchDriveOAuthStatus,
-  fetchTrelloBoards,
   startAnalyticsOAuth,
   startCalendarOAuth,
   startDriveOAuth,
@@ -69,10 +67,6 @@ export function SourcesFormPage() {
     clear: clearActionNotice,
   } = useActionNotice()
 
-  const [trelloBoards, setTrelloBoards] = useState<Array<{ id: string; name: string; url: string }>>([])
-  const [trelloBoardsNote, setTrelloBoardsNote] = useState<string | null>(null)
-  const [loadingTrelloBoards, setLoadingTrelloBoards] = useState(false)
-
   const [analyticsOAuthConfigured, setAnalyticsOAuthConfigured] = useState(true)
   const [analyticsOAuthNote, setAnalyticsOAuthNote] = useState<string | null>(null)
 
@@ -81,11 +75,6 @@ export function SourcesFormPage() {
   const [calendarOptions, setCalendarOptions] = useState<Array<{ id: string; name: string; primary?: boolean }>>([])
   const [calendarOptionsNote, setCalendarOptionsNote] = useState<string | null>(null)
   const [loadingCalendarOptions, setLoadingCalendarOptions] = useState(false)
-  const [asanaProjects, setAsanaProjects] = useState<
-    Array<{ gid: string; name: string; workspaceGid: string; workspaceName: string }>
-  >([])
-  const [asanaProjectsNote, setAsanaProjectsNote] = useState<string | null>(null)
-  const [loadingAsanaProjects, setLoadingAsanaProjects] = useState(false)
   const [driveOAuthConfigured, setDriveOAuthConfigured] = useState(true)
   const [driveOAuthNote, setDriveOAuthNote] = useState<string | null>(null)
   const [pendingDocumentFile, setPendingDocumentFile] = useState<File | null>(null)
@@ -245,6 +234,10 @@ export function SourcesFormPage() {
 
     void fetchSource(sourceId)
       .then((source) => {
+        if (String(source.category) === 'Trello') {
+          navigate('/sources', { replace: true })
+          return
+        }
         setSourceMeta(source)
         setCategory(source.category)
         setForm(sourceDtoToFormValues(source))
@@ -253,7 +246,7 @@ export function SourcesFormPage() {
         setError(err instanceof Error ? err.message : 'Bron laden mislukt')
       })
       .finally(() => setLoading(false))
-  }, [isEdit, sourceId])
+  }, [isEdit, sourceId, navigate])
 
   useEffect(() => {
     if (!isApiConfigured()) return
@@ -261,19 +254,6 @@ export function SourcesFormPage() {
       .then((data) => setFolders(data.folders ?? []))
       .catch(() => setFolders([]))
   }, [])
-
-  useEffect(() => {
-    if (activeCategory !== 'Trello' || !isApiConfigured()) return
-
-    setLoadingTrelloBoards(true)
-    void fetchTrelloBoards()
-      .then((data) => {
-        setTrelloBoards(data.boards)
-        setTrelloBoardsNote(data.configured ? null : data.note ?? null)
-      })
-      .catch(() => setTrelloBoardsNote('Trello boards laden mislukt'))
-      .finally(() => setLoadingTrelloBoards(false))
-  }, [activeCategory])
 
   useEffect(() => {
     if (activeCategory !== 'Analythics' || !isApiConfigured()) return
@@ -333,40 +313,6 @@ export function SourcesFormPage() {
     setSourceMeta(created)
     navigate(`/sources/${created.id}/edit`, { replace: true })
     return created.id
-  }
-
-  async function handleDiscoverAsana() {
-    if (!isApiConfigured()) return
-    const pat = form.asanaPatRef.trim()
-    if (!pat && !sourceMeta?.asanaPatConfigured) {
-      setAsanaProjectsNote('Vul eerst een Asana Personal Access Token in.')
-      return
-    }
-
-    setLoadingAsanaProjects(true)
-    setAsanaProjectsNote(null)
-    try {
-      if (isEdit && sourceId && pat) {
-        await updateSource(sourceId, { asanaPatRef: pat })
-      }
-      const data = await discoverAsanaProjects(pat, isEdit && sourceId ? sourceId : undefined)
-      const projects = Array.isArray(data.projects) ? data.projects : []
-      setAsanaProjects(
-        projects.map((project) => ({
-          gid: String(project.gid),
-          name: String(project.name),
-          workspaceGid: String(project.workspaceGid ?? ''),
-          workspaceName: String(project.workspaceName ?? ''),
-        })),
-      )
-      if (projects.length === 0) {
-        setAsanaProjectsNote('Geen projecten gevonden voor dit token.')
-      }
-    } catch (err) {
-      setAsanaProjectsNote(err instanceof Error ? err.message : 'Asana-projecten laden mislukt')
-    } finally {
-      setLoadingAsanaProjects(false)
-    }
   }
 
   async function handleConnectGoogleDrive() {
@@ -628,9 +574,6 @@ export function SourcesFormPage() {
                   onCancel={() => navigate('/sources')}
                   submitLabel="Submit"
                   busy={busy}
-                  trelloBoards={trelloBoards.map(({ id, name }) => ({ id, name }))}
-                  loadingTrelloBoards={loadingTrelloBoards}
-                  trelloBoardsNote={trelloBoardsNote}
                   analyticsOAuthConnected={sourceMeta?.analyticsOAuthConnected ?? false}
                   analyticsOAuthEmail={sourceMeta?.analyticsOAuthEmail}
                   analyticsOAuthConfigured={analyticsOAuthConfigured}
@@ -649,11 +592,6 @@ export function SourcesFormPage() {
                   scraperLinkedinPasswordConfigured={
                     sourceMeta?.scraperLinkedinPasswordConfigured ?? false
                   }
-                  asanaProjects={asanaProjects}
-                  loadingAsanaProjects={loadingAsanaProjects}
-                  asanaProjectsNote={asanaProjectsNote}
-                  asanaPatConfigured={sourceMeta?.asanaPatConfigured ?? false}
-                  onDiscoverAsana={() => void handleDiscoverAsana()}
                   driveOAuthConnected={sourceMeta?.driveOAuthConnected ?? false}
                   driveOAuthEmail={sourceMeta?.driveOAuthEmail}
                   driveOAuthConfigured={driveOAuthConfigured}

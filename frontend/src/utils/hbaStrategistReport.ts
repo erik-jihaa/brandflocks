@@ -1,5 +1,7 @@
 /** Plain-text merkarchitectuur-rapport voor HBA-strateeg mailto (Hero Brands meelezen). */
 
+import { DEFAULT_SUPPORT_EMAIL } from '../config/installContact'
+
 export type HbaStrategistReportInput = {
   companyName: string
   clientId?: string | null
@@ -98,5 +100,5 @@ export function buildHbaStrategistMailto(input: HbaStrategistReportInput): strin
   const company = input.companyName.trim() || 'tenant'
   const subject = encodeURIComponent(`Merkstrateeg gevraagd — ${company}`)
   const body = encodeURIComponent(buildHbaStrategistReport(input))
-  return `mailto:support@igisnext.com?subject=${subject}&body=${body}`
+  return `mailto:${DEFAULT_SUPPORT_EMAIL}?subject=${subject}&body=${body}`
 }

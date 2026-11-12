@@ -549,12 +549,11 @@ export function ResearchPage() {
     }
 
     setThemeFitLoading(true)
-    const slotArg = activeThemeId ? undefined : activeSlotId
-    void fetchThemeVerdicts(undefined, activeThemeId || undefined, slotArg)
+    void fetchThemeVerdicts(undefined, activeThemeId || undefined, activeSlotId || undefined)
       .then(applyThemeFit)
       .catch(() => {})
 
-    void runThemeVerdicts(undefined, activeThemeId || undefined, slotArg)
+    void runThemeVerdicts(undefined, activeThemeId || undefined, activeSlotId || undefined)
       .then(applyThemeFit)
       .catch(() => {})
       .finally(() => {

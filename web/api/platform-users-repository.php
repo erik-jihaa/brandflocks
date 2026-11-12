@@ -26,7 +26,7 @@ function ce_ensure_platform_users_schema(PDO $pdo): void
         return;
     }
 
-    $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_platform_users_table.sql';
+    $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_platform_users_table.sql';
     if (is_readable($migration)) {
         try {
             $pdo->exec((string) file_get_contents($migration));

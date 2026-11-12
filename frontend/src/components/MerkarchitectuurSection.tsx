@@ -33,15 +33,23 @@ import {
 } from './HbaArchitectureCheckPanel'
 
 const STEPS = [
-  { title: 'Wie jullie zijn en in welke markt' },
-  { title: 'Wat jullie willen bereiken' },
-  { title: 'Wat maakt jullie anders' },
-  { title: 'Wat jullie nooit over jezelf willen lezen' },
-  { title: 'Jullie regels' },
-  { title: 'Jullie merkstem' },
-  { title: 'Welke voelt als jullie' },
+  { title: 'Wie je bent en in welke markt' },
+  { title: 'Wat je wilt bereiken' },
+  { title: 'Wat je anders maakt' },
+  { title: 'Wat je nooit over jezelf wilt lezen' },
+  { title: 'Je regels' },
+  { title: 'Je merkstem' },
+  { title: 'Wat voelt als jouw merk' },
   { title: 'Bevestigen' },
 ] as const
+
+const WIZARD_ENTRY_STORAGE_KEY = 'ce-merkarchitectuur-wizard-entry'
+
+type WizardEntryMode = 'structuur' | 'vragen'
+
+type OverviewEditPanel = 'wie' | 'hoe' | 'taal' | 'voorbeelden'
+
+type StructuurWizardPhase = 'stappen' | 'bevestigen'
 
 type ExampleTriple = [string, string, string]
 
@@ -165,6 +173,36 @@ function contextprofielLabel(value: string): string {
   return HBA_CONTEXT_PROFILES.find((profile) => profile.value === value)?.label ?? ''
 }
 
+function readWizardEntryMode(): WizardEntryMode {
+  try {
+    const raw = localStorage.getItem(WIZARD_ENTRY_STORAGE_KEY)
+    if (raw === 'vragen' || raw === 'structuur') return raw
+  } catch {
+    /* ignore */
+  }
+  return 'structuur'
+}
+
+function writeWizardEntryMode(mode: WizardEntryMode): void {
+  try {
+    localStorage.setItem(WIZARD_ENTRY_STORAGE_KEY, mode)
+  } catch {
+    /* ignore */
+  }
+}
+
+function cloneWizardDraft(source: WizardDraft): WizardDraft {
+  return {
+    ...source,
+    regels: [...source.regels],
+    goedeVoorbeelden: [...source.goedeVoorbeelden] as ExampleTriple,
+    zwakkeVoorbeelden: [...source.zwakkeVoorbeelden] as ExampleTriple,
+    kernformuleringen: [...source.kernformuleringen],
+  }
+}
+
+const overviewDimClass = 'opacity-45 pointer-events-none transition-opacity'
+
 /**
  * Merkidentiteit mét HBA — gelicentieerd IP van Hero Brands, daarom één
  * afgebakende component. Twee toestanden: leeg → acht stappen, ingevuld → overzicht.
@@ -205,6 +243,33 @@ export function MerkarchitectuurSection() {
   const [confirmVoorbeeldPicks, setConfirmVoorbeeldPicks] = useState<HbaVoorbeeldSuggestionPick[]>([])
   const [narrativeCompleteness, setNarrativeCompleteness] = useState<BrandNarrativeCompleteness | null>(null)
   const scoringFieldsEnriched = useRef(false)
+
+  const [wizardEntryMode, setWizardEntryMode] = useState<WizardEntryMode>(() => readWizardEntryMode())
+  const [structuurWizardPhase, setStructuurWizardPhase] = useState<StructuurWizardPhase>('stappen')
+  const [overviewEditing, setOverviewEditing] = useState<OverviewEditPanel | null>(null)
+  const [overviewEditBuffer, setOverviewEditBuffer] = useState<WizardDraft | null>(null)
+  const structuurScrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    writeWizardEntryMode(wizardEntryMode)
+  }, [wizardEntryMode])
+
+  const showStructuurScroll =
+    flowMode === 'wizard' &&
+    wizardEntryMode === 'structuur' &&
+    structuurWizardPhase === 'stappen' &&
+    !recalibrating
+
+  useEffect(() => {
+    if (showStructuurScroll && structuurScrollRef.current) {
+      structuurScrollRef.current.scrollTop = 0
+    }
+  }, [showStructuurScroll])
+
+  const overviewPanelDimmed = useCallback(
+    (panel: OverviewEditPanel) => overviewEditing !== null && overviewEditing !== panel,
+    [overviewEditing],
+  )
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -272,6 +337,15 @@ export function MerkarchitectuurSection() {
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    if (loading || flowMode !== 'overview') {
+      return
+    }
+    void runArchitectureCheckForDraft(draft)
+    // Alleen bij binnenkomst overzicht — niet bij elke wijziging; Opslaan haalt de check opnieuw op.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, flowMode])
 
   useEffect(() => {
     if (loading || flowMode !== 'overview' || scoringFieldsEnriched.current) {
@@ -401,6 +475,38 @@ export function MerkarchitectuurSection() {
     }
   }
 
+  /** Zelfde als ensureBrancheResolved, maar zonder laadstatus — voor stille saves (overzicht). */
+  async function resolveBrancheQuiet(currentDraft: WizardDraft): Promise<WizardDraft> {
+    const input = currentDraft.brancheInput.trim()
+    if (input === '') {
+      return currentDraft
+    }
+    const exact = branches.find((branch) => branch.label.toLowerCase() === input.toLowerCase())
+    if (exact) {
+      return { ...currentDraft, brancheCode: exact.code, brancheInput: exact.label }
+    }
+    const result = await resolveHbaBranche({
+      brancheNaam: input,
+      brancheCode: currentDraft.brancheCode || undefined,
+    })
+    if (!result.ok || !result.branch) {
+      throw new Error(result.error ?? 'Branche kon niet worden afgeleid')
+    }
+    if (result.derived) {
+      setBranches((prev) => {
+        if (prev.some((branch) => branch.code === result.branch!.code)) {
+          return prev
+        }
+        return [...prev, result.branch!].sort((a, b) => a.label.localeCompare(b.label, 'nl'))
+      })
+    }
+    return {
+      ...currentDraft,
+      brancheCode: result.branch.code,
+      brancheInput: result.branch.label,
+    }
+  }
+
   async function ensureBrancheResolved(currentDraft: WizardDraft): Promise<WizardDraft> {
     const input = currentDraft.brancheInput.trim()
     if (input === '') {
@@ -468,44 +574,6 @@ export function MerkarchitectuurSection() {
     }),
     [draft.archetype, draft.doel, draft.foe, draft.distinctiviteit, draft.watBewustNiet, draft.regels],
   )
-
-  const overviewExamplesDirty = useMemo(() => {
-    const savedGood = narrative.goedeVoorbeelden ?? emptyExamples()
-    const savedWeak = narrative.zwakkeVoorbeelden ?? emptyExamples()
-    return (
-      draft.goedeVoorbeelden.some((value, index) => value.trim() !== (savedGood[index] ?? '').trim()) ||
-      draft.zwakkeVoorbeelden.some((value, index) => value.trim() !== (savedWeak[index] ?? '').trim())
-    )
-  }, [draft.goedeVoorbeelden, draft.zwakkeVoorbeelden, narrative.goedeVoorbeelden, narrative.zwakkeVoorbeelden])
-
-  const overviewKernDirty = useMemo(() => {
-    const saved = (narrative.kernformuleringen ?? []).map((s) => s.trim()).filter(Boolean)
-    const current = draft.kernformuleringen.map((s) => s.trim()).filter(Boolean)
-    if (saved.length !== current.length) {
-      return true
-    }
-    return current.some((value, index) => value !== (saved[index] ?? ''))
-  }, [draft.kernformuleringen, narrative.kernformuleringen])
-
-  const overviewWordsDirty = useMemo(() => {
-    const listsEqual = (saved: string[], currentInput: string) => {
-      const current = parseWordListInput(currentInput)
-      const a = saved.map((s) => s.trim()).filter(Boolean)
-      if (a.length !== current.length) return true
-      return current.some((value, index) => value !== (a[index] ?? ''))
-    }
-    return (
-      listsEqual(narrative.woordenDiePassen ?? [], draft.woordenDiePassenInput) ||
-      listsEqual(narrative.woordenDieNietPassen ?? [], draft.woordenDieNietPassenInput)
-    )
-  }, [
-    draft.woordenDiePassenInput,
-    draft.woordenDieNietPassenInput,
-    narrative.woordenDiePassen,
-    narrative.woordenDieNietPassen,
-  ])
-
-  const overviewDirty = overviewExamplesDirty || overviewKernDirty || overviewWordsDirty
 
   function buildNarrativePayload(currentDraft: WizardDraft): BrandNarrativeDto {
     const regels = currentDraft.regels.filter(Boolean)
@@ -578,30 +646,43 @@ export function MerkarchitectuurSection() {
     }
   }
 
+  async function fetchArchitectureDerivation(
+    source: WizardDraft,
+    brancheLabelForApi: string,
+  ): Promise<Partial<WizardDraft> | null> {
+    const result = await deriveHbaArchitecture({
+      identityIntro: source.identityIntro,
+      brancheCode: source.brancheCode,
+      brancheLabel: brancheLabelForApi,
+      doel: source.doel,
+      distinctiviteit: source.distinctiviteit,
+      watBewustNiet: source.watBewustNiet,
+      regels: source.regels.filter(Boolean),
+    })
+    if (!result.ok || !result.derivation) {
+      return null
+    }
+    return {
+      archetype: result.derivation?.archetype_voorstel ?? source.archetype,
+      foe: result.derivation?.foe_afgeleid ?? source.foe,
+      toneOfBehaviour: result.derivation?.tone_of_behaviour ?? source.toneOfBehaviour,
+    }
+  }
+
   async function runDerive(): Promise<Partial<WizardDraft> | null> {
     setDeriving(true)
     setDeriveError(null)
-    const result = await deriveHbaArchitecture({
-      identityIntro: draft.identityIntro,
-      brancheCode: draft.brancheCode,
-      brancheLabel,
-      doel: draft.doel,
-      distinctiviteit: draft.distinctiviteit,
-      watBewustNiet: draft.watBewustNiet,
-      regels: draft.regels.filter(Boolean),
-    })
-    setDeriving(false)
-    if (!result.ok || !result.derivation) {
-      setDeriveError(result.error ?? 'Afleiding mislukt')
-      return null
+    try {
+      const updates = await fetchArchitectureDerivation(draft, brancheLabel)
+      if (!updates) {
+        setDeriveError('Afleiding mislukt')
+        return null
+      }
+      setDraft((d) => ({ ...d, ...updates }))
+      return updates
+    } finally {
+      setDeriving(false)
     }
-    const updates = {
-      archetype: result.derivation?.archetype_voorstel ?? draft.archetype,
-      foe: result.derivation?.foe_afgeleid ?? draft.foe,
-      toneOfBehaviour: result.derivation?.tone_of_behaviour ?? draft.toneOfBehaviour,
-    }
-    setDraft((d) => ({ ...d, ...updates }))
-    return updates
   }
 
   useEffect(() => {
@@ -622,22 +703,10 @@ export function MerkarchitectuurSection() {
       )
       setDraft(draftToSave)
       await persistDraft({ complete: true, draftOverride: draftToSave })
+      setOverviewEditing(null)
+      setOverviewEditBuffer(null)
       setFlowMode('overview')
       void load()
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Opslaan mislukt'
-      setDraftSaveError(message)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function saveOverviewExamples() {
-    setSaving(true)
-    clearNotice()
-    setDraftSaveError(null)
-    try {
-      await persistDraft()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Opslaan mislukt'
       setDraftSaveError(message)
@@ -691,6 +760,38 @@ export function MerkarchitectuurSection() {
     }
   }
 
+  async function advanceStructuurToConfirm() {
+    setDeriveError(null)
+    setBrancheResolveError(null)
+    try {
+      let draftForSave = draft
+      draftForSave = await ensureBrancheResolved(draftForSave)
+      setDraft(draftForSave)
+      const brancheNameForApi =
+        draftForSave.brancheInput.trim() ||
+        branches.find((b) => b.code === draftForSave.brancheCode)?.label?.trim() ||
+        ''
+      if (!draftForSave.archetype.trim()) {
+        const updates = await fetchArchitectureDerivation(draftForSave, brancheNameForApi)
+        if (updates) {
+          draftForSave = { ...draftForSave, ...updates }
+          setDraft(draftForSave)
+        } else {
+          setDeriveError('Afleiding mislukt — kies een archetype bij stap 6 of probeer opnieuw.')
+          setDraftSaveError('Persoonlijkheid kon niet worden afgeleid.')
+          return
+        }
+      }
+      await persistDraft({ silent: true, draftOverride: draftForSave })
+      setStructuurWizardPhase('bevestigen')
+      setStep(7)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Opslaan mislukt'
+      setBrancheResolveError(err instanceof Error ? err.message : null)
+      setDraftSaveError(message)
+    }
+  }
+
   function startRecalibration() {
     clearNotice()
     setDraftSaveError(null)
@@ -717,6 +818,8 @@ export function MerkarchitectuurSection() {
     }))
     setRecalibrating(false)
     setFlowMode('overview')
+    setOverviewEditing(null)
+    setOverviewEditBuffer(null)
   }
 
   async function finishRecalibration() {
@@ -727,6 +830,8 @@ export function MerkarchitectuurSection() {
       await persistDraft()
       setRecalibrating(false)
       setFlowMode('overview')
+      setOverviewEditing(null)
+      setOverviewEditBuffer(null)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Opslaan mislukt'
       setDraftSaveError(message)
@@ -756,214 +861,1001 @@ export function MerkarchitectuurSection() {
     })
   }
 
+  function beginOverviewEdit(panel: OverviewEditPanel) {
+    setOverviewEditing(panel)
+    setOverviewEditBuffer(cloneWizardDraft(draft))
+    setDraftSaveError(null)
+    clearNotice()
+  }
+
+  function cancelOverviewEdit() {
+    setOverviewEditing(null)
+    setOverviewEditBuffer(null)
+  }
+
+  function patchOverviewBuffer(updater: (current: WizardDraft) => WizardDraft) {
+    setOverviewEditBuffer((prev) => (prev ? updater(prev) : null))
+  }
+
+  function overviewWieBufferDirty(buf: WizardDraft): boolean {
+    const a = buf.regels.filter(Boolean)
+    const b = draft.regels.filter(Boolean)
+    if (a.length !== b.length) return true
+    if (a.some((rule, i) => rule !== (b[i] ?? ''))) return true
+    return (
+      buf.identityIntro !== draft.identityIntro ||
+      buf.brancheCode !== draft.brancheCode ||
+      buf.brancheInput !== draft.brancheInput ||
+      buf.contextprofiel !== draft.contextprofiel ||
+      buf.doel !== draft.doel ||
+      buf.distinctiviteit !== draft.distinctiviteit ||
+      buf.watBewustNiet !== draft.watBewustNiet ||
+      buf.archetype !== draft.archetype ||
+      buf.foe !== draft.foe ||
+      buf.toneOfBehaviour !== draft.toneOfBehaviour ||
+      buf.aanspreekvorm !== draft.aanspreekvorm
+    )
+  }
+
+  function overviewHoeBufferDirty(buf: WizardDraft): boolean {
+    const a = buf.kernformuleringen.map((s) => s.trim())
+    const b = draft.kernformuleringen.map((s) => s.trim())
+    if (a.length !== b.length) return true
+    return a.some((line, i) => line !== (b[i] ?? ''))
+  }
+
+  function overviewTaalBufferDirty(buf: WizardDraft): boolean {
+    return (
+      buf.woordenDiePassenInput !== draft.woordenDiePassenInput ||
+      buf.woordenDieNietPassenInput !== draft.woordenDieNietPassenInput
+    )
+  }
+
+  function overviewVoorbeeldenBufferDirty(buf: WizardDraft): boolean {
+    return (
+      buf.goedeVoorbeelden.some((v, i) => v.trim() !== (draft.goedeVoorbeelden[i] ?? '').trim()) ||
+      buf.zwakkeVoorbeelden.some((v, i) => v.trim() !== (draft.zwakkeVoorbeelden[i] ?? '').trim())
+    )
+  }
+
+  function brancheLabelForDraftState(d: WizardDraft): string {
+    return (
+      d.brancheInput.trim() || branches.find((b) => b.code === d.brancheCode)?.label?.trim() || ''
+    )
+  }
+
+  async function saveOverviewPanel(panel: OverviewEditPanel) {
+    const buf = overviewEditBuffer
+    if (!buf) return
+    let dirty = false
+    if (panel === 'wie') dirty = overviewWieBufferDirty(buf)
+    if (panel === 'hoe') dirty = overviewHoeBufferDirty(buf)
+    if (panel === 'taal') dirty = overviewTaalBufferDirty(buf)
+    if (panel === 'voorbeelden') dirty = overviewVoorbeeldenBufferDirty(buf)
+    if (!dirty) {
+      cancelOverviewEdit()
+      return
+    }
+    setSaving(true)
+    clearNotice()
+    setDraftSaveError(null)
+    try {
+      let toSave = buf
+      if (panel === 'wie') {
+        toSave = await resolveBrancheQuiet(buf)
+        if (!toSave.archetype.trim()) {
+          setDeriving(true)
+          setDeriveError(null)
+          try {
+            const derived = await fetchArchitectureDerivation(
+              toSave,
+              brancheLabelForDraftState(toSave),
+            )
+            if (!derived) {
+              setDeriveError('Afleiding mislukt')
+              setDraftSaveError(
+                'Persoonlijkheid kon niet worden afgeleid — kies een archetype of probeer opnieuw.',
+              )
+              return
+            }
+            toSave = { ...toSave, ...derived }
+          } finally {
+            setDeriving(false)
+          }
+        }
+      }
+      setDraft(toSave)
+      await persistDraft({ draftOverride: toSave })
+      cancelOverviewEdit()
+      void runArchitectureCheckForDraft(toSave)
+      showNotice('Opgeslagen.')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Opslaan mislukt'
+      setDraftSaveError(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) {
     return <p className="m-0 text-[14px] leading-[18px] text-ce-beige">Laden…</p>
   }
 
   const scoringReady = narrativeCompleteness?.complete ?? false
   const missingForScoring = narrativeCompleteness?.missing ?? []
+  const filledRegels = draft.regels.filter((r) => r.trim())
+  const hoofdregel = filledRegels[0] ?? ''
+  const subregels = filledRegels.slice(1)
+  const marktArchetypeLabel = selectedBranch?.marktArchetype?.trim() ?? ''
 
   if (flowMode === 'overview') {
-    return (
-      <section className={`${designStackClass} ${borderedSectionClass}`}>
-        {scoringReady ? (
-          <p className="m-0 text-[14px] leading-[18px] text-ce-black">Jullie merkarchitectuur staat — merkcontrole op artikelen kan draaien.</p>
-        ) : (
-          <div className="rounded-[12px] bg-ce-pink px-[12px] py-[10px]">
-            <p className="m-0 text-[14px] font-semibold leading-[18px] text-ce-red">
-              Basis staat, maar scoring op artikelen kan nog niet.
-            </p>
-            {missingForScoring.length > 0 ? (
-              <p className="m-0 pt-[6px] text-[14px] leading-[18px] text-ce-black">
-                Ontbreekt nog: {missingForScoring.map(hbaNarrativeFieldLabel).join(', ')}.
-              </p>
-            ) : null}
-            <p className="m-0 pt-[6px] text-[14px] leading-[18px] text-ce-black">
-              Vul onderstaande secties aan (vooral{' '}
-              <a href="#grenzen-taal" className="font-semibold text-ce-blue underline">
-                Grenzen &amp; taal
-              </a>
-              ) en sla op.
-            </p>
-          </div>
-        )}
-        <RichTextDisplay
-          text={`**Wie jullie zijn:** ${draft.identityIntro || '—'}\n\n**Wat jullie willen bereiken:** ${draft.doel}\n\n**Waar jullie tegen vechten:** ${draft.foe}\n\n**Wat jullie nooit over jezelf willen lezen:** ${draft.watBewustNiet}\n\n**Jullie regels:** ${draft.regels.filter(Boolean).join('; ')}`}
-        />
+    const wieJeBentRichText = `**Rol:** ${draft.identityIntro || '—'}
 
-        <StrategySection
-          title="Mechanisme & bewijs"
-          hint="Drie tot vijf zinnen die de kern van je mechanisme in gewone woorden zeggen. Deze komen bewust terug in je content, in steeds andere onderwerpen."
-          hintTone="black"
-          filled={draft.kernformuleringen.some((line) => line.trim() !== '')}
-        >
-          <div className={borderedSectionStackClass}>
-            {draft.kernformuleringen.map((line, index) => (
-              <StrategyField
-                key={`kern-${index}`}
-                id={`overview-kern-${index}`}
-                title={index === 0 ? 'Hoe jullie werken' : `Hoe jullie werken (${index + 1})`}
-                documentSuggestion={docSuggestions?.kernformuleringen?.[index] ?? undefined}
-                value={line}
-                onChange={(v) => {
-                  const next = [...draft.kernformuleringen]
-                  next[index] = v
-                  setDraft((d) => ({ ...d, kernformuleringen: next }))
-                }}
-                minHeight={60}
-              />
-            ))}
-          </div>
-          {draft.kernformuleringen.length < 5 ? (
+**Branche:** ${draft.brancheInput.trim() || '—'}
+
+**Markt-archetype:** ${marktArchetypeLabel || '—'}
+
+**Doel:** ${draft.doel || '—'}
+
+**Tegenkracht:** ${draft.foe || '—'}
+
+**Wat je bewust niet doet:** ${draft.watBewustNiet || '—'}
+
+**Persoonlijkheid:** ${draft.archetype || '—'}
+
+**Toon:** ${draft.toneOfBehaviour || '—'}
+
+**Hoofdregel:** ${hoofdregel || '—'}
+
+**Subregels:** ${
+      subregels.length > 0 ? subregels.map((r, i) => `${i + 1}. ${r}`).join('\n') : '—'
+    }`
+
+    const buf = overviewEditBuffer
+    const editWieBranch =
+      buf && overviewEditing === 'wie'
+        ? branches.find((b) => b.code === buf.brancheCode) ?? null
+        : null
+    const editWieMarktArchetype = editWieBranch?.marktArchetype?.trim() ?? ''
+    const overviewHintBlack = 'm-0 mt-[8px] text-[14px] leading-[18px] text-ce-black'
+
+    return (
+      <div className={designStackClass}>
+        <section className={borderedSectionClass}>
+          {scoringReady ? (
+            <p className="m-0 text-[14px] leading-[18px] text-ce-black">
+              Je merkarchitectuur staat — merkcontrole op artikelen kan draaien.
+            </p>
+          ) : (
+            <div className="rounded-[12px] bg-ce-pink px-[12px] py-[10px]">
+              <p className="m-0 text-[14px] font-semibold leading-[18px] text-ce-red">
+                Basis staat, maar scoring op artikelen kan nog niet.
+              </p>
+              {missingForScoring.length > 0 ? (
+                <p className="m-0 pt-[6px] text-[14px] leading-[18px] text-ce-black">
+                  Ontbreekt nog: {missingForScoring.map(hbaNarrativeFieldLabel).join(', ')}.
+                </p>
+              ) : null}
+              <p className="m-0 pt-[6px] text-[14px] leading-[18px] text-ce-black">
+                Vul onderstaande secties aan (vooral{' '}
+                <a href="#blk-taal" className="font-semibold text-ce-blue underline">
+                  Taal
+                </a>
+                ) en sla op.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className={borderedSectionClass}>
+          <h3 className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">
+            Wie je bent — hoe wil je het invullen?
+          </h3>
+          <p className={overviewHintBlack}>
+            Heb je je Story Triangle (rol, doel, tegenkracht, regel) al scherp? Vul dan je structuur direct
+            in. Weet je dat nog niet precies, dan helpen acht simpele vragen je om het op te bouwen — zonder dat
+            je de hele HBA-theorie hoeft te kennen.
+          </p>
+          <div className="mt-[18px] grid gap-[12px] sm:grid-cols-2">
             <button
               type="button"
-              className="self-start border-0 bg-transparent text-[14px] font-semibold text-ce-blue underline"
-              onClick={() =>
-                setDraft((d) => ({
-                  ...d,
-                  kernformuleringen: [...d.kernformuleringen, ''],
-                }))
-              }
+              onClick={() => {
+                cancelOverviewEdit()
+                setWizardEntryMode('structuur')
+                setStructuurWizardPhase('stappen')
+                setFlowMode('wizard')
+                setStep(0)
+                setRecalibrating(false)
+              }}
+              className={`rounded-[14px] border px-[16px] py-[14px] text-left transition-colors ${
+                wizardEntryMode === 'structuur'
+                  ? 'border-ce-blue bg-ce-pink'
+                  : 'border-ce-beige bg-ce-offwhite hover:border-ce-blue'
+              }`}
             >
-              + Voeg formulering toe
+              <p className="m-0 text-[15px] font-semibold text-ce-black">Vul structuur in</p>
+              <p className="m-0 mt-[6px] text-[14px] leading-[18px] text-ce-beige">
+                Alleen als je het al helder hebt — alles op één scherm, daarna bevestigen.
+              </p>
             </button>
-          ) : null}
-        </StrategySection>
-
-        <StrategySection
-          id="grenzen-taal"
-          title="Grenzen & taal"
-          hint="Minimaal drie woorden of korte zinnen per lijst, gescheiden door komma's. Zonder deze lijsten kan merkcontrole op artikelen niet draaien."
-          hintTone="black"
-          filled={
-            parseWordListInput(draft.woordenDiePassenInput).length >= 3 &&
-            parseWordListInput(draft.woordenDieNietPassenInput).length >= 3
-          }
-        >
-          <div className={borderedSectionStackClass}>
-            <StrategyField
-              id="overview-woorden-passen"
-              title="Woorden die passen"
-              hint="Minimaal drie items. Scheid woorden met komma's."
-              value={draft.woordenDiePassenInput}
-              onChange={(v) => setDraft((d) => ({ ...d, woordenDiePassenInput: v }))}
-              minHeight={72}
-              placeholder="backcasting, uitvoerbaar, bouwen, onvermijdelijk"
-            />
-            <StrategyField
-              id="overview-woorden-niet-passen"
-              title="Woorden die niet passen"
-              hint="Minimaal drie items. Scheid woorden met komma's."
-              value={draft.woordenDieNietPassenInput}
-              onChange={(v) => setDraft((d) => ({ ...d, woordenDieNietPassenInput: v }))}
-              minHeight={72}
-              placeholder="rapport, theoretisch, synergy, best practice"
-            />
+            <button
+              type="button"
+              onClick={() => {
+                cancelOverviewEdit()
+                setWizardEntryMode('vragen')
+                setStructuurWizardPhase('stappen')
+                setFlowMode('wizard')
+                setStep(0)
+                setRecalibrating(false)
+              }}
+              className={`rounded-[14px] border px-[16px] py-[14px] text-left transition-colors ${
+                wizardEntryMode === 'vragen'
+                  ? 'border-ce-blue bg-ce-pink'
+                  : 'border-ce-beige bg-ce-offwhite hover:border-ce-blue'
+              }`}
+            >
+              <p className="m-0 text-[15px] font-semibold text-ce-black">Beantwoord de vragen</p>
+              <p className="m-0 mt-[6px] text-[14px] leading-[18px] text-ce-beige">
+                Acht stappen — de app bouwt je architectuur mee op.
+              </p>
+            </button>
           </div>
-        </StrategySection>
+        </section>
 
-        <StrategySection
-          title="Kalibratie-voorbeelden"
-          hint="Deze zinnen kalibreren de merkmeting — pas ze aan als iets niet klopt."
-          hintTone="black"
-        >
-          <div className="flex flex-wrap items-start gap-[12px] [&_button]:mb-0">
-            <PillButton type="button" variant="second" onClick={startRecalibration}>
-              Opnieuw kalibreren
+        <div className={`${borderedSectionClass} ${overviewEditing ? overviewDimClass : ''}`}>
+          <div className="flex flex-wrap items-start justify-between gap-[12px]">
+            <h3 className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">Wie je bent</h3>
+            {overviewEditing !== 'wie' ? (
+              <button
+                type="button"
+                className="border-0 bg-transparent p-0 text-[14px] font-semibold text-ce-blue underline"
+                onClick={() => beginOverviewEdit('wie')}
+              >
+                Bewerken
+              </button>
+            ) : null}
+          </div>
+          <p className={overviewHintBlack}>
+            Je identiteit: de Story Triangle (rol, doel, tegenkracht) plus je regel(s). Met mechanisme
+            (hieronder) en regel(s) erbij heet dit je volledige merkarchitectuur.
+          </p>
+          {overviewEditing === 'wie' && buf ? (
+            <>
+              <div className="mt-[18px] space-y-[18px]">
+                <StrategyField
+                  id="overview-wie-identity"
+                  title="Rol"
+                  value={buf.identityIntro}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, identityIntro: v }))}
+                  minHeight={80}
+                />
+                <StrategySection title="Branche" filled={Boolean(buf.brancheInput.trim())}>
+                  <div className="grid gap-[18px]">
+                    <Pulldown
+                      placeholder="— kies uit lijst —"
+                      value={branches.find((branch) => branch.code === buf.brancheCode)?.label ?? ''}
+                      options={branches.map((branch) => branch.label)}
+                      onChange={(label) => {
+                        setBrancheResolveError(null)
+                        const match = branches.find((branch) => branch.label === label)
+                        patchOverviewBuffer((current) => ({
+                          ...current,
+                          brancheInput: label,
+                          brancheCode: match?.code ?? '',
+                        }))
+                      }}
+                    />
+                    <FieldSingle
+                      id="overview-wie-branche-free"
+                      value={
+                        branches.some((branch) => branch.code === buf.brancheCode)
+                          ? ''
+                          : buf.brancheInput
+                      }
+                      placeholder="Of typ je eigen branche"
+                      onChange={(value) => {
+                        setBrancheResolveError(null)
+                        const match = branches.find(
+                          (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
+                        )
+                        patchOverviewBuffer((current) => ({
+                          ...current,
+                          brancheInput: value,
+                          brancheCode: match?.code ?? '',
+                        }))
+                      }}
+                    />
+                  </div>
+                  {editWieBranch?.marktArchetype ? (
+                    <p className="m-0 mt-[10px] text-[14px] leading-[18px] text-ce-black">
+                      Markt-archetype: {editWieMarktArchetype || '—'}
+                      {editWieBranch.bron === 'afgeleid' ? (
+                        <span className="text-ce-beige"> (automatisch afgeleid)</span>
+                      ) : (
+                        <span className="text-ce-beige"> (gecureerd)</span>
+                      )}
+                    </p>
+                  ) : buf.brancheInput.trim() ? (
+                    <p className="m-0 mt-[10px] text-[14px] leading-[18px] text-ce-beige">
+                      Markt-archetype: nog niet vastgelegd voor deze branche.
+                    </p>
+                  ) : null}
+                </StrategySection>
+                <StrategySection title="Waar staat je merk nu?" filled={Boolean(buf.contextprofiel)}>
+                  <Pulldown
+                    value={contextprofielLabel(buf.contextprofiel)}
+                    options={HBA_CONTEXT_PROFILES.map((profile) => profile.label)}
+                    onChange={(label) => {
+                      const match = HBA_CONTEXT_PROFILES.find((profile) => profile.label === label)
+                      patchOverviewBuffer((current) => ({
+                        ...current,
+                        contextprofiel: match?.value ?? current.contextprofiel,
+                      }))
+                    }}
+                  />
+                </StrategySection>
+                <StrategyField
+                  id="overview-wie-doel"
+                  title="Doel"
+                  value={buf.doel}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, doel: v }))}
+                  minHeight={72}
+                />
+                <StrategyField
+                  id="overview-wie-foe"
+                  title="Tegenkracht"
+                  value={buf.foe}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, foe: v }))}
+                  minHeight={72}
+                />
+                <StrategyField
+                  id="overview-wie-distinct"
+                  title="Wat je anders maakt"
+                  value={buf.distinctiviteit}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, distinctiviteit: v }))}
+                  minHeight={72}
+                />
+                <StrategyField
+                  id="overview-wie-niet"
+                  title="Wat je bewust niet doet"
+                  value={buf.watBewustNiet}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, watBewustNiet: v }))}
+                  minHeight={72}
+                />
+                <div className="grid gap-[12px]">
+                  <p className="m-0 text-[14px] font-semibold leading-[18px] text-ce-black">
+                    Regels — eerste regel is je hoofdregel, daarna subregels
+                  </p>
+                  <div className={borderedSectionStackClass}>
+                    {buf.regels.map((rule, index) => (
+                      <StrategyField
+                        key={`overview-wie-regel-${index}`}
+                        id={`overview-wie-regel-${index}`}
+                        title={index === 0 ? 'Hoofdregel' : `Subregel ${index}`}
+                        value={rule}
+                        onChange={(v) => {
+                          patchOverviewBuffer((current) => {
+                            const next = [...current.regels]
+                            next[index] = v
+                            return { ...current, regels: next }
+                          })
+                        }}
+                        minHeight={56}
+                      />
+                    ))}
+                  </div>
+                  {buf.regels.length < 5 ? (
+                    <button
+                      type="button"
+                      className="self-start border-0 bg-transparent text-[14px] font-semibold text-ce-blue underline"
+                      onClick={() =>
+                        patchOverviewBuffer((current) => ({
+                          ...current,
+                          regels: [...current.regels, ''],
+                        }))
+                      }
+                    >
+                      + Subregel toevoegen
+                    </button>
+                  ) : null}
+                </div>
+                <div className={borderedSectionStackClass}>
+                  <StrategyField
+                    id="overview-wie-tone"
+                    title="Je toon"
+                    value={buf.toneOfBehaviour}
+                    onChange={(v) => patchOverviewBuffer((d) => ({ ...d, toneOfBehaviour: v }))}
+                    minHeight={72}
+                  />
+                  <StrategySection title="Aanspreekvorm" filled={Boolean(buf.aanspreekvorm)}>
+                    <Pulldown
+                      value={buf.aanspreekvorm === 'u' ? 'u' : 'je'}
+                      options={['je', 'u']}
+                      onChange={(value) =>
+                        patchOverviewBuffer((d) => ({
+                          ...d,
+                          aanspreekvorm: value === 'u' ? 'u' : 'je',
+                        }))
+                      }
+                    />
+                  </StrategySection>
+                  <StrategySection title="Persoonlijkheid (archetype)" filled={Boolean(buf.archetype)}>
+                    <Pulldown
+                      value={buf.archetype}
+                      options={[...HBA_ARCHETYPES]}
+                      onChange={(value) => patchOverviewBuffer((d) => ({ ...d, archetype: value }))}
+                    />
+                  </StrategySection>
+                </div>
+              </div>
+              <div className={`${pillActionsRowClass} mt-[18px]`}>
+                <PillButton
+                  type="button"
+                  loading={saving || deriving}
+                  disabled={saving || deriving}
+                  onClick={() => void saveOverviewPanel('wie')}
+                >
+                  Opslaan
+                </PillButton>
+                <PillButton
+                  type="button"
+                  variant="second"
+                  disabled={saving || deriving}
+                  onClick={cancelOverviewEdit}
+                >
+                  Annuleren
+                </PillButton>
+              </div>
+            </>
+          ) : (
+            <div className="mt-[18px]">
+              <RichTextDisplay text={wieJeBentRichText} />
+            </div>
+          )}
+        </div>
+
+        <div className={overviewEditing ? overviewDimClass : ''}>
+          <StrategySection
+            title="Hoe sterk staat je architectuur?"
+            hint="Dit wordt automatisch opnieuw bekeken na opslaan — blokkeert niets, maar laat zien waar je architectuur zwakker kan zijn."
+            hintTone="black"
+          >
+            <HbaArchitectureCheckPanel
+              check={architectureCheck}
+              loading={architectureCheckLoading}
+              error={architectureCheckError}
+              onRetry={() => void runArchitectureCheckForDraft(draft)}
+              onStrategist={openStrategistMail}
+              showSummaryHeading={false}
+              selectionMode={false}
+            />
+          </StrategySection>
+        </div>
+
+        <div className={`${borderedSectionClass} ${overviewPanelDimmed('hoe') ? overviewDimClass : ''}`}>
+          <div className="flex flex-wrap items-start justify-between gap-[12px]">
+            <h3 className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">Hoe je werkt</h3>
+            {overviewEditing !== 'hoe' ? (
+              <button
+                type="button"
+                className="border-0 bg-transparent p-0 text-[14px] font-semibold text-ce-blue underline"
+                onClick={() => beginOverviewEdit('hoe')}
+              >
+                Bewerken
+              </button>
+            ) : null}
+          </div>
+          <p className={overviewHintBlack}>
+            Het mechanisme: hoe je regel in de praktijk werkt, met bewijs. Drie tot vijf zinnen die de kern in
+            gewone woorden zeggen — deze komen bewust terug in je content.
+          </p>
+          {overviewEditing === 'hoe' && buf ? (
+            <>
+              <div className="mt-[18px] space-y-[12px]">
+                {buf.kernformuleringen.map((line, index) => (
+                  <StrategyField
+                    key={`overview-kern-edit-${index}`}
+                    id={`overview-kern-edit-${index}`}
+                    title={index === 0 ? 'Formulering 1' : `Formulering ${index + 1}`}
+                    documentSuggestion={docSuggestions?.kernformuleringen?.[index] ?? undefined}
+                    value={line}
+                    onChange={(v) => {
+                      patchOverviewBuffer((current) => {
+                        const next = [...current.kernformuleringen]
+                        next[index] = v
+                        return { ...current, kernformuleringen: next }
+                      })
+                    }}
+                    minHeight={60}
+                  />
+                ))}
+                {buf.kernformuleringen.length < 5 ? (
+                  <button
+                    type="button"
+                    className="self-start border-0 bg-transparent text-[14px] font-semibold text-ce-blue underline"
+                    onClick={() =>
+                      patchOverviewBuffer((current) => ({
+                        ...current,
+                        kernformuleringen: [...current.kernformuleringen, ''],
+                      }))
+                    }
+                  >
+                    + Voeg formulering toe
+                  </button>
+                ) : null}
+              </div>
+              <div className={`${pillActionsRowClass} mt-[18px]`}>
+                <PillButton
+                  type="button"
+                  loading={saving}
+                  disabled={saving}
+                  onClick={() => void saveOverviewPanel('hoe')}
+                >
+                  Opslaan
+                </PillButton>
+                <PillButton type="button" variant="second" disabled={saving} onClick={cancelOverviewEdit}>
+                  Annuleren
+                </PillButton>
+              </div>
+            </>
+          ) : (
+            <div className="mt-[18px] space-y-[8px]">
+              {draft.kernformuleringen.map((line, index) => (
+                <p key={`kern-view-${index}`} className="m-0 text-[14px] leading-[18px] text-ce-black">
+                  <span className="font-semibold">
+                    {index === 0 ? 'Formulering 1' : `Formulering ${index + 1}`}:{' '}
+                  </span>
+                  {line.trim() ? line : '—'}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={`${borderedSectionClass} ${overviewPanelDimmed('taal') ? overviewDimClass : ''}`} id="blk-taal">
+          <div className="flex flex-wrap items-start justify-between gap-[12px]">
+            <h3 className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">Taal</h3>
+            {overviewEditing !== 'taal' ? (
+              <button
+                type="button"
+                className="border-0 bg-transparent p-0 text-[14px] font-semibold text-ce-blue underline"
+                onClick={() => beginOverviewEdit('taal')}
+              >
+                Bewerken
+              </button>
+            ) : null}
+          </div>
+          {overviewEditing === 'taal' && buf ? (
+            <>
+              <div className="mt-[18px] space-y-[12px]">
+                <StrategyField
+                  id="overview-taal-passen"
+                  title="Woorden die passen"
+                  hint="Minimaal drie items. Scheid woorden met komma's."
+                  value={buf.woordenDiePassenInput}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, woordenDiePassenInput: v }))}
+                  minHeight={72}
+                  placeholder="backcasting, uitvoerbaar, bouwen, onvermijdelijk"
+                />
+                <StrategyField
+                  id="overview-taal-niet"
+                  title="Woorden die niet passen"
+                  hint="Minimaal drie items. Scheid woorden met komma's."
+                  value={buf.woordenDieNietPassenInput}
+                  onChange={(v) => patchOverviewBuffer((d) => ({ ...d, woordenDieNietPassenInput: v }))}
+                  minHeight={72}
+                  placeholder="rapport, theoretisch, synergy, best practice"
+                />
+              </div>
+              <div className={`${pillActionsRowClass} mt-[18px]`}>
+                <PillButton
+                  type="button"
+                  loading={saving}
+                  disabled={saving}
+                  onClick={() => void saveOverviewPanel('taal')}
+                >
+                  Opslaan
+                </PillButton>
+                <PillButton type="button" variant="second" disabled={saving} onClick={cancelOverviewEdit}>
+                  Annuleren
+                </PillButton>
+              </div>
+            </>
+          ) : (
+            <div className="mt-[18px] space-y-[8px]">
+              <p className="m-0 text-[14px] leading-[18px] text-ce-black">
+                <span className="font-semibold">Woorden die passen: </span>
+                {parseWordListInput(draft.woordenDiePassenInput).length > 0
+                  ? parseWordListInput(draft.woordenDiePassenInput).join(' · ')
+                  : '—'}
+              </p>
+              <p className="m-0 text-[14px] leading-[18px] text-ce-black">
+                <span className="font-semibold">Woorden die niet passen: </span>
+                {parseWordListInput(draft.woordenDieNietPassenInput).length > 0
+                  ? parseWordListInput(draft.woordenDieNietPassenInput).join(' · ')
+                  : '—'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className={`${borderedSectionClass} ${overviewPanelDimmed('voorbeelden') ? overviewDimClass : ''}`}>
+          <div className="flex flex-wrap items-start justify-between gap-[12px]">
+            <h3 className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">Voorbeelden voor de merkmeting</h3>
+            {overviewEditing !== 'voorbeelden' ? (
+              <button
+                type="button"
+                className="border-0 bg-transparent p-0 text-[14px] font-semibold text-ce-blue underline"
+                onClick={() => beginOverviewEdit('voorbeelden')}
+              >
+                Bewerken
+              </button>
+            ) : null}
+          </div>
+          <p className={overviewHintBlack}>Deze zinnen ijken de merkmeting — pas ze aan als iets niet klopt.</p>
+          {overviewEditing === 'voorbeelden' && buf ? (
+            <>
+              <div className="mt-[12px] flex flex-wrap items-start gap-[12px] [&_button]:mb-0">
+                <PillButton type="button" variant="second" onClick={startRecalibration}>
+                  Opnieuw kalibreren
+                </PillButton>
+              </div>
+              <div className={`${borderedSectionStackClass} mt-[12px]`}>
+                {[0, 1, 2].flatMap((index) => [
+                  <StrategyField
+                    key={`overview-good-edit-${index}`}
+                    id={`overview-good-edit-${index}`}
+                    title={`Sterk voorbeeld ${index + 1}`}
+                    value={buf.goedeVoorbeelden[index] ?? ''}
+                    onChange={(v) => {
+                      patchOverviewBuffer((current) => {
+                        const next = [...current.goedeVoorbeelden] as ExampleTriple
+                        next[index] = v
+                        return { ...current, goedeVoorbeelden: next }
+                      })
+                    }}
+                    minHeight={60}
+                  />,
+                  <StrategyField
+                    key={`overview-weak-edit-${index}`}
+                    id={`overview-weak-edit-${index}`}
+                    title={`Zwak voorbeeld ${index + 1}`}
+                    value={buf.zwakkeVoorbeelden[index] ?? ''}
+                    onChange={(v) => {
+                      patchOverviewBuffer((current) => {
+                        const next = [...current.zwakkeVoorbeelden] as ExampleTriple
+                        next[index] = v
+                        return { ...current, zwakkeVoorbeelden: next }
+                      })
+                    }}
+                    minHeight={60}
+                  />,
+                ])}
+              </div>
+              <div className={`${pillActionsRowClass} mt-[18px]`}>
+                <PillButton
+                  type="button"
+                  loading={saving}
+                  disabled={saving}
+                  onClick={() => void saveOverviewPanel('voorbeelden')}
+                >
+                  Opslaan
+                </PillButton>
+                <PillButton type="button" variant="second" disabled={saving} onClick={cancelOverviewEdit}>
+                  Annuleren
+                </PillButton>
+              </div>
+            </>
+          ) : (
+            <div className="mt-[18px] space-y-[6px]">
+              {[0, 1, 2].map((index) => (
+                <div key={`ex-pair-${index}`} className="space-y-[4px]">
+                  <p className="m-0 text-[14px] leading-[18px] text-ce-black">
+                    <span className="font-semibold">Sterk {index + 1}: </span>
+                    {draft.goedeVoorbeelden[index]?.trim() ? draft.goedeVoorbeelden[index] : '—'}
+                  </p>
+                  <p className="m-0 text-[14px] leading-[18px] text-ce-black">
+                    <span className="font-semibold">Zwak {index + 1}: </span>
+                    {draft.zwakkeVoorbeelden[index]?.trim() ? draft.zwakkeVoorbeelden[index] : '—'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={overviewEditing ? overviewDimClass : ''}>
+          <StrategySection
+            title="Strategiedocument"
+            hint="Upload een strategiedocument — we gebruiken het voor suggesties."
+            hintTone="black"
+          >
+            <HbaWizardDocumentUpload
+              busy={docUploadBusy}
+              error={docUploadError}
+              currentFilename={uploadedDocumentFilename}
+              hasExistingAnswers={hasExistingAnswers}
+              mode="maintenance"
+              onUpload={(file, options) => void handleWizardDocumentUpload(file, options)}
+            />
+          </StrategySection>
+        </div>
+
+        <section className={`${borderedSectionClass} ${overviewEditing ? overviewDimClass : ''}`}>
+          <ActionNotice message={notice} kind={noticeKind} fading={noticeFading} className="m-0" />
+          {draftSaveError ? <p className="m-0 text-[14px] text-ce-red">{draftSaveError}</p> : null}
+
+          <div className={`${pillActionsRowClass} flex-nowrap`}>
+            <PillButton
+              type="button"
+              variant="second"
+              className="shrink-0"
+              disabled={Boolean(overviewEditing)}
+              onClick={() => {
+                cancelOverviewEdit()
+                setStructuurWizardPhase('stappen')
+                setFlowMode('wizard')
+                setStep(0)
+                setRecalibrating(false)
+              }}
+            >
+              Opnieuw invullen
+            </PillButton>
+            <PillButton
+              type="button"
+              variant="second"
+              className="shrink-0"
+              disabled={Boolean(overviewEditing)}
+              onClick={() => {
+                openStrategistMail()
+              }}
+            >
+              Laat een HBA-strateeg meekijken
             </PillButton>
           </div>
-        </StrategySection>
-
-        <div className={borderedSectionStackClass}>
-          {[0, 1, 2].flatMap((index) => [
-            <StrategyField
-              key={`overview-good-${index}`}
-              id={`overview-good-${index}`}
-              title={`Sterk voorbeeld ${index + 1}`}
-              value={draft.goedeVoorbeelden[index] ?? ''}
-              onChange={(v) => {
-                const next = [...draft.goedeVoorbeelden] as ExampleTriple
-                next[index] = v
-                setDraft((d) => ({ ...d, goedeVoorbeelden: next }))
-              }}
-              minHeight={60}
-            />,
-            <StrategyField
-              key={`overview-weak-${index}`}
-              id={`overview-weak-${index}`}
-              title={`Zwak voorbeeld ${index + 1}`}
-              value={draft.zwakkeVoorbeelden[index] ?? ''}
-              onChange={(v) => {
-                const next = [...draft.zwakkeVoorbeelden] as ExampleTriple
-                next[index] = v
-                setDraft((d) => ({ ...d, zwakkeVoorbeelden: next }))
-              }}
-              minHeight={60}
-            />,
-          ])}
-        </div>
-
-        <HbaWizardDocumentUpload
-          busy={docUploadBusy}
-          error={docUploadError}
-          currentFilename={uploadedDocumentFilename}
-          hasExistingAnswers={hasExistingAnswers}
-          mode="maintenance"
-          onUpload={(file, options) => void handleWizardDocumentUpload(file, options)}
-        />
-
-        <ActionNotice message={notice} kind={noticeKind} fading={noticeFading} className="m-0" />
-        {draftSaveError ? <p className="m-0 text-[14px] text-ce-red">{draftSaveError}</p> : null}
-
-        <div className={`${pillActionsRowClass} flex-nowrap`}>
-          <PillButton
-            type="button"
-            className="shrink-0"
-            disabled={saving || !overviewDirty}
-            loading={saving}
-            onClick={() => void saveOverviewExamples()}
-          >
-            Opslaan
-          </PillButton>
-          <PillButton
-            type="button"
-            variant="second"
-            className="shrink-0"
-            onClick={() => {
-              setFlowMode('wizard')
-              setStep(0)
-            }}
-          >
-            Opnieuw invullen
-          </PillButton>
-          <PillButton
-            type="button"
-            variant="second"
-            className="shrink-0"
-            onClick={() => {
-              openStrategistMail()
-            }}
-          >
-            laat een strateeg meekijken
-          </PillButton>
-        </div>
-        <p className="m-0 text-[12px] leading-[16px] text-ce-beige">
-          We nemen binnen één werkdag contact op.
-        </p>
-      </section>
+          <p className="m-0 mt-[8px] text-[12px] leading-[16px] text-ce-beige">
+            We nemen binnen één werkdag contact op.
+          </p>
+        </section>
+      </div>
     )
   }
 
   const current = STEPS[step]
   const examplesReady = examplesComplete(draft.goedeVoorbeelden, draft.zwakkeVoorbeelden)
 
+  const stepTitleLine = recalibrating
+    ? 'Kalibratie opnieuw — kies drie paren'
+    : showStructuurScroll
+      ? 'Vul je merkarchitectuur in — daarna bevestig je op het volgende scherm.'
+      : `Stap ${step + 1} van ${STEPS.length} — ${current.title}`
+
+  if (showStructuurScroll) {
+    return (
+      <section className={`${designStackClass} ${borderedSectionClass}`}>
+        <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">{stepTitleLine}</p>
+        <div
+          ref={structuurScrollRef}
+          className="max-h-[min(70vh,720px)] overflow-y-auto pr-[4px]"
+        >
+          <div className={`${borderedSectionStackClass} pt-[12px]`}>
+            {showWizardDocumentUpload ? (
+              <HbaWizardDocumentUpload
+                busy={docUploadBusy}
+                error={docUploadError}
+                currentFilename={uploadedDocumentFilename}
+                hasExistingAnswers={hasExistingAnswers}
+                onUpload={(file, options) => void handleWizardDocumentUpload(file, options)}
+                onSkip={uploadedDocumentFilename ? undefined : skipWizardDocumentUpload}
+              />
+            ) : docUploadSkipped && !uploadedDocumentFilename ? (
+              <StrategySection title="Strategiedocument (optioneel)" hint="Geen strategiedocument geüpload.">
+                <div className={pillActionsRowInnerClass}>
+                  <PillButton type="button" variant="second" onClick={() => setDocUploadSkipped(false)}>
+                    Strategiedocument uploaden
+                  </PillButton>
+                </div>
+              </StrategySection>
+            ) : null}
+            <StrategyField
+              id="identity-intro-structuur"
+              title="Wie ben je en in welke markt opereer je?"
+              documentSuggestion={docSuggestions?.identityIntro ?? undefined}
+              value={draft.identityIntro}
+              onChange={(v) => setDraft((d) => ({ ...d, identityIntro: v }))}
+              minHeight={100}
+            />
+            <StrategySection title="In welke markt" filled={Boolean(draft.brancheInput.trim())}>
+              <div className="grid gap-[18px]">
+                <Pulldown
+                  placeholder="— kies uit lijst —"
+                  value={branches.find((branch) => branch.code === draft.brancheCode)?.label ?? ''}
+                  options={branches.map((branch) => branch.label)}
+                  onChange={(label) => {
+                    setBrancheResolveError(null)
+                    const match = branches.find((branch) => branch.label === label)
+                    setDraft((cur) => ({
+                      ...cur,
+                      brancheInput: label,
+                      brancheCode: match?.code ?? '',
+                    }))
+                  }}
+                />
+                <FieldSingle
+                  id="hba-branche-structuur"
+                  value={
+                    branches.some((branch) => branch.code === draft.brancheCode) ? '' : draft.brancheInput
+                  }
+                  placeholder="Of typ je eigen branche"
+                  onChange={(value) => {
+                    setBrancheResolveError(null)
+                    const match = branches.find(
+                      (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
+                    )
+                    setDraft((cur) => ({
+                      ...cur,
+                      brancheInput: value,
+                      brancheCode: match?.code ?? '',
+                    }))
+                  }}
+                />
+              </div>
+              {brancheResolving ? (
+                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-black">Branche afleiden…</p>
+              ) : null}
+              {brancheResolveError ? (
+                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-red" role="alert">
+                  {brancheResolveError}
+                </p>
+              ) : null}
+              {selectedBranch?.bron === 'afgeleid' ? (
+                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-beige">
+                  Deze branche is automatisch afgeleid; een strateeg kan de definitie nog aanscherpen.
+                </p>
+              ) : null}
+            </StrategySection>
+            <StrategySection title="Waar staat je merk nu?" filled={Boolean(draft.contextprofiel)}>
+              <Pulldown
+                value={contextprofielLabel(draft.contextprofiel)}
+                options={HBA_CONTEXT_PROFILES.map((profile) => profile.label)}
+                onChange={(label) => {
+                  const match = HBA_CONTEXT_PROFILES.find((profile) => profile.label === label)
+                  setDraft((d) => ({ ...d, contextprofiel: match?.value ?? d.contextprofiel }))
+                }}
+              />
+            </StrategySection>
+            <StrategyField
+              id="hba-doel-structuur"
+              title="Wat wil je bereiken?"
+              hint="Concreet waar je voor gaat — geen mooie missiezin nodig."
+              documentSuggestion={docSuggestions?.doel ?? undefined}
+              value={draft.doel}
+              onChange={(v) => setDraft((d) => ({ ...d, doel: v }))}
+              minHeight={120}
+            />
+            <StrategyField
+              id="hba-distinct-structuur"
+              title="Wat maakt je anders dan de rest?"
+              hint="Schrijf het zoals je het aan een vriend zou vertellen."
+              documentSuggestion={docSuggestions?.distinctiviteit ?? undefined}
+              value={draft.distinctiviteit}
+              onChange={(v) => setDraft((d) => ({ ...d, distinctiviteit: v }))}
+              minHeight={120}
+            />
+            <StrategyField
+              id="hba-niet-structuur"
+              title="Waar geloof je niet in, ook al doet de hele markt het?"
+              documentSuggestion={docSuggestions?.watBewustNiet ?? undefined}
+              value={draft.watBewustNiet}
+              onChange={(v) => setDraft((d) => ({ ...d, watBewustNiet: v }))}
+              minHeight={120}
+            />
+            <div className="grid gap-[12px]">
+              <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">
+                Waar zou je nee tegen zeggen, ook als het geld zou opleveren?
+              </p>
+              <p className="m-0 text-[13px] leading-[17px] text-ce-beige">
+                De eerste regel is je hoofdregel; daarna zijn het subregels.
+              </p>
+              <div className={borderedSectionStackClass}>
+                {draft.regels.map((rule, index) => (
+                  <StrategyField
+                    key={`struct-regel-${index}`}
+                    id={`struct-rule-${index}`}
+                    title={index === 0 ? 'Hoofdregel' : `Subregel ${index}`}
+                    documentSuggestion={docSuggestions?.regels?.[index] ?? undefined}
+                    value={rule}
+                    onChange={(v) => {
+                      const next = [...draft.regels]
+                      next[index] = v
+                      setDraft((d) => ({ ...d, regels: next }))
+                    }}
+                    minHeight={60}
+                  />
+                ))}
+              </div>
+              {draft.regels.length < 5 ? (
+                <button
+                  type="button"
+                  className="self-start border-0 bg-transparent text-[14px] font-semibold text-ce-blue underline"
+                  onClick={() => setDraft((d) => ({ ...d, regels: [...d.regels, ''] }))}
+                >
+                  + Voeg regel toe
+                </button>
+              ) : null}
+            </div>
+            <div className="grid gap-[12px]">
+              {deriving ? <p className="m-0 text-[14px] text-ce-black">We stellen iets voor…</p> : null}
+              {deriveError ? <p className="m-0 text-[14px] text-ce-red">{deriveError}</p> : null}
+              {!draft.archetype && !deriving ? (
+                <PillButton type="button" onClick={() => void runDerive()}>
+                  Stel persoonlijkheid voor
+                </PillButton>
+              ) : null}
+              {draft.archetype ? (
+                <div className={borderedSectionStackClass}>
+                  <StrategyField
+                    id="hba-foe-structuur"
+                    title="Waar je tegen vecht"
+                    value={draft.foe}
+                    onChange={(v) => setDraft((d) => ({ ...d, foe: v }))}
+                    minHeight={80}
+                  />
+                  <StrategyField
+                    id="hba-tone-structuur"
+                    title="Je toon"
+                    value={draft.toneOfBehaviour}
+                    onChange={(v) => setDraft((d) => ({ ...d, toneOfBehaviour: v }))}
+                    minHeight={80}
+                  />
+                  <StrategySection title="Aanspreekvorm" filled={Boolean(draft.aanspreekvorm)}>
+                    <Pulldown
+                      value={draft.aanspreekvorm === 'u' ? 'u' : 'je'}
+                      options={['je', 'u']}
+                      onChange={(value) =>
+                        setDraft((d) => ({ ...d, aanspreekvorm: value === 'u' ? 'u' : 'je' }))
+                      }
+                    />
+                  </StrategySection>
+                  <StrategySection title="Andere persoonlijkheid?" filled={Boolean(draft.archetype)}>
+                    <Pulldown
+                      value={draft.archetype}
+                      options={[...HBA_ARCHETYPES]}
+                      onChange={(value) => setDraft((d) => ({ ...d, archetype: value }))}
+                    />
+                  </StrategySection>
+                </div>
+              ) : null}
+            </div>
+            <IdentityCalibrationStep
+              key={calibrationSessionKey}
+              goedeVoorbeelden={draft.goedeVoorbeelden}
+              zwakkeVoorbeelden={draft.zwakkeVoorbeelden}
+              architecture={calibrationArchitecture}
+              onChange={(good, weak) =>
+                setDraft((d) => ({ ...d, goedeVoorbeelden: good, zwakkeVoorbeelden: weak }))
+              }
+            />
+          </div>
+        </div>
+        <div className={pillActionsRowClass}>
+          {draftSaveError ? <p className="m-0 w-full basis-full text-[14px] text-ce-red">{draftSaveError}</p> : null}
+          <PillButton
+            type="button"
+            loading={saving || deriving || brancheResolving}
+            disabled={saving || deriving || brancheResolving || !examplesReady}
+            onClick={() => void advanceStructuurToConfirm()}
+          >
+            Naar bevestigen
+          </PillButton>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className={`${designStackClass} ${borderedSectionClass}`}>
-      <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">
-        {recalibrating
-          ? 'Kalibratie opnieuw — kies drie paren'
-          : `Stap ${step + 1} van ${STEPS.length} — ${current.title}`}
-      </p>
+      <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">{stepTitleLine}</p>
 
       {step === 0 && (
         <div className={borderedSectionStackClass}>
@@ -986,87 +1878,80 @@ export function MerkarchitectuurSection() {
             </StrategySection>
           ) : null}
           <StrategyField
-              id="identity-intro"
-              title="Wie zijn jullie en in welke markt opereren jullie?"
-              documentSuggestion={docSuggestions?.identityIntro ?? undefined}
-              value={draft.identityIntro}
-              onChange={(v) => setDraft((d) => ({ ...d, identityIntro: v }))}
-              minHeight={100}
-            />
-            <StrategySection title="In welke markt" filled={Boolean(draft.brancheInput.trim())}>
-              <div className="grid gap-[18px]">
-                <Pulldown
-                  placeholder="— kies uit lijst —"
-                  value={
-                    branches.find((branch) => branch.code === draft.brancheCode)?.label ?? ''
-                  }
-                  options={branches.map((branch) => branch.label)}
-                  onChange={(label) => {
-                    setBrancheResolveError(null)
-                    const match = branches.find((branch) => branch.label === label)
-                    setDraft((current) => ({
-                      ...current,
-                      brancheInput: label,
-                      brancheCode: match?.code ?? '',
-                    }))
-                  }}
-                />
-                <FieldSingle
-                  id="hba-branche"
-                  value={
-                    branches.some((branch) => branch.code === draft.brancheCode)
-                      ? ''
-                      : draft.brancheInput
-                  }
-                  placeholder="Of typ je eigen branche"
-                  onChange={(value) => {
-                    setBrancheResolveError(null)
-                    const match = branches.find(
-                      (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
-                    )
-                    setDraft((current) => ({
-                      ...current,
-                      brancheInput: value,
-                      brancheCode: match?.code ?? '',
-                    }))
-                  }}
-                />
-              </div>
-              {brancheResolving ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-black">Branche afleiden…</p>
-              ) : null}
-              {brancheResolveError ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-red" role="alert">
-                  {brancheResolveError}
-                </p>
-              ) : null}
-              {selectedBranch?.bron === 'afgeleid' ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-beige">
-                  Deze branche is automatisch afgeleid; een strateeg kan de definitie nog aanscherpen.
-                </p>
-              ) : null}
-            </StrategySection>
-            <StrategySection
-              title="Waar staat jullie merk nu?"
-              filled={Boolean(draft.contextprofiel)}
-            >
+            id="identity-intro"
+            title="Wie ben je en in welke markt opereer je?"
+            documentSuggestion={docSuggestions?.identityIntro ?? undefined}
+            value={draft.identityIntro}
+            onChange={(v) => setDraft((d) => ({ ...d, identityIntro: v }))}
+            minHeight={100}
+          />
+          <StrategySection title="In welke markt" filled={Boolean(draft.brancheInput.trim())}>
+            <div className="grid gap-[18px]">
               <Pulldown
-                value={contextprofielLabel(draft.contextprofiel)}
-                options={HBA_CONTEXT_PROFILES.map((profile) => profile.label)}
+                placeholder="— kies uit lijst —"
+                value={branches.find((branch) => branch.code === draft.brancheCode)?.label ?? ''}
+                options={branches.map((branch) => branch.label)}
                 onChange={(label) => {
-                  const match = HBA_CONTEXT_PROFILES.find((profile) => profile.label === label)
-                  setDraft((d) => ({ ...d, contextprofiel: match?.value ?? d.contextprofiel }))
+                  setBrancheResolveError(null)
+                  const match = branches.find((branch) => branch.label === label)
+                  setDraft((current) => ({
+                    ...current,
+                    brancheInput: label,
+                    brancheCode: match?.code ?? '',
+                  }))
                 }}
               />
-            </StrategySection>
+              <FieldSingle
+                id="hba-branche"
+                value={
+                  branches.some((branch) => branch.code === draft.brancheCode) ? '' : draft.brancheInput
+                }
+                placeholder="Of typ je eigen branche"
+                onChange={(value) => {
+                  setBrancheResolveError(null)
+                  const match = branches.find(
+                    (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
+                  )
+                  setDraft((current) => ({
+                    ...current,
+                    brancheInput: value,
+                    brancheCode: match?.code ?? '',
+                  }))
+                }}
+              />
+            </div>
+            {brancheResolving ? (
+              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-black">Branche afleiden…</p>
+            ) : null}
+            {brancheResolveError ? (
+              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-red" role="alert">
+                {brancheResolveError}
+              </p>
+            ) : null}
+            {selectedBranch?.bron === 'afgeleid' ? (
+              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-beige">
+                Deze branche is automatisch afgeleid; een strateeg kan de definitie nog aanscherpen.
+              </p>
+            ) : null}
+          </StrategySection>
+          <StrategySection title="Waar staat je merk nu?" filled={Boolean(draft.contextprofiel)}>
+            <Pulldown
+              value={contextprofielLabel(draft.contextprofiel)}
+              options={HBA_CONTEXT_PROFILES.map((profile) => profile.label)}
+              onChange={(label) => {
+                const match = HBA_CONTEXT_PROFILES.find((profile) => profile.label === label)
+                setDraft((d) => ({ ...d, contextprofiel: match?.value ?? d.contextprofiel }))
+              }}
+            />
+          </StrategySection>
         </div>
       )}
 
       {step === 1 && (
         <StrategyField
           id="hba-doel"
-          title="Wat willen jullie bereiken?"
-          hint="Concreet waar jullie voor gaan — geen mooie missiezin nodig."
+          title="Wat wil je bereiken?"
+          hint="Concreet waar je voor gaat — geen mooie missiezin nodig."
           documentSuggestion={docSuggestions?.doel ?? undefined}
           value={draft.doel}
           onChange={(v) => setDraft((d) => ({ ...d, doel: v }))}
@@ -1077,7 +1962,7 @@ export function MerkarchitectuurSection() {
       {step === 2 && (
         <StrategyField
           id="hba-distinct"
-          title="Wat maakt jullie anders dan de rest?"
+          title="Wat maakt je anders dan de rest?"
           hint="Schrijf het zoals je het aan een vriend zou vertellen."
           documentSuggestion={docSuggestions?.distinctiviteit ?? undefined}
           value={draft.distinctiviteit}
@@ -1089,7 +1974,7 @@ export function MerkarchitectuurSection() {
       {step === 3 && (
         <StrategyField
           id="hba-niet"
-          title="Waar geloven jullie niet in, ook al doet de hele markt het?"
+          title="Waar geloof je niet in, ook al doet de hele markt het?"
           documentSuggestion={docSuggestions?.watBewustNiet ?? undefined}
           value={draft.watBewustNiet}
           onChange={(v) => setDraft((d) => ({ ...d, watBewustNiet: v }))}
@@ -1100,23 +1985,23 @@ export function MerkarchitectuurSection() {
       {step === 4 && (
         <div className="grid gap-[12px]">
           <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">
-            Waar zouden jullie nee tegen zeggen, ook als het geld zou opleveren?
+            Waar zou je nee tegen zeggen, ook als het geld zou opleveren?
           </p>
           <div className={borderedSectionStackClass}>
             {draft.regels.map((rule, index) => (
-            <StrategyField
-              key={index}
-              id={`rule-${index}`}
-              title={`Regel ${index + 1}`}
-              documentSuggestion={docSuggestions?.regels?.[index] ?? undefined}
-              value={rule}
-              onChange={(v) => {
-                const next = [...draft.regels]
-                next[index] = v
-                setDraft((d) => ({ ...d, regels: next }))
-              }}
-              minHeight={60}
-            />
+              <StrategyField
+                key={index}
+                id={`rule-${index}`}
+                title={`Regel ${index + 1}`}
+                documentSuggestion={docSuggestions?.regels?.[index] ?? undefined}
+                value={rule}
+                onChange={(v) => {
+                  const next = [...draft.regels]
+                  next[index] = v
+                  setDraft((d) => ({ ...d, regels: next }))
+                }}
+                minHeight={60}
+              />
             ))}
           </div>
           {draft.regels.length < 5 ? (
@@ -1145,14 +2030,14 @@ export function MerkarchitectuurSection() {
               <div className={borderedSectionStackClass}>
                 <StrategyField
                   id="hba-foe"
-                  title="Waar jullie tegen vechten"
+                  title="Waar je tegen vecht"
                   value={draft.foe}
                   onChange={(v) => setDraft((d) => ({ ...d, foe: v }))}
                   minHeight={80}
                 />
                 <StrategyField
                   id="hba-tone"
-                  title="Jullie toon"
+                  title="Je toon"
                   value={draft.toneOfBehaviour}
                   onChange={(v) => setDraft((d) => ({ ...d, toneOfBehaviour: v }))}
                   minHeight={80}
@@ -1193,31 +2078,46 @@ export function MerkarchitectuurSection() {
 
       {step === 7 && (
         <div className="grid w-full gap-[12px]">
+          {wizardEntryMode === 'structuur' && structuurWizardPhase === 'bevestigen' ? (
+            <div className={pillActionsRowClass}>
+              <PillButton
+                type="button"
+                variant="second"
+                onClick={() => {
+                  setStructuurWizardPhase('stappen')
+                  setStep(0)
+                }}
+              >
+                Terug naar invullen
+              </PillButton>
+            </div>
+          ) : null}
           <RichTextDisplay
             className="w-full"
-            text={`**Wie jullie zijn:** ${draft.identityIntro || '—'}\n\n**Wat jullie willen bereiken:** ${draft.doel}\n\n**Waar jullie tegen vechten:** ${draft.foe}`}
+            text={`**Wie je bent:** ${draft.identityIntro || '—'}\n\n**Wat je wilt bereiken:** ${draft.doel}\n\n**Waar je tegen vecht:** ${draft.foe}`}
           />
           <HbaArchitectureCheckPanel
             check={architectureCheck}
             loading={architectureCheckLoading}
             error={architectureCheckError}
             onRetry={() => void runArchitectureCheckForDraft(draft)}
-            onAanscherpen={(targetStep) => setStep(targetStep)}
+            onAanscherpen={(targetStep) => {
+              setStructuurWizardPhase('stappen')
+              setStep(targetStep)
+            }}
             onStrategist={openStrategistMail}
             selectedToneSuggestion={confirmToneSuggestion}
             onSelectToneSuggestion={setConfirmToneSuggestion}
             selectedVoorbeeldPicks={confirmVoorbeeldPicks}
             onToggleVoorbeeldPick={(pick, selected) => {
-              setConfirmVoorbeeldPicks((current) => {
+              setConfirmVoorbeeldPicks((cur) => {
                 if (!selected) {
-                  return current.filter(
-                    (item) => !(item.type === pick.type && item.tekst === pick.tekst),
-                  )
+                  return cur.filter((item) => !(item.type === pick.type && item.tekst === pick.tekst))
                 }
-                if (current.some((item) => item.type === pick.type && item.tekst === pick.tekst)) {
-                  return current
+                if (cur.some((item) => item.type === pick.type && item.tekst === pick.tekst)) {
+                  return cur
                 }
-                return [...current, pick]
+                return [...cur, pick]
               })
             }}
           />
@@ -1241,17 +2141,17 @@ export function MerkarchitectuurSection() {
                 openStrategistMail()
               }}
             >
-              laat een strateeg meekijken
+              Laat een HBA-strateeg meekijken
             </PillButton>
           </div>
         </div>
       )}
 
       <div className={pillActionsRowClass}>
-        {draftSaveError && (recalibrating || step < STEPS.length - 1) ? (
+        {draftSaveError && (recalibrating || step < 7) ? (
           <p className="m-0 w-full basis-full text-[14px] text-ce-red">{draftSaveError}</p>
         ) : null}
-        {draftSaved && !recalibrating && step < STEPS.length - 1 ? (
+        {draftSaved && !recalibrating && step < 7 ? (
           <p className="m-0 w-full basis-full text-[14px] text-ce-green-text">Voortgang opgeslagen</p>
         ) : null}
         {recalibrating && step === 6 ? (
@@ -1268,10 +2168,23 @@ export function MerkarchitectuurSection() {
               Opslaan
             </PillButton>
           </>
-        ) : step < STEPS.length - 1 ? (
+        ) : step < 7 ? (
           <>
             {step > 0 ? (
-              <PillButton type="button" variant="second" onClick={() => setStep((s) => s - 1)}>
+              <PillButton
+                type="button"
+                variant="second"
+                onClick={() => {
+                  if (
+                    wizardEntryMode === 'structuur' &&
+                    structuurWizardPhase === 'bevestigen' &&
+                    step === 7
+                  ) {
+                    setStructuurWizardPhase('stappen')
+                  }
+                  setStep((s) => s - 1)
+                }}
+              >
                 Vorige
               </PillButton>
             ) : null}
@@ -1280,7 +2193,9 @@ export function MerkarchitectuurSection() {
               disabled={step === 6 && !examplesReady}
               onClick={() => void advanceStep()}
             >
-              Volgende
+              {wizardEntryMode === 'structuur' && structuurWizardPhase === 'stappen' && step === 6
+                ? 'Naar bevestigen'
+                : 'Volgende'}
             </PillButton>
           </>
         ) : null}

@@ -15,6 +15,7 @@ require_once __DIR__ . '/campagne-preview-plan-check.php';
 require_once __DIR__ . '/campagne-preview-ankers.php';
 require_once __DIR__ . '/campagne-preview-bank.php';
 require_once __DIR__ . '/llm-repository.php';
+require_once __DIR__ . '/theme-repository.php';
 
 const CE_CAMPAGNE_PREVIEW_ORIGIN = 'campagne_preview';
 
@@ -33,7 +34,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
     if (!ce_table_exists($pdo, 'campaigns')) {
         $migration = dirname(__DIR__) . '/migrations/add_campaigns_table.sql';
         if (!is_readable($migration)) {
-            $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campaigns_table.sql';
+            $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campaigns_table.sql';
         }
         if (is_readable($migration)) {
             try {
@@ -45,7 +46,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     $p1Migration = dirname(__DIR__) . '/migrations/add_campagne_preview_p1.sql';
     if (!is_readable($p1Migration)) {
-        $p1Migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campagne_preview_p1.sql';
+        $p1Migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campagne_preview_p1.sql';
     }
     if (is_readable($p1Migration)) {
         try {
@@ -56,7 +57,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     $p2Migration = dirname(__DIR__) . '/migrations/add_campagne_preview_p2.sql';
     if (!is_readable($p2Migration)) {
-        $p2Migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campagne_preview_p2.sql';
+        $p2Migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campagne_preview_p2.sql';
     }
     if (is_readable($p2Migration)) {
         try {
@@ -67,7 +68,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     $p3Migration = dirname(__DIR__) . '/migrations/add_campagne_preview_p3.sql';
     if (!is_readable($p3Migration)) {
-        $p3Migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campagne_preview_p3.sql';
+        $p3Migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campagne_preview_p3.sql';
     }
     if (is_readable($p3Migration)) {
         try {
@@ -78,7 +79,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     $p4Migration = dirname(__DIR__) . '/migrations/add_campagne_preview_p4.sql';
     if (!is_readable($p4Migration)) {
-        $p4Migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campagne_preview_p4.sql';
+        $p4Migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campagne_preview_p4.sql';
     }
     if (is_readable($p4Migration)) {
         try {
@@ -89,7 +90,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     $p5Migration = dirname(__DIR__) . '/migrations/add_campagne_preview_p5.sql';
     if (!is_readable($p5Migration)) {
-        $p5Migration = dirname(__DIR__, 2) . '/scripts/migrations/add_campagne_preview_p5.sql';
+        $p5Migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_campagne_preview_p5.sql';
     }
     if (is_readable($p5Migration)) {
         try {
@@ -641,7 +642,7 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
  * @param list<array{key: string, label: string, share: float, rol: string, merkOnderdeel: string|null, opdracht: string}> $phaseSequence
  * @param array<string, mixed>|null $schedule
  * @param list<string> $merkOnderdelen
- * @return list<array{slotId: string, platform: string, publishDate: string, faseKey: string|null}>
+ * @return list<array{slotId: string, themeId: string|null, platform: string, publishDate: string, faseKey: string|null}>
  */
 function ce_campagne_preview_generate_slots(
     PDO $pdo,
@@ -656,6 +657,7 @@ function ce_campagne_preview_generate_slots(
     ?array $schedule = null,
     array $merkOnderdelen = [],
 ): array {
+    ce_ensure_themes_schema($pdo);
     $stubs = ce_campagne_preview_build_slot_schedule($startDate, $endDate, $channels, $schedule);
     $created = [];
 
@@ -694,12 +696,68 @@ function ce_campagne_preview_generate_slots(
         }
 
         $slotId = ce_uuid_v4();
-        $articleId = ce_uuid_v4();
+
+        $themeId = null;
+        $cycleWeekMonday = ce_monday_of_calendar_date($publishDate);
+        $themePhaseKey = ce_phase_key_from_date($cycleWeekMonday) ?? $phaseKey;
+
+        if (ce_table_exists($pdo, 'themes')) {
+            $themeId = ce_uuid_v4();
+            $tCols = ['id', 'client_id', 'title'];
+            $tVals = [':tid', ':client_id', ':title'];
+            $tParams = [
+                'tid' => $themeId,
+                'client_id' => $clientId,
+                'title' => $slotTitle,
+            ];
+            if (ce_table_has_column($pdo, 'themes', 'rationale')) {
+                $tCols[] = 'rationale';
+                $tVals[] = ':rationale';
+                $tParams['rationale'] = $opdracht !== '' ? $opdracht : null;
+            }
+            if (ce_table_has_column($pdo, 'themes', 'cycle_week')) {
+                $tCols[] = 'cycle_week';
+                $tVals[] = ':cycle_week';
+                $tParams['cycle_week'] = $cycleWeekMonday;
+            }
+            if (ce_table_has_column($pdo, 'themes', 'phase_key')) {
+                $tCols[] = 'phase_key';
+                $tVals[] = ':theme_phase_key';
+                $tParams['theme_phase_key'] = $themePhaseKey;
+            }
+            if (ce_table_has_column($pdo, 'themes', 'status')) {
+                $tCols[] = 'status';
+                $tVals[] = ':theme_status';
+                $tParams['theme_status'] = ce_pick_status_value($pdo, 'themes', ['proposed', 'submitted']);
+            }
+            if (ce_table_has_column($pdo, 'themes', 'feedback')) {
+                $tCols[] = 'feedback';
+                $tVals[] = ':theme_feedback';
+                $tParams['theme_feedback'] = 'none';
+            }
+            require_once __DIR__ . '/copy-modus.php';
+            ce_ensure_theme_copy_modus_columns($pdo);
+            $themeCopyModus = ce_copy_modus_from_template_key($templateKey);
+            if (ce_table_has_column($pdo, 'themes', 'copy_modus')) {
+                $tCols[] = 'copy_modus';
+                $tVals[] = ':copy_modus';
+                $tParams['copy_modus'] = $themeCopyModus;
+            }
+            if (ce_table_has_column($pdo, 'themes', 'copy_modus_override')) {
+                $tCols[] = 'copy_modus_override';
+                $tVals[] = ':copy_modus_override';
+                $tParams['copy_modus_override'] = 0;
+            }
+            $pdo->prepare(
+                'INSERT INTO themes (' . implode(', ', $tCols) . ') VALUES (' . implode(', ', $tVals) . ')'
+            )->execute($tParams);
+        }
 
         $marker = json_encode([
             'campagnePreview' => true,
             'campaignId' => $campaignId,
             'templateKey' => $templateKey,
+            'themeId' => $themeId,
             'platform' => $platform,
             'slotIndex' => $slotIndex,
             'totalForPlatform' => $count,
@@ -715,6 +773,11 @@ function ce_campagne_preview_generate_slots(
             'client_id' => $clientId,
             'theme' => $slotTitle,
         ];
+        if ($themeId !== null && ce_table_has_column($pdo, 'content_slots', 'theme_id')) {
+            $slotCols[] = 'theme_id';
+            $slotVals[] = ':theme_id';
+            $slotParams['theme_id'] = $themeId;
+        }
 
         if (ce_table_has_column($pdo, 'content_slots', 'status')) {
             $slotCols[] = 'status';
@@ -781,15 +844,9 @@ function ce_campagne_preview_generate_slots(
             'INSERT INTO content_slots (' . implode(', ', $slotCols) . ') VALUES (' . implode(', ', $slotVals) . ')'
         )->execute($slotParams);
 
-        ce_insert_fastlane_article($pdo, $articleId, $slotId, $slotTitle, [
-            'platform' => $platformLabel,
-            'angle' => 'general',
-            'rationale' => $opdracht,
-        ]);
-
         $created[] = [
             'slotId' => $slotId,
-            'articleId' => $articleId,
+            'themeId' => $themeId,
             'platform' => $platform,
             'publishDate' => $publishDate,
             'faseKey' => $faseKey !== '' ? $faseKey : null,

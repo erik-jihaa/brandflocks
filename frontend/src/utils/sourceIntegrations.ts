@@ -11,8 +11,6 @@ export function sourceTabIntegrationKey(tab: SourceTab): IntegrationKey | null {
     case 'Scraper':
     case 'Linkedin':
       return 'apify_scraper'
-    case 'Trello':
-      return 'trello'
     case 'Analythics':
       return 'ga4'
     default:

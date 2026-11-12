@@ -344,7 +344,7 @@ function ce_hba_v2_call_json_with_web_search(string $systemPrompt, string $userP
 function ce_hba_branch_derive_system_prompt(): string
 {
     return <<<'PROMPT'
-Je leidt een branchrecord af voor ContentFlow. Werk in ZEVEN FASES. Sla geen fase over.
+Je leidt een branchrecord af voor Brandflocks. Werk in ZEVEN FASES. Sla geen fase over.
 Evidence eerst, dan pas clusteren. Nooit afleiden uit één bedrijf of één bron.
 Hygiënefactor en differentiatie-as nooit samenvoegen. Markt-archetype is een observatie
 van de categorie, NOOIT het merkarchetype van de klant.

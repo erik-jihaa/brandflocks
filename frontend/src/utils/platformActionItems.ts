@@ -46,7 +46,6 @@ function eventIntegrationKey(event: string): string | null {
   if (hay.includes('analytics') || hay.includes('ga4')) return 'ga4'
   if (hay.includes('calendar')) return 'calendar'
   if (hay.includes('linkedin')) return 'linkedin_publish'
-  if (hay.includes('trello')) return 'trello'
   return null
 }
 

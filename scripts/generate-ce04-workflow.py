@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-JSON_DIR = ROOT.parent.parent / "JSON"
+JSON_DIR = ROOT.parent / "json" / "n8n"
 OUT = JSON_DIR / "CE-04 - Review & Publish.json"
 
 SOURCE_CANDIDATES = (

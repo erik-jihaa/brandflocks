@@ -90,7 +90,7 @@ $emit = static function (string $line): void {
     flush();
 };
 
-$emit('-- Content Engine — volledige dump (schema + data)');
+$emit('-- Brandflocks — volledige dump (schema + data)');
 $emit('-- Omgeving:  ' . ce_env());
 $emit('-- Gegenereerd: ' . gmdate('Y-m-d H:i:s') . ' UTC');
 $emit('-- Bron: GET /api/admin/db-dump — herstel: ./scripts/restore-db.sh <bestand>');

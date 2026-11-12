@@ -17,7 +17,7 @@ $pdo = ce_db();
 $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN) ?: [];
 
 $lines = [
-    '-- Content Engine — schema export from production MySQL',
+    '-- Brandflocks — schema export from production MySQL',
     '-- Generated: ' . gmdate('Y-m-d H:i:s') . ' UTC',
     '-- Source: GET /api/admin/schema-export (SHOW CREATE TABLE via PDO on server)',
     '-- Regenerate: ./scripts/export-production-schema.sh',

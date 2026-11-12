@@ -199,7 +199,7 @@ function ce_support_email(): string
 {
     $email = ce_config_value('CE_SUPPORT_EMAIL', 'support_email');
     if ($email === '') {
-        $email = ce_config_value('CE_REVIEW_EMAIL', 'review_email', 'support@igisnext.com');
+        $email = ce_config_value('CE_REVIEW_EMAIL', 'review_email', ce_install_contact_defaults()['support']);
     }
 
     return $email;
@@ -246,9 +246,10 @@ function ce_event_log_notify_error(
     require_once __DIR__ . '/mail-helper.php';
 
     $env = ce_env();
-    $subject = sprintf('[CE %s] %s', strtoupper($env), $event);
+    $product = ce_product_name();
+    $subject = sprintf('[%s %s] %s', $product, strtoupper($env), $event);
     $lines = [
-        'Content Engine meldt een fout.',
+        $product . ' meldt een fout.',
         '',
         'Event:       ' . $event,
         'Categorie:   ' . $category,

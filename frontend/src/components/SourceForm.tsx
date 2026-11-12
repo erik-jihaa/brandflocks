@@ -31,11 +31,6 @@ export type SourceFormValues = {
   scraperWebhookUrl: string
   scraperLinkedinProfile: string
   scraperLinkedinPasswordRef: string
-  asanaPatRef: string
-  asanaProjectGid: string
-  asanaProjectName: string
-  asanaWorkspaceGid: string
-  asanaWorkspaceName: string
   driveFileUrl: string
   sourceTier: 'core' | 'supplementary'
 }
@@ -61,11 +56,6 @@ export function emptySourceFormValues(): SourceFormValues {
     scraperWebhookUrl: '',
     scraperLinkedinProfile: '',
     scraperLinkedinPasswordRef: '',
-    asanaPatRef: '',
-    asanaProjectGid: '',
-    asanaProjectName: '',
-    asanaWorkspaceGid: '',
-    asanaWorkspaceName: '',
     driveFileUrl: '',
     sourceTier: 'core',
   }
@@ -92,9 +82,6 @@ type SourceFormProps = {
   onCancel?: () => void
   submitLabel?: string
   busy?: boolean
-  trelloBoards?: Array<{ id: string; name: string }>
-  loadingTrelloBoards?: boolean
-  trelloBoardsNote?: string | null
   analyticsOAuthConnected?: boolean
   analyticsOAuthEmail?: string | null
   analyticsOAuthConfigured?: boolean
@@ -111,11 +98,6 @@ type SourceFormProps = {
   mailboxPasswordConfigured?: boolean
   scraperTokenConfigured?: boolean
   scraperLinkedinPasswordConfigured?: boolean
-  asanaProjects?: Array<{ gid: string; name: string; workspaceGid: string; workspaceName: string }>
-  loadingAsanaProjects?: boolean
-  asanaProjectsNote?: string | null
-  asanaPatConfigured?: boolean
-  onDiscoverAsana?: () => void
   driveOAuthConnected?: boolean
   driveOAuthEmail?: string | null
   driveOAuthConfigured?: boolean
@@ -141,9 +123,6 @@ export function SourceForm({
   submitLabel = 'Submit',
   busy = false,
   folders = [],
-  trelloBoards = [],
-  loadingTrelloBoards = false,
-  trelloBoardsNote = null,
   analyticsOAuthConnected = false,
   analyticsOAuthEmail = null,
   analyticsOAuthConfigured = true,
@@ -160,11 +139,6 @@ export function SourceForm({
   mailboxPasswordConfigured = false,
   scraperTokenConfigured = false,
   scraperLinkedinPasswordConfigured = false,
-  asanaProjects = [],
-  loadingAsanaProjects = false,
-  asanaProjectsNote = null,
-  asanaPatConfigured = false,
-  onDiscoverAsana,
   driveOAuthConnected = false,
   driveOAuthEmail = null,
   driveOAuthConfigured = true,
@@ -186,17 +160,6 @@ export function SourceForm({
   const selectedFolderName =
     folders.find((folder) => folder.id === values.folderId)?.name ?? 'Geen map'
 
-  const trelloOptions =
-    trelloBoards.length > 0
-      ? trelloBoards.map((b) => b.name)
-      : values.trelloBoardId
-        ? [values.trelloBoardId]
-        : ['Kies een Trello board…']
-
-  const selectedTrelloName =
-    trelloBoards.find((b) => b.id === values.trelloBoardId)?.name ??
-    (values.trelloBoardId || trelloOptions[0])
-
   const calendarPulldownOptions =
     calendarOptions.length > 0
       ? calendarOptions.map((c) => calendarOptionLabel(c))
@@ -210,18 +173,6 @@ export function SourceForm({
       : values.calendarName
         ? calendarOptionLabel({ id: values.calendarId, name: values.calendarName, primary: false })
         : calendarPulldownOptions[0] ?? ''
-
-  const asanaProjectOptions =
-    asanaProjects.length > 0
-      ? asanaProjects.map((project) => project.name)
-      : values.asanaProjectName
-        ? [values.asanaProjectName]
-        : ['Kies een Asana-project…']
-
-  const selectedAsanaProjectName =
-    asanaProjects.find((project) => project.gid === values.asanaProjectGid)?.name ??
-    values.asanaProjectName ??
-    asanaProjectOptions[0]
 
   function googleIntegrationHint(): string | null {
     if (integrationStatus === 'connected') return null
@@ -384,62 +335,6 @@ export function SourceForm({
         </>
       )}
 
-      {category === 'Asana' && (
-        <>
-          <p className="m-0 px-[30px] text-[14px] leading-[18px] text-ce-black">
-            Koppel een Asana-project via een Personal Access Token. Open taken worden meegenomen als
-            interne PR-concepten in research.
-          </p>
-          <FieldSingle
-            placeholder="Title"
-            value={values.title}
-            onChange={(title) => patch({ title })}
-          />
-          <FieldSingle
-            placeholder="Asana Personal Access Token"
-            type="password"
-            value={values.asanaPatRef}
-            onChange={(asanaPatRef) => patch({ asanaPatRef })}
-            helpKey="asana_pat"
-            hint={
-              asanaPatConfigured && values.asanaPatRef === ''
-                ? 'PAT opgeslagen (versleuteld) — laat leeg om te behouden.'
-                : undefined
-            }
-          />
-          {onDiscoverAsana ? (
-            <div className="px-[30px]">
-              <PillButton
-                variant="second"
-                onClick={onDiscoverAsana}
-                disabled={busy || loadingAsanaProjects || (!values.asanaPatRef.trim() && !asanaPatConfigured)}
-                loading={loadingAsanaProjects}
-              >
-                Laad projecten
-              </PillButton>
-            </div>
-          ) : null}
-          {asanaProjectsNote ? <FieldHint position="below">{asanaProjectsNote}</FieldHint> : null}
-          {asanaProjects.length > 0 && (
-            <Pulldown
-              options={asanaProjectOptions}
-              value={selectedAsanaProjectName}
-              onChange={(name) => {
-                const project = asanaProjects.find((item) => item.name === name)
-                if (!project) return
-                patch({
-                  asanaProjectGid: project.gid,
-                  asanaProjectName: project.name,
-                  asanaWorkspaceGid: project.workspaceGid,
-                  asanaWorkspaceName: project.workspaceName,
-                  title: values.title || project.name,
-                })
-              }}
-            />
-          )}
-        </>
-      )}
-
       {category === 'Drive' && (
         <>
           <FieldSingle
@@ -492,7 +387,7 @@ export function SourceForm({
             placeholder="LinkedIn profiel- of bedrijfspagina-URL"
             value={values.scraperLinkedinProfile}
             onChange={(scraperLinkedinProfile) => patch({ scraperLinkedinProfile })}
-            hint="Persoonlijk: linkedin.com/in/naam. Bedrijf: linkedin.com/company/igisnext of admin-URL met company-ID."
+            hint="Persoonlijk: linkedin.com/in/naam. Bedrijf: linkedin.com/company/jouwbedrijf of admin-URL met company-ID."
           />
           <FieldSingle
             placeholder="LinkedIn wachtwoord (optioneel)"
@@ -587,44 +482,6 @@ export function SourceForm({
         </>
       )}
 
-      {category === 'Trello' && (
-        <>
-          <p className="m-0 px-[30px] text-[14px] leading-[18px] text-ce-black">
-            Koppel een Trello-bord via n8n — geen API-token in dit formulier. Kies een board uit de lijst
-            of plak het Board ID, vul een titel in en klik Submit. Daarna Check voor groen.
-          </p>
-          <FieldSingle
-            placeholder="Title"
-            value={values.title}
-            onChange={(title) => patch({ title })}
-          />
-          {loadingTrelloBoards && (
-            <p className="m-0 px-[30px] text-[13px] text-ce-beige">Boards laden…</p>
-          )}
-          {trelloBoardsNote ? (
-            <FieldHint position="below">{trelloBoardsNote}</FieldHint>
-          ) : null}
-          {trelloBoards.length > 0 && (
-            <Pulldown
-              options={trelloOptions}
-              value={selectedTrelloName}
-              onChange={(name) => {
-                const board = trelloBoards.find((b) => b.name === name)
-                patch({
-                  trelloBoardId: board?.id ?? '',
-                  title: values.title || board?.name || values.title,
-                })
-              }}
-            />
-          )}
-          <FieldSingle
-            placeholder="Board ID"
-            value={values.trelloBoardId}
-            onChange={(trelloBoardId) => patch({ trelloBoardId })}
-          />
-        </>
-      )}
-
       {category === 'Mailbox' && (
         <>
           <FieldSingle
@@ -638,7 +495,7 @@ export function SourceForm({
             onChange={(mailboxEmail) => patch({ mailboxEmail })}
           />
           <FieldSingle
-            placeholder="IMAP-host (bijv. mail.igisnext.com)"
+            placeholder="IMAP-host (bijv. mail.jouwdomein.nl)"
             value={values.mailboxImapHost}
             onChange={(mailboxImapHost) => patch({ mailboxImapHost })}
             helpKey="mailbox_imap_host"
@@ -837,11 +694,6 @@ export function sourceFormValuesToPayload(
     payload.maxUnitsPerRun = Number.isNaN(maxUnits) ? null : maxUnits
   }
 
-  if (category === 'Trello') {
-    payload.trelloBoardId = values.trelloBoardId || undefined
-    payload.trelloApiTokenRef = values.trelloApiTokenRef || undefined
-  }
-
   if (category === 'Mailbox') {
     payload.mailboxEmail = values.mailboxEmail || undefined
     payload.mailboxImapHost = values.mailboxImapHost || undefined
@@ -859,14 +711,6 @@ export function sourceFormValuesToPayload(
 
   if (category === 'YouTube') {
     payload.url = values.url.trim() || undefined
-  }
-
-  if (category === 'Asana') {
-    payload.asanaPatRef = values.asanaPatRef || undefined
-    payload.asanaProjectGid = values.asanaProjectGid || undefined
-    payload.asanaProjectName = values.asanaProjectName || undefined
-    payload.asanaWorkspaceGid = values.asanaWorkspaceGid || undefined
-    payload.asanaWorkspaceName = values.asanaWorkspaceName || undefined
   }
 
   if (category === 'Drive') {
@@ -904,11 +748,6 @@ export function sourceDtoToFormValues(source: {
   scraperWebhookUrl?: string | null
   scraperLinkedinProfile?: string | null
   scraperLinkedinPasswordConfigured?: boolean
-  asanaPatConfigured?: boolean
-  asanaProjectGid?: string | null
-  asanaProjectName?: string | null
-  asanaWorkspaceGid?: string | null
-  asanaWorkspaceName?: string | null
   driveFileUrl?: string | null
   sourceTier?: 'core' | 'supplementary'
 }): SourceFormValues {
@@ -939,11 +778,6 @@ export function sourceDtoToFormValues(source: {
     scraperWebhookUrl: source.scraperWebhookUrl ?? '',
     scraperLinkedinProfile: source.scraperLinkedinProfile ?? '',
     scraperLinkedinPasswordRef: '',
-    asanaPatRef: '',
-    asanaProjectGid: source.asanaProjectGid ?? '',
-    asanaProjectName: source.asanaProjectName ?? '',
-    asanaWorkspaceGid: source.asanaWorkspaceGid ?? '',
-    asanaWorkspaceName: source.asanaWorkspaceName ?? '',
     driveFileUrl: source.driveFileUrl ?? '',
     sourceTier: source.sourceTier === 'supplementary' ? 'supplementary' : 'core',
   }
@@ -955,13 +789,11 @@ export function defaultSourceRowTitle(category: SourceTab): string {
     Blogs: 'Blog title',
     Document: 'Document title',
     YouTube: 'YouTube title',
-    Asana: 'Asana title',
     Drive: 'Google Drive',
     Linkedin: 'LinkedIn title',
     Scraper: 'Scraper title',
     Mailbox: 'Mailbox title',
     Analythics: 'Analythics title',
-    Trello: 'Trello title',
     Calendar: 'Google Calendar',
   }[category]
 }

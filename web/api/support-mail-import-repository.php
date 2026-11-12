@@ -128,7 +128,7 @@ function ce_support_match_client_by_email(PDO $pdo, string $email): ?string
 /** @return array{clientId: string|null, contactEmail: string}|null */
 function ce_support_parse_escalation_body(string $body): ?array
 {
-    if (!preg_match('/Support-escalatie vanuit Content Engine/i', $body)) {
+    if (!preg_match('/Support-escalatie vanuit /i', $body)) {
         return null;
     }
 

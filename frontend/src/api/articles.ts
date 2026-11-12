@@ -104,9 +104,20 @@ export function confirmGeenBronMerkBewering(
   })
 }
 
+function rewrittenArticleIsReady(fresh: ArticleDto, previousArticleId: string | null): boolean {
+  if (fresh.themeOnly) return false
+  if (!fresh.id) return false
+  if (previousArticleId && fresh.id === previousArticleId) return false
+  const body = (fresh.contentAi || fresh.content || '').trim()
+  if (!body) return false
+  if (fresh.writingPending) return false
+  return true
+}
+
 /**
  * Rewrite vervangt de artikel-rij (DELETE + INSERT in CE-03) — content blijft dus
- * niet-leeg tijdens het herschrijven. Poll daarom op een gewijzigd article.id.
+ * niet-leeg tijdens het herschrijven. Poll op een nieuw article.id met echte body.
+ * themeOnly (campagneslot zonder tekst) is géén klaar-signaal.
  */
 export async function waitForRewrittenArticle(
   slotId: string,
@@ -121,7 +132,7 @@ export async function waitForRewrittenArticle(
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
     try {
       const fresh = await fetchArticle(slotId)
-      if (fresh.id !== previousArticleId) {
+      if (rewrittenArticleIsReady(fresh, previousArticleId)) {
         return fresh
       }
     } catch (err) {

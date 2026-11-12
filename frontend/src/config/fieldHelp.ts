@@ -111,17 +111,6 @@ export const FIELD_HELP = {
     reassure:
       'We volgen het kanaal via de officiële RSS-feed — geen API-key nodig. Transcripties zitten er niet bij.',
   },
-  asana_pat: {
-    key: 'asana_pat',
-    label: 'Asana Personal Access Token',
-    what:
-      'Je persoonlijke sleutel waarmee open taken uit het gekozen Asana-project gelezen mogen worden.',
-    looksLike: 'lange tekst die begint met een cijfer/letter-combinatie',
-    where:
-      'Asana → My Settings → Apps → Personal access tokens → Create new token. Geef alleen leesrechten op het project dat je kiest.',
-    reassure:
-      'We slaan het token versleuteld op. Laat het veld leeg na opslaan om het huidige token te behouden.',
-  },
   drive_file_url: {
     key: 'drive_file_url',
     label: 'Google Drive-bestands-URL',

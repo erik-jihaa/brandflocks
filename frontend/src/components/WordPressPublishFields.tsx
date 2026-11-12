@@ -103,7 +103,7 @@ export function WordPressPublishFields({
             placeholder="WordPress site-URL (https://jouwsite.nl)"
             value={draft.wordpressSiteUrl}
             onChange={(v) => onDraftChange((d) => ({ ...d, wordpressSiteUrl: v }))}
-            hint="REST-basis, geen /wp-admin. CE-blog: https://ce.igisnext.com/blog — niet staging.igisnext.com (dat is alleen de app)."
+            hint="REST-basis, geen /wp-admin — de URL van de WordPress-site, niet van deze app."
           />
           <FieldSingle
             placeholder="WordPress gebruiker"

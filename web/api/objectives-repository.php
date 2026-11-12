@@ -8,6 +8,59 @@ require_once __DIR__ . '/sources-repository.php';
 
 const CE_OBJECTIVES_MAX = 6;
 
+const CE_BRAND_ARCHITECTURE_OBJECTIVE_LABEL = 'Merkdoel (merkarchitectuur)';
+
+/**
+ * Tekstveld "Doel" / merkverhaal onder Strategy (Wie je bent) — leidend voor schrijfprompts sinds stap 1a.
+ */
+function ce_client_brand_architecture_goal_text(PDO $pdo, string $clientId): string
+{
+    $clientId = trim($clientId);
+    if ($clientId === '' || !ce_table_exists($pdo, 'clients')) {
+        return '';
+    }
+    ce_ensure_strategy_columns($pdo);
+    if (!ce_table_has_column($pdo, 'clients', 'brand_goal')) {
+        return '';
+    }
+    $stmt = $pdo->prepare('SELECT brand_goal FROM clients WHERE id = :id LIMIT 1');
+    $stmt->execute(['id' => $clientId]);
+    $raw = $stmt->fetchColumn();
+
+    return trim(is_string($raw) ? $raw : '');
+}
+
+/**
+ * @return array{id: string, clientId: string, label: string, description: string, percentage: int, sortOrder: int, writingStyle: string, sourceFolderId: null, _source: string}
+ */
+function ce_brand_architecture_objective_dto(PDO $pdo, string $clientId): ?array
+{
+    $goal = ce_client_brand_architecture_goal_text($pdo, $clientId);
+    if ($goal === '') {
+        return null;
+    }
+    ce_ensure_strategy_columns($pdo);
+    $writingStyle = 'zakelijk_direct';
+    if (ce_table_has_column($pdo, 'clients', 'writing_style')) {
+        $stmt = $pdo->prepare('SELECT writing_style FROM clients WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => trim($clientId)]);
+        $ws = $stmt->fetchColumn();
+        $writingStyle = trim(is_string($ws) ? $ws : '') ?: 'zakelijk_direct';
+    }
+
+    return [
+        'id' => '',
+        'clientId' => trim($clientId),
+        'label' => CE_BRAND_ARCHITECTURE_OBJECTIVE_LABEL,
+        'description' => $goal,
+        'percentage' => 0,
+        'sortOrder' => 0,
+        'writingStyle' => $writingStyle,
+        'sourceFolderId' => null,
+        '_source' => 'brand_architecture',
+    ];
+}
+
 function ce_ensure_objectives_schema(PDO $pdo): void
 {
     static $checked = false;
@@ -268,6 +321,22 @@ function ce_resolve_article_objective(PDO $pdo, array $articleRow): ?array
 }
 
 /**
+ * Doel voor schrijven: merkarchitectuur (clients.brand_goal) eerst; anders oud objectives-record.
+ *
+ * @return array<string, mixed>|null
+ */
+function ce_resolve_article_objective_for_writing(PDO $pdo, array $articleRow): ?array
+{
+    $clientId = trim((string) ($articleRow['client_id'] ?? ''));
+    $fromBrand = $clientId !== '' ? ce_brand_architecture_objective_dto($pdo, $clientId) : null;
+    if ($fromBrand !== null) {
+        return $fromBrand;
+    }
+
+    return ce_resolve_article_objective($pdo, $articleRow);
+}
+
+/**
  * Regels voor write_directive / CE-03 — doelstelling + prompt-instructie.
  *
  * @param array<string, mixed>|null $objective
@@ -283,17 +352,29 @@ function ce_objective_write_directive_lines(?array $objective, string $styleLine
     $description = trim((string) ($objective['description'] ?? ''));
     $percentage = (int) ($objective['percentage'] ?? 0);
     $writingStyle = trim((string) ($objective['writingStyle'] ?? ''));
+    $isBrandArch = (($objective['_source'] ?? '') === 'brand_architecture') || ($label === CE_BRAND_ARCHITECTURE_OBJECTIVE_LABEL);
 
     $lines = [];
-    if ($label !== '') {
-        $pct = $percentage > 0 ? " ({$percentage}%)" : '';
-        $lines[] = 'DOELSTELLING VAN DEZE POST: ' . $label . $pct . '.';
-    }
-    if ($description !== '') {
-        $lines[] = $description;
-    }
-    if ($label !== '' || $description !== '') {
-        $lines[] = 'Richt rationale, boodschap en CTA expliciet op deze doelstelling.';
+    if ($isBrandArch) {
+        if ($description !== '') {
+            $lines[] = 'MERKDOEL (merkarchitectuur — wie je bent): ' . $description;
+        } elseif ($label !== '') {
+            $lines[] = 'MERKDOEL (merkarchitectuur — wie je bent): ' . $label;
+        }
+        if ($description !== '' || $label !== '') {
+            $lines[] = 'Richt rationale, boodschap en CTA op dit merkdoel en de merkarchitectuur.';
+        }
+    } else {
+        if ($label !== '') {
+            $pct = $percentage > 0 ? " ({$percentage}%)" : '';
+            $lines[] = 'DOELSTELLING VAN DEZE POST: ' . $label . $pct . '.';
+        }
+        if ($description !== '') {
+            $lines[] = $description;
+        }
+        if ($label !== '' || $description !== '') {
+            $lines[] = 'Richt rationale, boodschap en CTA expliciet op deze doelstelling.';
+        }
     }
     if ($writingStyle !== '') {
         $lines[] = 'Schrijfstijl bij deze doelstelling: ' . $writingStyle . '.';

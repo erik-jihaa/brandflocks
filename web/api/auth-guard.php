@@ -47,6 +47,11 @@ function ce_auth_is_required(PDO $pdo): bool
         return false;
     }
 
+    // Lege tenant-DB: op local nog open voor dev; elders altijd login-scherm (§5.9).
+    if (ce_env() !== 'local') {
+        return true;
+    }
+
     $count = (int) $pdo->query(
         "SELECT COUNT(*) FROM clients WHERE password_hash IS NOT NULL AND TRIM(password_hash) <> ''"
     )->fetchColumn();

@@ -91,7 +91,7 @@ function ce_public_base_url(): string
         return rtrim($base, '/');
     }
 
-    $host = $_SERVER['HTTP_HOST'] ?? 'ce.igisnext.com';
+    $host = $_SERVER['HTTP_HOST'] ?? ce_install_contact_defaults()['appHost'];
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
     return $scheme . '://' . $host;
@@ -438,7 +438,7 @@ function ce_review_email(?PDO $pdo = null, ?string $clientId = null): string
         }
     }
 
-    return $email !== '' ? $email : 'erik@igisnext.com';
+    return $email !== '' ? $email : ce_install_contact_defaults()['review'];
 }
 
 /** @return array{ok: bool, error?: string, httpCode?: int, reviewerEmail?: string} */

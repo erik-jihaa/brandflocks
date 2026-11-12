@@ -3,6 +3,7 @@
 #
 #   ./scripts/deploy-ftp-probe.sh              # .env (productie)
 #   ./scripts/deploy-ftp-probe.sh staging      # .env.staging
+#   ./scripts/deploy-ftp-probe.sh brandflocks-target  # .env.brandflocks-target
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$ROOT/scripts/ce-env.sh"

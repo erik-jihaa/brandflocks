@@ -1,0 +1,1041 @@
+{
+  "name": "CE-01 (Theme Director) [Bf app]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce01-theme-director-brandflocks",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce01-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        300
+      ],
+      "webhookId": "ce01-theme-director-brandflocks-webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "ce01-schedule",
+      "name": "Weekly Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first()?.json ?? {};\nconst isWebhook = raw.body !== undefined || raw.headers !== undefined;\nconst body = raw.body ?? raw;\nconst clientId = body.client_id ?? body.clientId ?? '';\nconst refillRaw = body.refill_cycle_weeks ?? body.refillCycleWeeks ?? [];\nconst refillCycleWeeks = Array.isArray(refillRaw)\n  ? refillRaw.map((w) => String(w).slice(0, 10)).filter(Boolean)\n  : [];\nconst proposalCount = Math.max(1, Number(body.proposal_count ?? body.proposalCount ?? 3));\nreturn {\n  json: {\n    client_id: String(clientId || '').trim(),\n    trigger: isWebhook ? 'webhook' : 'schedule',\n    refill_cycle_weeks: refillCycleWeeks,\n    proposal_count: proposalCount,\n  },\n};"
+      },
+      "id": "ce01-parse",
+      "name": "Parse Run Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.id, c.name, c.archetype, c.archetype_traits, c.adversary, c.brand_goal, c.tone_of_voice, c.writing_guide,\n  COALESCE(c.planning_horizon_weeks, 4) AS planning_horizon_weeks,\n  COALESCE(c.posts_per_week, 1) AS posts_per_week,\n  c.phases,\n  bn.geloofwaardigheidstest, bn.mechanisme,\n  bl.markt_archetype AS branche_archetype\nFROM clients c\nLEFT JOIN brand_narratives bn ON bn.client_id = c.id AND COALESCE(bn.is_current, 1) = 1\nLEFT JOIN branche_library bl ON bl.branche_code = bn.branche_code\nWHERE (NULLIF($1, '') IS NULL OR c.id = $1)\n  AND (\n    NULLIF($1, '') IS NOT NULL\n    OR COALESCE(c.ce01_weekly_schedule, 1) = 1\n  )\nORDER BY c.name ASC",
+        "options": {
+          "queryReplacement": "={{ $('Parse Run Input').item.json.client_id }}"
+        }
+      },
+      "id": "ce01-get-clients",
+      "name": "Get Active Clients",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        380
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "ce01-loop-clients",
+      "name": "Loop Clients",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1300,
+        380
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ce01-all-clients-done",
+      "name": "All Clients Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DATE(cycle_week) AS cycle_week, status FROM themes\nWHERE client_id = $1\n  AND COALESCE(status, 'proposed') NOT IN ('deleted')\n  AND (title IS NULL OR title NOT LIKE '[nulmeting]%')\n  AND cycle_week >= CURDATE() - INTERVAL 1 DAY\nORDER BY cycle_week ASC",
+        "options": {
+          "queryReplacement": "={{ [ $json.id ] }}"
+        }
+      },
+      "id": "ce01-existing-themes",
+      "name": "Get Existing Themes",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        480
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COALESCE(a.headline_human, a.headline) AS headline, s.phase_key, s.theme,\n  (COALESCE(a.interaction_likes, 0) + COALESCE(a.interaction_comments, 0)) AS engagement,\n  JSON_UNQUOTE(JSON_EXTRACT(hs.raw_llm_response, '$.hoofdoordeel')) AS hba_hoofdoordeel\nFROM articles a\nJOIN content_slots s ON s.id = a.slot_id\nLEFT JOIN hba_scores hs ON hs.id = (\n  SELECT hs2.id FROM hba_scores hs2 WHERE hs2.post_id = a.id ORDER BY hs2.scored_at DESC LIMIT 1\n)\nWHERE s.client_id = $1\n  AND COALESCE(s.origin, '') NOT IN ('baseline')\n  AND COALESCE(a.headline, '') NOT LIKE 'HBA-test:%'\n  AND COALESCE(a.headline_human, '') NOT LIKE 'HBA-test:%'\n  AND a.status IN ('published', 'archived')\nORDER BY engagement DESC\nLIMIT 8",
+        "options": {
+          "queryReplacement": "={{ [ $('Get Active Clients').item.json.id ] }}"
+        }
+      },
+      "id": "ce01-performance",
+      "name": "Get Performance",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        380
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT title, url, category, source_kind, description, trello_board_id, last_checked_at\nFROM sources\nWHERE client_id = $1 AND COALESCE(active, 1) = 1\nORDER BY last_checked_at DESC, title ASC\nLIMIT 20",
+        "options": {
+          "queryReplacement": "={{ [ $('Get Active Clients').item.json.id ] }}"
+        }
+      },
+      "id": "ce01-sources",
+      "name": "Get Sources",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1740,
+        380
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT posts_per_week, roles FROM content_rhythms\nWHERE client_id = $1 AND active = 1\nORDER BY created_at DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Get Active Clients').item.json.id ] }}"
+        }
+      },
+      "id": "ce01-content-rhythm",
+      "name": "Get Content Rhythm",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        580
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst client = $('Get Active Clients').item.json;\nconst existingRows = $('Get Existing Themes').all().map((i) => i.json).filter((r) => r.cycle_week);\nconst perfRows = $('Get Performance').all().map((i) => i.json).filter((r) => r.headline || r.theme);\nconst sourceRows = $('Get Sources').all()\n  .map((i) => i.json)\n  .filter((r) => r.title)\n  .filter((r) => {\n    const cat = String(r.category || '').toLowerCase();\n    return cat !== 'linkedin' && cat !== 'scraper';\n  });\n\nfunction mondayOf(d) {\n  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = x.getUTCDay() || 7;\n  x.setUTCDate(x.getUTCDate() - day + 1);\n  return x.toISOString().slice(0, 10);\n}\n\nfunction addDays(iso, days) {\n  const d = new Date(iso + 'T12:00:00Z');\n  d.setUTCDate(d.getUTCDate() + days);\n  return d.toISOString().slice(0, 10);\n}\n\nconst existing = new Set(\n  existingRows\n    .map((r) => String(r.cycle_week || '').slice(0, 10))\n    .filter(Boolean),\n);\n\nfunction proposedCountForWeek(isoWeek) {\n  return existingRows.filter((r) => {\n    const week = String(r.cycle_week || '').slice(0, 10);\n    const status = String(r.status || 'proposed').toLowerCase();\n    return week === isoWeek && (status === 'proposed' || status === '');\n  }).length;\n}\n\nconst parseInput = $('Parse Run Input').item.json;\nconst forcedWeeks = Array.isArray(parseInput.refill_cycle_weeks)\n  ? parseInput.refill_cycle_weeks.map((w) => String(w).slice(0, 10)).filter(Boolean)\n  : [];\nconst forcedProposalCount = Math.max(\n  1,\n  Number(parseInput.proposal_count || parseInput.proposalCount || 3),\n);\n\nconst horizon = Math.max(1, Number(client.planning_horizon_weeks || 4));\nconst postsPerWeek = Math.max(1, Number(client.posts_per_week || 1));\nconst today = new Date();\nconst startMonday = mondayOf(today);\n\nconst horizonWeeks = [];\nfor (let w = 0; w < horizon; w += 1) {\n  horizonWeeks.push(addDays(startMonday, w * 7));\n}\n\nlet missingWeeks;\nlet weeksToFill;\nlet themesNeeded;\nlet proposalCount = postsPerWeek;\n\nif (forcedWeeks.length > 0) {\n  proposalCount = forcedProposalCount;\n  missingWeeks = forcedWeeks.filter((w) => proposedCountForWeek(w) < proposalCount);\n  weeksToFill = missingWeeks.length;\n  themesNeeded = missingWeeks.reduce(\n    (sum, w) => sum + Math.max(0, proposalCount - proposedCountForWeek(w)),\n    0,\n  );\n} else {\n  missingWeeks = horizonWeeks.filter((w) => !existing.has(w));\n  weeksToFill = missingWeeks.length;\n  themesNeeded = weeksToFill * postsPerWeek;\n}\n\nlet phases = [];\ntry {\n  phases = typeof client.phases === 'string' ? JSON.parse(client.phases) : client.phases || [];\n} catch {\n  phases = [];\n}\n\nconst performance_summary = perfRows.length\n  ? perfRows\n      .map((r) => {\n        const hoofd = r.hba_hoofdoordeel ? `, hoofdoordeel ${r.hba_hoofdoordeel}` : '';\n        return `- ${r.headline || r.theme || 'Post'} (engagement ${r.engagement || 0}${hoofd})`;\n      })\n      .join('\\n')\n  : 'Geen gepubliceerde posts met engagement-data (testposts uitgesloten).';\n\nconst trending_signals_summary = sourceRows.length\n  ? sourceRows\n      .map((s) => {\n        if (s.category === 'trello' && s.trello_board_id) {\n          return `- [trello] ${s.title} (board ${s.trello_board_id})`;\n        }\n        if (s.category === 'url_rss') {\n          return `- [rss] ${s.title} (feed \u2014 geen artikel-URL gebruiken)`;\n        }\n        if (s.category === 'blogs') {\n          return `- [blogs] ${s.title} (blogoverzicht \u2014 onderliggende posts, geen overzichts-URL gebruiken)`;\n        }\n        if (s.category === 'youtube') {\n          return `- [youtube] ${s.title} (kanaal-RSS \u2014 video-updates, geen transcripties)`;\n        }\n        if (s.category === 'document') {\n          return `- [document] ${s.title} (eigen PDF \u2014 interne kennis, geen extern nieuws)`;\n        }\n        if (s.category === 'drive') {\n          return `- [drive] ${s.title} (eigen Drive-document \u2014 interne kennis)`;\n        }\n        return `- [${s.category || s.source_kind || 'bron'}] ${s.title}${s.url ? ': ' + s.url : ''}`;\n      })\n      .join('\\n')\n  : 'Geen actieve bronnen geconfigureerd \u2014 baseer voorstellen op fasecyclus en performance.';\n\nconst rhythmRow = $('Get Content Rhythm').first()?.json ?? {};\nlet rhythmRoles = [];\nlet rhythmPostsPerWeek = postsPerWeek;\ntry {\n  const parsed = typeof rhythmRow.roles === 'string' ? JSON.parse(rhythmRow.roles) : rhythmRow.roles;\n  if (Array.isArray(parsed)) rhythmRoles = parsed;\n} catch {\n  rhythmRoles = [];\n}\nif (Number(rhythmRow.posts_per_week) > 0) {\n  rhythmPostsPerWeek = Number(rhythmRow.posts_per_week);\n}\n\nfunction rhythmLabel(name) {\n  const key = String(name || '').toLowerCase();\n  if (key === 'autoriteit') return 'Autoriteit';\n  if (key === 'inzicht') return 'Inzicht';\n  if (key.includes('product')) return 'Product of dienst';\n  return String(name || '').trim();\n}\n\nconst rhythmLines = rhythmRoles.map((role, index) => {\n  const name = String(role?.role_name || role?.roleName || '').trim();\n  if (!name) return '';\n  return `${index + 1}. ${rhythmLabel(name)} (${name})`;\n}).filter(Boolean);\n\nconst rhythm_summary = rhythmLines.length\n  ? `Vast content-ritme (${rhythmRoles.length} rollen per week):\\n${rhythmLines.join('\\n')}\\n\\nWijs per week thema 1 aan rol 1, thema 2 aan rol 2, enz. \u2014 herhaal het patroon cyclisch.`\n  : 'Geen content-ritme geconfigureerd \u2014 varieer tussen autoriteit, inzicht en product/dienst.';\n\nreturn {\n  json: {\n    client,\n    missingWeeks,\n    weeksToFill,\n    themesNeeded,\n    postsPerWeek: Math.max(postsPerWeek, rhythmPostsPerWeek),\n    proposalCount,\n    existingRows,\n    phases,\n    performance_summary,\n    trending_signals_summary,\n    rhythmRoles,\n    rhythm_summary,\n    skip: themesNeeded <= 0,\n  },\n};\n"
+      },
+      "id": "ce01-compute",
+      "name": "Compute Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "false"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01-if-needs-themes",
+      "name": "Needs Themes?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 4096,\n  system: \"Je bent de content-strateeg voor \\n\\nNEDERLANDS \u2014 VERMIJD CALQUE-WOORDEN\\n\\nSchrijf natuurlijk, spreektalig Nederlands. Let specifiek op woorden die grammaticaal correct\\nzijn maar ontstaan zijn als letterlijke vertaling van een Engels begrip, en daardoor net anders\\nklinken dan hoe een Nederlandse schrijver het zou zeggen. Herken dit patroon zelf en kies het\\nalledaagse alternatief, ook als het gevraagde woord niet op onderstaande lijst staat.\\n\\nBekende voorbeelden (vermijd, tenzij het vaktaal in de tekst zelf is):\\n- \\\"expliciteren / ge\u00ebxpliciteerd\\\" (van \\\"make explicit\\\") \u2192 gebruik \\\"vastleggen\\\", \\\"opschrijven\\\",\\n  \\\"onder woorden brengen\\\", \\\"duidelijk maken\\\"\\n- \\\"additioneel\\\" (van \\\"additional\\\") \u2192 \\\"extra\\\"\\n- \\\"faciliteren\\\" (van \\\"facilitate\\\") \u2192 \\\"mogelijk maken\\\", \\\"helpen\\\"\\n- \\\"actioneren\\\" (van \\\"action\\\" als werkwoord) \u2192 \\\"oppakken\\\", \\\"uitvoeren\\\"\\n- \\\"leveren\\\" als vertaling van \\\"deliver\\\" in abstracte zin (\\\"waarde leveren\\\") \u2192 concreter maken:\\n  wat gebeurt er dan precies\\n\\nVuistregel: als een woord vaker in een vertaald Engels rapport voorkomt dan in een gesprek aan de\\nkeukentafel, kies dan het keukentafel-woord \u2014 tenzij het een vakterm is die in deze tekst bewust\\nwordt gebruikt (zoals HBA-begrippen: Hero, Foe, hygi\u00ebnefactor \u2014 die blijven staan).\" + $json.client.name + \".\\nArchetype: \" + $json.client.archetype + \" (\" + ($json.client.archetype_traits || \"\") + \")\\nTegenstander/adversary: \" + $json.client.adversary + \"\\nMerkdoel: \" + $json.client.brand_goal + \"\\nSchrijfwijzer: \" + ($json.client.writing_guide || \"niet ingevuld\") + \"\\nRegel van het merk: \" + ($json.client.geloofwaardigheidstest || \"niet ingevuld\") + \"\\nMechanisme: \" + ($json.client.mechanisme || \"niet ingevuld\") + (String($json.client.archetype || \"\").trim() && String($json.client.branche_archetype || \"\").trim() && String($json.client.archetype).trim().toLowerCase() === String($json.client.branche_archetype).trim().toLowerCase() ? \"\\n\\nHet archetype van dit merk is ook het gangbare archetype van de branche. Passen bij het archetype maakt een thema hier niet onderscheidend. Stel alleen een thema voor als versterking van het merk als het een concreet element van het mechanisme of de regel laat zien. Een warm of menselijk thema zonder dat element is hoogstens neutraal.\" : \"\") + \"\\n\\nVolg de schrijfwijzer strikt: doelgroep, producten en wat je niet post. Bronnen zijn inspiratie, geen vrijbrief om van het merk af te wijken.\\n\\nBeschikbare fasen:\\n\" + ($json.phases || []).map(p => \"- \" + p.key + \": \" + p.label + \" \u2014 \" + (p.description || \"\")).join(\"\\n\") + \"\\n\\nGebruik geen interne labels (HBA-patroon, testpost-titels). Baseer je op hoofdoordeel in de performance-lijst, niet op koppen. Het woord regel alleen voor de regel van het merk (geloofwaardigheidstest), niet voor feiten of vakkennis. Beschrijf de regel zoals in de geloofwaardigheidstest; een belofte die op de regel lijkt maar iets anders zegt, is geen uitwerking van de regel.\\n\\nOutput uitsluitend via tool propose_themes.\",\n  messages: [\n    {\n      role: \"user\",\n      content: \"Content-ritme:\\n\" + ($json.rhythm_summary || \"Geen ritme geconfigureerd.\") + \"\\n\\nBeste presterende content:\\n\" + $json.performance_summary + \"\\n\\nTrending signalen / bronnen:\\n\" + $json.trending_signals_summary + \"\\n\\nOPDRACHT: Stel precies \" + $json.themesNeeded + \" thema('s) voor voor de ontbrekende week(en) in de planning-horizon (\" + $json.weeksToFill + \" week(s), \" + $json.postsPerWeek + \" per week). Gebruik horizon_week_index (1 = eerste ontbrekende week). Stem elk thema af op de ritmrol voor die positie in de week (thema 1 = rol 1, thema 2 = rol 2, enz.). Begin motivation en rationale niet met Ritmrol of Trending signaal \u2014 de app toont de ritmrol apart. Motiveer wel trending vs fasecyclus \u00e9n ritmrol in de inhoud. Geen datums \u2014 die worden in code gezet. source_article_url: directe URL naar \u00e9\u00e9n nieuwsartikel bij de uitgever; NOOIT een RSS-feed-URL, news.google.com/rss/search link, of LinkedIn-post/ profiel-URL (eigen gescrapete posts \u2014 geen content-loop). Laat leeg als onbekend.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"propose_themes\",\n      description: \"Thema-voorstellen voor ontbrekende weken\",\n      input_schema: {\n        type: \"object\",\n        properties: {\n          themes: {\n            type: \"array\",\n            items: {\n              type: \"object\",\n              properties: {\n                horizon_week_index: { type: \"integer\", minimum: 1 },\n                phase_key: { type: \"string\" },\n                title: { type: \"string\" },\n                motivation: { type: \"string\" },\n                rationale: { type: \"string\" },\n                source_article_url: { type: \"string\" }\n              },\n              required: [\"horizon_week_index\", \"phase_key\", \"title\", \"motivation\", \"rationale\"]\n            }\n          }\n        },\n        required: [\"themes\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"propose_themes\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce01-claude",
+      "name": "Claude Theme Director",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2400,
+        280
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Compute Context').item.json;\nconst claude = $('Claude Theme Director').item.json;\nconst input = claude?.content?.[0]?.input ?? {};\nconst rawThemes = Array.isArray(input.themes) ? input.themes : [];\n\nif (ctx.skip) {\n  return [{ json: { skip: true, client_id: ctx.client.id, reason: 'Horizon already filled' } }];\n}\n\nconst { client, missingWeeks, postsPerWeek, proposalCount, existingRows, rhythmRoles = [] } = ctx;\n\nfunction rhythmRoleForWeekIndex(weekIso, indexInWeek) {\n  if (!Array.isArray(rhythmRoles) || rhythmRoles.length === 0) return null;\n  const role = rhythmRoles[indexInWeek % rhythmRoles.length];\n  return String(role?.role_name || role?.roleName || '').trim() || null;\n}\n\nfunction proposedCountForWeek(isoWeek) {\n  return (existingRows || []).filter((r) => {\n    const week = String(r.cycle_week || '').slice(0, 10);\n    const status = String(r.status || 'proposed').toLowerCase();\n    return week === isoWeek && (status === 'proposed' || status === '');\n  }).length;\n}\n\nconst slots = [];\nconst weekRoleCounts = {};\nfor (const week of missingWeeks) {\n  const perWeek = Math.max(1, Number(proposalCount || postsPerWeek));\n  const need = Math.max(0, perWeek - proposedCountForWeek(week));\n  for (let p = 0; p < need; p += 1) {\n    const roleIndex = weekRoleCounts[week] || 0;\n    weekRoleCounts[week] = roleIndex + 1;\n    slots.push({ cycle_week: week, slot_index: slots.length, week_role_index: roleIndex });\n  }\n}\n\nconst out = [];\nconst assignedSlots = new Set();\nconst usedTitles = new Set();\nfunction makeUuid() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = (Math.random() * 16) | 0;\n    const v = c === 'x' ? r : (r & 0x3) | 0x8;\n    return v.toString(16);\n  });\n}\nfunction isoWeekFromDate(iso) {\n  if (!iso) return '';\n  const d = new Date(String(iso).slice(0, 10) + 'T12:00:00Z');\n  const day = d.getUTCDay() || 7;\n  d.setUTCDate(d.getUTCDate() + 4 - day);\n  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));\n  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);\n  return String(week);\n}\n\nfunction isFeedOrSearchUrl(url) {\n  const u = String(url || '').trim().toLowerCase();\n  if (!u) return true;\n  if (u.includes('news.google.com/rss/search')) return true;\n  if (u.includes('news.google.com/rss/feeds')) return true;\n  if (/\\/rss(\\?|$)/.test(u) && !u.includes('/rss/articles/')) return true;\n  if (/\\.(xml|rss)(\\?|$)/.test(u)) return true;\n  return false;\n}\n\nfunction isLinkedInContentUrl(url) {\n  const u = String(url || '').trim().toLowerCase();\n  if (!u) return false;\n  return u.includes('linkedin.com/') || u.includes('lnkd.in/');\n}\n\nconst sortedThemes = [...rawThemes].sort((a, b) => {\n  const wa = Number(a.horizon_week_index || 1);\n  const wb = Number(b.horizon_week_index || 1);\n  if (wa !== wb) return wa - wb;\n  return String(a.title || '').localeCompare(String(b.title || ''), 'nl');\n});\n\nfor (const t of sortedThemes) {\n  const weekIdx = Math.max(1, Number(t.horizon_week_index || 1)) - 1;\n  const title = String(t.title || '').trim();\n  const titleKey = title.toLowerCase();\n  if (titleKey && usedTitles.has(titleKey)) continue;\n\n  let slot = null;\n  let slotIndex = -1;\n  const targetWeek = missingWeeks[weekIdx];\n  for (let i = 0; i < slots.length; i += 1) {\n    if (assignedSlots.has(i)) continue;\n    if (targetWeek && slots[i].cycle_week !== targetWeek) continue;\n    assignedSlots.add(i);\n    slotIndex = i;\n    slot = slots[i];\n    break;\n  }\n  if (!slot) continue;\n\n  usedTitles.add(titleKey);\n  const themeId = makeUuid();\n  const phaseKey = String(t.phase_key || isoWeekFromDate(slot.cycle_week) || `week_${weekIdx + 1}`);\n  const rhythmRole = rhythmRoleForWeekIndex(slot.cycle_week, slot.week_role_index ?? slotIndex);\n  function stripThemeStoryLeadIn(text) {\n    let body = String(text || '').trim();\n    for (let i = 0; i < 6; i += 1) {\n      const next = body\n        .replace(/^ritmrol\\s*(?:\\d+\\s*=\\s*)?[^.\\n]+(?:\\.\\s*)?/iu, '')\n        .replace(/^ritmrol:\\s*[^.\\n]+\\.\\s*/iu, '')\n        .replace(/^trending signaal:\\s*/iu, '')\n        .trim();\n      if (next === body) break;\n      body = next;\n    }\n    return body;\n  }\n  const motivation = stripThemeStoryLeadIn(t.motivation);\n  const rationale = stripThemeStoryLeadIn(t.rationale);\n  out.push({\n    json: {\n      theme_id: themeId,\n      client_id: client.id,\n      cycle_week: slot.cycle_week,\n      phase_key: phaseKey,\n      title: title || `Theme ${slotIndex + 1}`,\n      motivation,\n      rationale,\n      rhythm_role: rhythmRole,\n      source_article_url: t.source_article_url && !isFeedOrSearchUrl(t.source_article_url) && !isLinkedInContentUrl(t.source_article_url)\n        ? String(t.source_article_url).trim()\n        : null,\n    },\n  });\n}\n\nif (out.length === 0) {\n  throw new Error('Claude returned no themes while weeks still need filling.');\n}\n\nreturn out;\n"
+      },
+      "id": "ce01-prepare",
+      "name": "Prepare Theme Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2620,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO themes (id, client_id, cycle_week, phase_key, title, motivation, rationale, source_article_url, status, feedback)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'proposed', 'none')",
+        "options": {
+          "queryReplacement": "={{ [ $json.theme_id, $json.client_id, $json.cycle_week, $json.phase_key, $json.title, $json.motivation, $json.rationale, $json.source_article_url ] }}"
+        }
+      },
+      "id": "ce01-insert",
+      "name": "Insert Theme",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2840,
+        280
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "ce01-aggregate",
+      "name": "Aggregate Themes",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3060,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst prepared = $('Prepare Theme Rows').all().map((i) => i.json).filter((r) => r.theme_id);\nconst ctx = $('Compute Context').item.json;\nreturn {\n  json: {\n    ok: true,\n    skipped: false,\n    themes_created: prepared.length,\n    theme_ids: prepared.map((r) => r.theme_id),\n    client_id: ctx.client.id,\n    client_name: ctx.client.name,\n  },\n};\n"
+      },
+      "id": "ce01-build-response",
+      "name": "Build Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst j = $input.first()?.json ?? {};\nconst clientId = j.client_id || $('Get Active Clients').item.json.id;\nreturn {\n  json: {\n    ...j,\n    client_id: clientId,\n    trigger: $('Parse Run Input').item.json.trigger,\n  },\n};\n"
+      },
+      "id": "ce01-route-after-client",
+      "name": "Route After Client",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3500,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "webhook-only",
+              "leftValue": "={{ $json.trigger }}",
+              "rightValue": "webhook",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01-if-webhook",
+      "name": "If Webhook",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3940,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "schedule-only",
+              "leftValue": "={{ $('Parse Run Input').item.json.trigger === 'schedule' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01-if-schedule",
+      "name": "If Run Pipeline Cascade",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3940,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT t.id AS theme_id, t.client_id, t.title, DATE(t.cycle_week) AS cycle_week\nFROM themes t\nWHERE t.client_id = $1\n  AND COALESCE(t.status, 'proposed') IN ('proposed', 'draft', 'submitted')\n  AND (t.title IS NULL OR t.title NOT LIKE '[nulmeting]%')\n  AND DATE(t.cycle_week) <= CURDATE()\nORDER BY t.cycle_week ASC",
+        "options": {
+          "queryReplacement": "={{ [ $json.client_id ] }}"
+        }
+      },
+      "id": "ce01-get-themes-ce02",
+      "name": "Get Themes For CE-02",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        4160,
+        520
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst rows = $('Get Themes For CE-02').all().map((i) => i.json).filter((r) => r.theme_id);\nif (!rows.length) {\n  return [{ json: { client_id: $('Route After Client').item.json.client_id, phase: 'ce02', skipped: true } }];\n}\nreturn rows.map((r) => ({\n  json: { theme_id: r.theme_id, client_id: r.client_id, phase: 'ce02' },\n}));\n"
+      },
+      "id": "ce01-prepare-ce02",
+      "name": "Prepare CE-02 Triggers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4380,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-theme",
+              "leftValue": "={{ $json.theme_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01-if-ce02-target",
+      "name": "Has CE-02 Target?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4600,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://erikjihaa.app.n8n.cloud/webhook/ce02-research-brandflocks",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ theme_id: $json.theme_id, client_id: $json.client_id }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ce01-trigger-ce02-phase",
+      "name": "Trigger CE-02 Phase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        4820,
+        440
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "ce01-aggregate-ce02",
+      "name": "Aggregate CE-02 Runs",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        5040,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT s.id AS slot_id, s.client_id\nFROM content_slots s\nINNER JOIN themes t ON t.id = s.theme_id\nWHERE s.client_id = $1\n  AND COALESCE(s.status, '') IN ('themed', 'research_done')\n  AND COALESCE(s.origin, 'theme') <> 'fastlane'\n  AND (t.title IS NULL OR t.title NOT LIKE '[nulmeting]%')\n  AND (s.input_human IS NULL OR s.input_human NOT LIKE '%testsetFreeze%')\n  AND DATE(t.cycle_week) <= DATE_SUB(CURDATE(), INTERVAL 7 DAY)\n  AND NOT EXISTS (\n    SELECT 1 FROM articles a\n    WHERE a.slot_id = s.id\n      AND COALESCE(a.status, '') NOT IN ('deleted')\n  )\nORDER BY t.cycle_week ASC",
+        "options": {
+          "queryReplacement": "={{ [ $('Route After Client').item.json.client_id ] }}"
+        }
+      },
+      "id": "ce01-get-slots-ce03",
+      "name": "Get Slots For CE-03",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        5260,
+        520
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Brandflocks [app]"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst rows = $('Get Slots For CE-03').all().map((i) => i.json).filter((r) => r.slot_id);\nif (!rows.length) {\n  return [{ json: { client_id: $('Route After Client').item.json.client_id, phase: 'ce03', skipped: true } }];\n}\n\nreturn rows.map((r) => ({\n  json: { slot_id: r.slot_id, client_id: r.client_id, phase: 'ce03' },\n}));\n"
+      },
+      "id": "ce01-prepare-ce03",
+      "name": "Prepare CE-03 Triggers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5260,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-slot",
+              "leftValue": "={{ $json.slot_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01-if-ce03-target",
+      "name": "Has CE-03 Target?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5480,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://erikjihaa.app.n8n.cloud/webhook/ce03-write-article-brandflocks",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ slot_id: $json.slot_id }) }}",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "id": "ce01-trigger-ce03-phase",
+      "name": "Trigger CE-03 Phase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        5700,
+        440
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "ce01-aggregate-ce03",
+      "name": "Aggregate CE-03 Runs",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        5920,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return { json: { ok: true, skipped: true, reason: 'Planning horizon already has themes for upcoming weeks', client_id: $('Compute Context').item.json.client.id, client_name: $('Compute Context').item.json.client.name } };"
+      },
+      "id": "ce01-skip-response",
+      "name": "Skip Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "ce01-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        4160,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Run Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Schedule": {
+      "main": [
+        [
+          {
+            "node": "Parse Run Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Run Input": {
+      "main": [
+        [
+          {
+            "node": "Get Active Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Clients": {
+      "main": [
+        [
+          {
+            "node": "Loop Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Clients": {
+      "main": [
+        [
+          {
+            "node": "All Clients Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Existing Themes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Themes": {
+      "main": [
+        [
+          {
+            "node": "Get Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Performance": {
+      "main": [
+        [
+          {
+            "node": "Get Content Rhythm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Content Rhythm": {
+      "main": [
+        [
+          {
+            "node": "Get Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sources": {
+      "main": [
+        [
+          {
+            "node": "Compute Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Context": {
+      "main": [
+        [
+          {
+            "node": "Needs Themes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Themes?": {
+      "main": [
+        [
+          {
+            "node": "Claude Theme Director",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Theme Director": {
+      "main": [
+        [
+          {
+            "node": "Prepare Theme Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Theme Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Theme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Theme": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Themes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Themes": {
+      "main": [
+        [
+          {
+            "node": "Build Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Response": {
+      "main": [
+        [
+          {
+            "node": "Route After Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Response": {
+      "main": [
+        [
+          {
+            "node": "Route After Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route After Client": {
+      "main": [
+        [
+          {
+            "node": "If Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If Run Pipeline Cascade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Respond OK": {
+      "main": [
+        [
+          {
+            "node": "Loop Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Run Pipeline Cascade": {
+      "main": [
+        [
+          {
+            "node": "Get Themes For CE-02",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get Themes For CE-02": {
+      "main": [
+        [
+          {
+            "node": "Prepare CE-02 Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare CE-02 Triggers": {
+      "main": [
+        [
+          {
+            "node": "Has CE-02 Target?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has CE-02 Target?": {
+      "main": [
+        [
+          {
+            "node": "Trigger CE-02 Phase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Slots For CE-03",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger CE-02 Phase": {
+      "main": [
+        [
+          {
+            "node": "Aggregate CE-02 Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate CE-02 Runs": {
+      "main": [
+        [
+          {
+            "node": "Get Slots For CE-03",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Slots For CE-03": {
+      "main": [
+        [
+          {
+            "node": "Prepare CE-03 Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare CE-03 Triggers": {
+      "main": [
+        [
+          {
+            "node": "Has CE-03 Target?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has CE-03 Target?": {
+      "main": [
+        [
+          {
+            "node": "Trigger CE-03 Phase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger CE-03 Phase": {
+      "main": [
+        [
+          {
+            "node": "Aggregate CE-03 Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate CE-03 Runs": {
+      "main": [
+        [
+          {
+            "node": "Loop Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

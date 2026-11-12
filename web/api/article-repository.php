@@ -619,6 +619,52 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
     return $params;
 }
 
+/**
+ * Start CE-03 herschrijf nadat artikel-meta is opgeslagen.
+ *
+ * @return array{ok: bool, error?: string, http?: int}
+ */
+function ce_start_article_ce03_rewrite(PDO $pdo, string $slotId, array $row): array
+{
+    require_once __DIR__ . '/review-edits-repository.php';
+    require_once __DIR__ . '/fastlane-repository.php';
+    require_once __DIR__ . '/tone-styles.php';
+
+    $status = strtolower(trim((string) ($row['status'] ?? 'draft')));
+    if (!in_array($status, ['draft', 'feedback'], true)) {
+        return [
+            'ok' => false,
+            'http' => 409,
+            'error' => 'Rewrite is alleen mogelijk voor concepten in redactie.',
+        ];
+    }
+
+    if (ce_fetch_review_edits($pdo, $slotId, 'pending') !== []) {
+        return [
+            'ok' => false,
+            'http' => 409,
+            'error' => 'Los eerst open review-wijzigingen op voordat je herschrijft.',
+        ];
+    }
+
+    $articleId = trim((string) ($row['id'] ?? ''));
+    if ($status === 'feedback' && $articleId !== '') {
+        $pdo->prepare("UPDATE articles SET status = 'draft' WHERE id = :id")->execute(['id' => $articleId]);
+    }
+
+    $ce03Meta = ce_ce03_webhook_meta_from_slot($pdo, $slotId);
+    $trigger = ce_trigger_ce03_write($slotId, true, $ce03Meta);
+    if (($trigger['ok'] ?? false) !== true) {
+        return [
+            'ok' => false,
+            'http' => 503,
+            'error' => (string) ($trigger['error'] ?? 'CE-03 kon niet worden gestart.'),
+        ];
+    }
+
+    return ['ok' => true];
+}
+
 /** @return array{ok: bool, error?: string, httpCode?: int} */
 function ce_trigger_ce04_webhook(string $slotId): array
 {
@@ -969,6 +1015,8 @@ function ce_reedit_article_from_notes(PDO $pdo, string $slotId, array $row, arra
             isset($body['platform']) ? (string) $body['platform'] : ce_platform_to_ui($row['platform_final'] ?? $row['platform_suggested'] ?? null),
             null,
             isset($body['editor']) ? (string) $body['editor'] : (string) ($row['editor_final'] ?? $row['editor_suggested'] ?? ''),
+            $slotId,
+            $row,
         );
     }
 
@@ -989,7 +1037,7 @@ function ce_reedit_article_from_notes(PDO $pdo, string $slotId, array $row, arra
     }
 
     $system = <<<'PROMPT'
-Je bent co-auteur in Content Engine. De redacteur heeft aantekeningen IN de concepttekst gezet. Die aantekeningen zijn opdrachten, geen copy. Verwerk ze tot een nieuwe, publiceerbare versie van DEZE tekst.
+Je bent co-auteur in Brandflocks. De redacteur heeft aantekeningen IN de concepttekst gezet. Die aantekeningen zijn opdrachten, geen copy. Verwerk ze tot een nieuwe, publiceerbare versie van DEZE tekst.
 
 Aantekeningen herken je als (ook zonder haken):
 - instructies tussen haakjes of blokhaken, bv. [kort dit], (te zakelijk)

@@ -31,7 +31,7 @@ function ce_ensure_hba_v2_schema(PDO $pdo): void
     ce_ensure_hba_schema($pdo);
 
     if (!ce_table_exists($pdo, 'hba_theme_verdicts')) {
-        $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_hba_v2_meedenker.sql';
+        $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_hba_v2_meedenker.sql';
         if (is_readable($migration)) {
             try {
                 $pdo->exec((string) file_get_contents($migration));
@@ -42,7 +42,7 @@ function ce_ensure_hba_v2_schema(PDO $pdo): void
     }
 
     if (!ce_table_exists($pdo, 'hba_research_verdicts')) {
-        $researchMigration = dirname(__DIR__, 2) . '/scripts/migrations/add_hba_research_verdicts.sql';
+        $researchMigration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_hba_research_verdicts.sql';
         if (is_readable($researchMigration)) {
             try {
                 $pdo->exec((string) file_get_contents($researchMigration));
@@ -544,6 +544,92 @@ function ce_hba_v2_call_json(string $systemPrompt, string $userPrompt, float $te
     return ce_hba_v2_call_json_for(null, $systemPrompt, $userPrompt, $temperature, $maxTokens);
 }
 
+/** @return array{ok: false, error: string}|array{ok: true, data: array<string, mixed>, model: string} */
+function ce_hba_v2_decode_json_llm_text(string $text, string $model): array
+{
+    $text = trim($text);
+    if (str_starts_with($text, '```')) {
+        $text = preg_replace('/^```(?:json)?\s*/i', '', $text) ?? $text;
+        $text = preg_replace('/\s*```$/', '', $text) ?? $text;
+    }
+
+    $data = json_decode($text, true);
+    if (!is_array($data)) {
+        return ['ok' => false, 'error' => 'LLM gaf geen geldige JSON terug'];
+    }
+
+    return ['ok' => true, 'data' => $data, 'model' => $model];
+}
+
+function ce_hba_v2_gemini_model_id(): string
+{
+    ce_load_env();
+    $model = trim((string) (getenv('HBA_GEMINI_MODEL') ?: ''));
+
+    return $model !== '' ? $model : 'gemini-flash-latest';
+}
+
+function ce_hba_v2_should_try_gemini_fallback(string $anthropicError): bool
+{
+    ce_load_env();
+    $flag = strtolower(trim((string) (getenv('CE_HBA_GEMINI_FALLBACK') ?: '1')));
+    if (in_array($flag, ['0', 'false', 'no', 'off'], true)) {
+        return false;
+    }
+
+    $err = strtolower($anthropicError);
+
+    return str_contains($err, 'x-api-key')
+        || str_contains($err, 'authentication')
+        || str_contains($err, 'anthropic_api_key ontbreekt');
+}
+
+/** @return array{ok: bool, data?: array<string, mixed>, model?: string, error?: string} */
+function ce_hba_v2_call_json_gemini(
+    string $systemPrompt,
+    string $userPrompt,
+    float $temperature = 0.2,
+    int $maxTokens = 4096,
+): array {
+    $keys = ce_llm_visibility_api_keys();
+    $geminiKey = trim((string) ($keys['gemini'] ?? ''));
+    if ($geminiKey === '') {
+        return ['ok' => false, 'error' => 'GOOGLE_GEMINI_API_KEY ontbreekt'];
+    }
+
+    $model = ce_hba_v2_gemini_model_id();
+    $userFull = $userPrompt . "\n\nAntwoord uitsluitend met geldige JSON, zonder markdown fences.";
+    $payload = json_encode([
+        'systemInstruction' => ['parts' => [['text' => $systemPrompt]]],
+        'contents' => [
+            ['role' => 'user', 'parts' => [['text' => $userFull]]],
+        ],
+        'generationConfig' => [
+            'maxOutputTokens' => max(256, min(8192, $maxTokens)),
+            'temperature' => max(0.0, min(1.0, $temperature)),
+        ],
+    ], JSON_THROW_ON_ERROR);
+
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+        . rawurlencode($model)
+        . ':generateContent?key='
+        . rawurlencode($geminiKey);
+
+    $res = ce_llm_visibility_http_post($url, ['Content-Type: application/json'], $payload, 120);
+    if (!$res['ok']) {
+        return ['ok' => false, 'error' => $res['error']];
+    }
+
+    $raw = json_decode($res['body'], true);
+    if (!is_array($raw)) {
+        return ['ok' => false, 'error' => 'Ongeldig Gemini-antwoord'];
+    }
+
+    $text = (string) ($raw['candidates'][0]['content']['parts'][0]['text'] ?? '');
+
+    return ce_hba_v2_decode_json_llm_text($text, $model);
+}
+
 /** @return array{ok: bool, data?: array<string, mixed>, model?: string, error?: string} */
 function ce_hba_v2_call_json_for(
     ?string $functionKey,
@@ -552,9 +638,28 @@ function ce_hba_v2_call_json_for(
     float $temperature = 0.2,
     int $maxTokens = 4096,
 ): array {
+    ce_load_env();
+    if (strtolower(trim((string) (getenv('CE_HBA_LLM_PROVIDER') ?: ''))) === 'gemini') {
+        if (str_contains($systemPrompt, '{{') && !str_contains($userPrompt, '{{')) {
+            $systemPrompt = $userPrompt;
+            $userPrompt = 'Geef nu de gevraagde JSON-output.';
+        }
+
+        return ce_hba_v2_call_json_gemini($systemPrompt, $userPrompt, $temperature, $maxTokens);
+    }
+
     $keys = ce_llm_visibility_api_keys();
     $key = trim((string) ($keys['anthropic'] ?? ''));
     if ($key === '') {
+        if (ce_hba_v2_should_try_gemini_fallback('ANTHROPIC_API_KEY ontbreekt')) {
+            if (str_contains($systemPrompt, '{{') && !str_contains($userPrompt, '{{')) {
+                $systemPrompt = $userPrompt;
+                $userPrompt = 'Geef nu de gevraagde JSON-output.';
+            }
+
+            return ce_hba_v2_call_json_gemini($systemPrompt, $userPrompt, $temperature, $maxTokens);
+        }
+
         return ['ok' => false, 'error' => 'ANTHROPIC_API_KEY ontbreekt'];
     }
 
@@ -595,6 +700,10 @@ function ce_hba_v2_call_json_for(
     );
 
     if (!$res['ok']) {
+        if (ce_hba_v2_should_try_gemini_fallback($res['error'])) {
+            return ce_hba_v2_call_json_gemini($systemPrompt, $userPrompt, $temperature, $maxTokens);
+        }
+
         return ['ok' => false, 'error' => $res['error']];
     }
 
@@ -610,18 +719,7 @@ function ce_hba_v2_call_json_for(
         }
     }
 
-    $text = trim($text);
-    if (str_starts_with($text, '```')) {
-        $text = preg_replace('/^```(?:json)?\s*/i', '', $text) ?? $text;
-        $text = preg_replace('/\s*```$/', '', $text) ?? $text;
-    }
-
-    $data = json_decode($text, true);
-    if (!is_array($data)) {
-        return ['ok' => false, 'error' => 'LLM gaf geen geldige JSON terug'];
-    }
-
-    return ['ok' => true, 'data' => $data, 'model' => $model];
+    return ce_hba_v2_decode_json_llm_text($text, $model);
 }
 
 /** @return list<array<string, mixed>> */
@@ -696,15 +794,33 @@ function ce_hba_v2_format_themes_for_prompt(array $themes): string
 {
     $lines = [];
     foreach ($themes as $theme) {
+        $motivation = trim((string) ($theme['motivation'] ?? ''));
+        if ($motivation === '') {
+            $motivation = trim((string) ($theme['rationale'] ?? ''));
+        }
         $lines[] = sprintf(
             '- id=%s | titel=%s | motivatie=%s',
             (string) ($theme['id'] ?? ''),
             (string) ($theme['title'] ?? ''),
-            (string) ($theme['motivation'] ?? '')
+            $motivation
         );
     }
 
     return $lines === [] ? '(geen thema\'s)' : implode("\n", $lines);
+}
+
+/** @return list<string> */
+function ce_hba_v2_merge_theme_filter_ids(string $themeId, string $slotId): array
+{
+    $ids = [];
+    if ($themeId !== '') {
+        $ids[] = $themeId;
+    }
+    if ($slotId !== '' && !in_array($slotId, $ids, true)) {
+        $ids[] = $slotId;
+    }
+
+    return $ids;
 }
 
 /**
@@ -769,18 +885,29 @@ function ce_hba_v2_theme_rows_by_ids(PDO $pdo, array $themeIds): array
 
     $byId = [];
     if (ce_table_exists($pdo, 'themes')) {
+        $cols = ['id', 'title'];
+        if (ce_table_has_column($pdo, 'themes', 'motivation')) {
+            $cols[] = 'motivation';
+        }
+        if (ce_table_has_column($pdo, 'themes', 'rationale')) {
+            $cols[] = 'rationale';
+        }
         $placeholders = implode(',', array_fill(0, count($themeIds), '?'));
-        $stmt = $pdo->prepare("SELECT id, title, motivation FROM themes WHERE id IN ({$placeholders})");
+        $stmt = $pdo->prepare('SELECT ' . implode(', ', $cols) . " FROM themes WHERE id IN ({$placeholders})");
         $stmt->execute($themeIds);
         foreach ($stmt->fetchAll() ?: [] as $row) {
             $id = (string) ($row['id'] ?? '');
             if ($id === '') {
                 continue;
             }
+            $motivation = trim((string) ($row['motivation'] ?? ''));
+            if ($motivation === '') {
+                $motivation = trim((string) ($row['rationale'] ?? ''));
+            }
             $byId[$id] = [
                 'id' => $id,
                 'title' => (string) ($row['title'] ?? ''),
-                'motivation' => (string) ($row['motivation'] ?? ''),
+                'motivation' => $motivation,
             ];
         }
     }
@@ -813,17 +940,26 @@ function ce_hba_v2_theme_rows_by_ids(PDO $pdo, array $themeIds): array
     }
 
     $out = [];
+    $seen = [];
     foreach ($themeIds as $id) {
-        if (isset($byId[$id])) {
-            $out[] = $byId[$id];
-            continue;
-        }
-        foreach ($byId as $row) {
-            if (($row['id'] ?? '') === $id) {
-                $out[] = $row;
-                break;
+        $row = $byId[$id] ?? null;
+        if ($row === null) {
+            foreach ($byId as $candidate) {
+                if (($candidate['id'] ?? '') === $id) {
+                    $row = $candidate;
+                    break;
+                }
             }
         }
+        if ($row === null) {
+            continue;
+        }
+        $canonical = (string) ($row['id'] ?? '');
+        if ($canonical === '' || isset($seen[$canonical])) {
+            continue;
+        }
+        $seen[$canonical] = true;
+        $out[] = $row;
     }
 
     return $out;
@@ -852,6 +988,22 @@ function ce_hba_v2_expand_theme_verdict_ids(PDO $pdo, array $themeIds): array
         $linked = trim((string) ($ctx['themeId'] ?? ''));
         if ($linked !== '' && $linked !== $id) {
             $expanded[] = $linked;
+        }
+        if (!ce_table_has_column($pdo, 'content_slots', 'theme_id')) {
+            continue;
+        }
+        $slotStmt = $pdo->prepare(
+            "SELECT id FROM content_slots
+             WHERE theme_id = :theme_id
+               AND COALESCE(status, '') NOT IN ('archived', 'archive', 'deleted')
+             LIMIT 20"
+        );
+        $slotStmt->execute(['theme_id' => $id]);
+        foreach ($slotStmt->fetchAll() ?: [] as $slotRow) {
+            $sid = trim((string) ($slotRow['id'] ?? ''));
+            if ($sid !== '') {
+                $expanded[] = $sid;
+            }
         }
     }
 
@@ -983,7 +1135,11 @@ function ce_hba_v2_run_theme_verdicts(PDO $pdo, string $clientId, ?string $week 
             $themeIds[] = $id;
         }
     }
-    $cached = ce_hba_v2_fetch_theme_verdicts($pdo, $clientId, $themeIds);
+    $cached = ce_hba_v2_fetch_theme_verdicts(
+        $pdo,
+        $clientId,
+        ce_hba_v2_expand_theme_verdict_ids($pdo, array_values(array_unique(array_merge($themeIds, $themeIdsFilter)))),
+    );
 
     $llm = ce_hba_v2_call_json_for(CE_HBA_FN_THEMA_VERDICT, $filled, 'Geef nu de gevraagde JSON-output.');
     if (!$llm['ok']) {
@@ -1141,9 +1297,10 @@ function ce_hba_v2_fetch_theme_verdicts(PDO $pdo, string $clientId, array $theme
            SELECT theme_id, MAX(judged_at) AS max_judged
            FROM hba_theme_verdicts
            WHERE client_id = ?
+             AND theme_id IS NOT NULL
            GROUP BY theme_id
-         ) latest ON latest.theme_id = v.theme_id AND latest.max_judged = v.judged_at
-         WHERE v.client_id = ? AND v.theme_id IN ($placeholders)"
+         ) latest ON latest.theme_id <=> v.theme_id AND latest.max_judged <=> v.judged_at
+         WHERE v.client_id = ? AND v.theme_id IS NOT NULL AND v.theme_id IN ($placeholders)"
     );
     $params = [$clientId, $clientId, ...$themeIds];
     $stmt->execute($params);
@@ -1569,10 +1726,11 @@ function ce_hba_v2_fetch_research_verdicts(PDO $pdo, string $clientId, string $s
          INNER JOIN (
            SELECT research_item_id, MAX(judged_at) AS max_judged
            FROM hba_research_verdicts
-           WHERE client_id = ? AND slot_id = ?
+           WHERE client_id = ? AND slot_id <=> ?
+             AND research_item_id IS NOT NULL
            GROUP BY research_item_id
-         ) latest ON latest.research_item_id = v.research_item_id AND latest.max_judged = v.judged_at
-         WHERE v.client_id = ? AND v.slot_id = ? AND v.research_item_id IN ($placeholders)"
+         ) latest ON latest.research_item_id <=> v.research_item_id AND latest.max_judged <=> v.judged_at
+         WHERE v.client_id = ? AND v.slot_id <=> ? AND v.research_item_id IS NOT NULL AND v.research_item_id IN ($placeholders)"
     );
     $params = array_merge([$clientId, $slotId, $clientId, $slotId], $itemIds);
     $stmt->execute($params);

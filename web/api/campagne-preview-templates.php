@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/copy-modus.php';
+
 /**
  * Ronde 8 P2 — sjablonen A (lancering) en B (serie), vaste fase-aandelen (addendum §2).
  *
@@ -465,16 +467,6 @@ function ce_campagne_preview_build_slot_schedule(
     );
 
     return $stubs;
-}
-
-/** @return array<string, mixed> */
-function ce_campagne_copy_mode_line(string $templateKey): string
-{
-    if ($templateKey === 'lancering') {
-        return 'Schrijfwijze: activatie mag. Sluit af met een oproep tot actie.';
-    }
-
-    return 'Schrijfwijze: geen verkooptaal. Laat het mechanisme of het bewijs zien.';
 }
 
 function ce_campagne_sell_fit_hint(PDO $pdo, ?string $clientId): ?string

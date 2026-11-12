@@ -132,12 +132,11 @@ function ce_wordpress_site_url_probe_error(string $siteUrl): ?string
     $path = rtrim((string) parse_url($siteUrl, PHP_URL_PATH), '/');
 
     if ($host === 'staging.igisnext.com') {
-        return 'staging.igisnext.com is alleen Content Engine — geen WordPress. '
-            . 'Vul https://ce.igisnext.com/blog in (ook als je Integrations op staging opent).';
+        return 'staging.igisnext.com is de app, geen WordPress. Vul de URL van je WordPress-site in.';
     }
 
     if ($host === 'ce.igisnext.com' && !str_ends_with(strtolower($path), '/blog') && $path !== '/blog') {
-        return 'https://ce.igisnext.com zonder /blog is de CE-app. Site-URL voor publish: https://ce.igisnext.com/blog';
+        return 'https://ce.igisnext.com zonder /blog is de app. Site-URL voor publish: https://ce.igisnext.com/blog';
     }
 
     return null;
@@ -158,7 +157,7 @@ function ce_normalize_wordpress_user(string $user): string
         $user = trim(substr($user, 1, -1));
     }
 
-    if (strcasecmp($user, 'Content Engine') === 0) {
+    if (strcasecmp($user, 'Content Engine') === 0 || strcasecmp($user, 'Brandflocks') === 0) {
         return 'content-engine';
     }
 

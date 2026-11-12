@@ -222,6 +222,27 @@ function ce_fastlane_slot_select_columns(PDO $pdo): array
     if (ce_table_has_column($pdo, 'content_slots', 'origin')) {
         $cols[] = 'origin';
     }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
+        $cols[] = 'campaign_id';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_fase')) {
+        $cols[] = 'campaign_fase';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_opdracht')) {
+        $cols[] = 'campaign_opdracht';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_instructie')) {
+        $cols[] = 'campaign_instructie';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_anker')) {
+        $cols[] = 'campaign_anker';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_platform')) {
+        $cols[] = 'campaign_platform';
+    }
+    if (ce_table_has_column($pdo, 'content_slots', 'publish_date')) {
+        $cols[] = 'publish_date';
+    }
 
     return $cols;
 }

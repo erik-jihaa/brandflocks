@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$ROOT/scripts/n8n-push-common.sh" "${1:-production}"
 
-JSON="$ROOT/../JSON/CE-04 - Review & Publish.json"
+JSON="$ROOT/json/n8n/CE-04 - Review & Publish.json"
 
 if [[ ! -f "$JSON" ]]; then
   echo "Missing workflow JSON: $JSON" >&2

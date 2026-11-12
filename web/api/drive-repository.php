@@ -210,7 +210,7 @@ function ce_probe_drive_source(PDO $pdo, string $sourceId): array
     if ($exported === null) {
         return [
             'ok' => false,
-            'message' => 'Bestand niet leesbaar — koppel Google Drive opnieuw en controleer of dit Google Doc/PDF is dat je met Content Engine hebt gedeeld.',
+            'message' => 'Bestand niet leesbaar — koppel Google Drive opnieuw en controleer of dit Google Doc/PDF is dat je met ' . ce_product_name() . ' hebt gedeeld.',
             'itemCount' => 0,
         ];
     }

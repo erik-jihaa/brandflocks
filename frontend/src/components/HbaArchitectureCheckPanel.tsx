@@ -100,6 +100,9 @@ type HbaArchitectureCheckPanelProps = {
   selectedVoorbeeldPicks?: HbaVoorbeeldSuggestionPick[]
   onToggleVoorbeeldPick?: (pick: HbaVoorbeeldSuggestionPick, selected: boolean) => void
   onStrategist?: () => void
+  /** Overzichtspagina: geen interne kop en geen selectie-UI voor suggesties. */
+  showSummaryHeading?: boolean
+  selectionMode?: boolean
 }
 
 export function HbaArchitectureCheckPanel({
@@ -113,9 +116,11 @@ export function HbaArchitectureCheckPanel({
   selectedVoorbeeldPicks = [],
   onToggleVoorbeeldPick,
   onStrategist,
+  showSummaryHeading = true,
+  selectionMode = true,
 }: HbaArchitectureCheckPanelProps) {
-  const toneSelectionEnabled = Boolean(onSelectToneSuggestion)
-  const voorbeeldSelectionEnabled = Boolean(onToggleVoorbeeldPick)
+  const toneSelectionEnabled = Boolean(onSelectToneSuggestion) && selectionMode
+  const voorbeeldSelectionEnabled = Boolean(onToggleVoorbeeldPick) && selectionMode
 
   function voorbeeldSelected(pick: HbaVoorbeeldSuggestionPick): boolean {
     return selectedVoorbeeldPicks.some(
@@ -133,7 +138,7 @@ export function HbaArchitectureCheckPanel({
   if (error && !check) {
     return (
       <section className={FRAME_CLASS}>
-        <p className={TITLE_CLASS}>Kwaliteitscheck</p>
+        {showSummaryHeading ? <p className={TITLE_CLASS}>Kwaliteitscheck</p> : null}
         <p className="m-0 text-[14px] leading-[18px] text-ce-black">{error}</p>
         {onRetry ? (
           <div className="mt-[12px]">
@@ -161,7 +166,9 @@ export function HbaArchitectureCheckPanel({
 
   return (
     <div className="grid w-full basis-full gap-[12px]">
-      <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">Kwaliteitscheck</p>
+      {showSummaryHeading ? (
+        <p className="m-0 text-[14px] leading-[18px] font-semibold text-ce-black">Kwaliteitscheck</p>
+      ) : null}
 
       {check.meetlatStatus != null ? (
         <p className="m-0 text-[14px] leading-[18px] text-ce-black">
@@ -273,7 +280,7 @@ export function HbaArchitectureCheckPanel({
 
       {check.regelsOordeel.oordeel || check.regelsOordeel.toelichting ? (
         <DimensionBlock
-          title="Jullie regels"
+          title="Je regels"
           dimensionKey="regelsOordeel"
           oordeel={check.regelsOordeel.oordeel}
           toelichting={check.regelsOordeel.toelichting}
@@ -282,9 +289,9 @@ export function HbaArchitectureCheckPanel({
         />
       ) : null}
 
-      {check.toonSuggesties.length > 0 ? (
+      {check.toonSuggesties.length > 0 && selectionMode ? (
         <section className={FRAME_CLASS}>
-          <p className={TITLE_CLASS}>Suggesties voor jullie toon</p>
+          <p className={TITLE_CLASS}>Suggesties voor je toon</p>
           {toneSelectionEnabled ? (
             <p className="m-0 mb-[8px] text-[13px] leading-[17px] text-ce-beige">
               Kies hoogstens één suggestie — die nemen we mee bij Vastleggen en beginnen.
@@ -321,7 +328,7 @@ export function HbaArchitectureCheckPanel({
         </section>
       ) : null}
 
-      {check.voorbeeldSuggesties.length > 0 ? (
+      {check.voorbeeldSuggesties.length > 0 && selectionMode ? (
         <section className={FRAME_CLASS}>
           <p className={TITLE_CLASS}>Suggesties voor voorbeelden</p>
           {voorbeeldSelectionEnabled ? (

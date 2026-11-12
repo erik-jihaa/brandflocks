@@ -8,7 +8,7 @@ import {
 
 const DEFAULT_LOGO = '/svg/iGiSNext_Blue-main.svg' // canonical: SVG/iGiSNext_Blue-main.svg (sync-platform-logo.sh)
 const DARK_LOGO = '/svg/iGiSNext_Blue-dark.svg'
-const DEFAULT_ALT = 'iGiS ContentFlow'
+const DEFAULT_ALT = 'Brandflocks'
 
 /** Dispatch na upload/delete zodat de sidebar-logo meteen ververst. */
 export const TENANT_LOGO_CHANGED_EVENT = 'ce-tenant-logo-changed'

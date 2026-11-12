@@ -83,7 +83,7 @@ function ce_ensure_hba_schema(PDO $pdo): void
     $ensured = true;
 
     if (!ce_table_exists($pdo, 'brand_narratives')) {
-        $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_hba_brandlaag.sql';
+        $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_hba_brandlaag.sql';
         if (is_readable($migration)) {
             try {
                 $pdo->exec((string) file_get_contents($migration));
@@ -1056,77 +1056,6 @@ function ce_hba_finalize_scored_tool(
     ];
 }
 
-/** @return array{articleId: string, headline: string, status: string, publishedAt: ?string}[] */
-function ce_hba_fetch_content_score_test_articles(PDO $pdo, string $clientId, int $limit, int $offset): array
-{
-    if (!ce_table_exists($pdo, 'articles') || !ce_table_exists($pdo, 'content_slots')) {
-        return [];
-    }
-
-    $order = 'a.id DESC';
-    if (ce_table_has_column($pdo, 'articles', 'published_at')) {
-        $order = 'COALESCE(a.published_at, a.id) DESC';
-        if (ce_table_has_column($pdo, 'articles', 'updated_at')) {
-            $order = 'COALESCE(a.published_at, a.updated_at, a.id) DESC';
-        } elseif (ce_table_has_column($pdo, 'articles', 'created_at')) {
-            $order = 'COALESCE(a.published_at, a.created_at, a.id) DESC';
-        }
-    }
-
-    $stmt = $pdo->prepare(
-        "SELECT a.id, a.headline, a.headline_human, a.status, a.published_at
-         FROM articles a
-         INNER JOIN content_slots cs ON cs.id = a.slot_id
-         WHERE cs.client_id = :client_id
-           AND (
-             TRIM(COALESCE(a.content_human, '')) <> ''
-             OR TRIM(COALESCE(a.content_ai, '')) <> ''
-           )
-           AND a.status IN ('published', 'archived', 'approved')
-         ORDER BY
-           CASE a.status WHEN 'published' THEN 0 WHEN 'archived' THEN 1 ELSE 2 END,
-           {$order}
-         LIMIT " . max(1, min(50, $limit)) . ' OFFSET ' . max(0, $offset)
-    );
-    $stmt->execute(['client_id' => $clientId]);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-    return array_map(static function (array $row): array {
-        $headline = trim((string) ($row['headline_human'] ?? ''));
-        if ($headline === '') {
-            $headline = trim((string) ($row['headline'] ?? ''));
-        }
-
-        return [
-            'articleId' => (string) ($row['id'] ?? ''),
-            'headline' => $headline,
-            'status' => (string) ($row['status'] ?? ''),
-            'publishedAt' => isset($row['published_at']) ? (string) $row['published_at'] : null,
-        ];
-    }, $rows);
-}
-
-function ce_hba_count_content_score_test_articles(PDO $pdo, string $clientId): int
-{
-    if (!ce_table_exists($pdo, 'articles') || !ce_table_exists($pdo, 'content_slots')) {
-        return 0;
-    }
-
-    $stmt = $pdo->prepare(
-        "SELECT COUNT(*) FROM articles a
-         INNER JOIN content_slots cs ON cs.id = a.slot_id
-         WHERE cs.client_id = :client_id
-           AND (
-             TRIM(COALESCE(a.content_human, '')) <> ''
-             OR TRIM(COALESCE(a.content_ai, '')) <> ''
-           )
-           AND a.status IN ('published', 'archived', 'approved')"
-    );
-    $stmt->execute(['client_id' => $clientId]);
-
-    return (int) $stmt->fetchColumn();
-}
-
 function ce_hba_first_sentence(string $text): string
 {
     $text = trim($text);
@@ -1530,7 +1459,7 @@ function ce_hba_build_narrative_repair_from_client(PDO $pdo, string $clientId, ?
         ],
         'bewijsvelden' => [
             'Identiteit en kennis expliciet vóór automatisering',
-            'ContentFlow als fundament-laag voor herkenbare content',
+            'Brandflocks als fundament-laag voor herkenbare content',
             'Groei zonder verlies van herkenbaarheid',
         ],
         'tone_of_behaviour' => $tone,
@@ -1688,65 +1617,6 @@ function ce_hba_resolve_narrative_for_scoring(PDO $pdo, string $clientId): ?arra
         'zwakke_voorbeelden' => ce_hba_decode_json_list($base['zwakke_voorbeelden'] ?? []),
         'contextprofiel' => trim((string) ($base['contextprofiel'] ?? 'groeiend')),
     ]);
-}
-
-/** @return array{ok: bool, error?: string, tool?: array<string, mixed>, model?: string} */
-function ce_hba_dry_run_content_score_for_article(PDO $pdo, string $articleId, string $model): array
-{
-    $article = ce_fetch_article_by_id($pdo, $articleId);
-    if (!$article) {
-        return ['ok' => false, 'error' => 'Artikel niet gevonden'];
-    }
-
-    $slotId = (string) ($article['slot_id'] ?? '');
-    $clientId = ce_client_id_for_slot($pdo, $slotId);
-    if ($clientId === '') {
-        return ['ok' => false, 'error' => 'Client niet gevonden'];
-    }
-
-    $narrativeRow = ce_hba_resolve_narrative_for_scoring($pdo, $clientId);
-    if (!$narrativeRow) {
-        return ['ok' => false, 'error' => 'Merkarchitectuur niet klaar (archetype/doel/foe)'];
-    }
-
-    $postText = ce_hba_article_post_text($article);
-    if ($postText === '') {
-        return ['ok' => false, 'error' => 'Geen posttekst'];
-    }
-
-    $platform = strtolower(trim((string) ($article['platform_final'] ?? $article['platform'] ?? 'website_blog')));
-    $contentrolOverride = trim((string) ($article['hba_contentrol_override'] ?? ''));
-
-    require_once __DIR__ . '/hygiene-repository.php';
-    $hygieneContext = ce_hygiene_scoring_context(
-        $pdo,
-        trim((string) ($narrativeRow['contextprofiel'] ?? '')),
-    );
-    $prompt = ce_hba_build_system_prompt($narrativeRow, $platform, 'article', $postText, $hygieneContext, $pdo);
-    if ($contentrolOverride !== '') {
-        $prompt .= "\n\nContentrol override (gebruik als startpunt): " . $contentrolOverride;
-    }
-
-    $llm = ce_hba_call_llm_with_model($prompt, $model, false);
-    if (!$llm['ok'] || !is_array($llm['tool'])) {
-        return ['ok' => false, 'error' => $llm['error'] !== '' ? $llm['error'] : 'Scoring mislukt'];
-    }
-
-    return ['ok' => true, 'tool' => $llm['tool'], 'model' => (string) ($llm['model'] ?? $model)];
-}
-
-/** @return array{diagnose: string, contentrol: string, status: string, brandContribution: ?float} */
-function ce_hba_content_score_tool_summary(array $tool): array
-{
-    $scores = is_array($tool['scores'] ?? null) ? $tool['scores'] : [];
-    $bc = is_array($scores['brand_contribution'] ?? null) ? $scores['brand_contribution'] : null;
-
-    return [
-        'diagnose' => trim((string) ($tool['diagnose'] ?? '')),
-        'contentrol' => trim((string) ($tool['contentrol'] ?? '')),
-        'status' => trim((string) ($tool['status'] ?? '')),
-        'brandContribution' => isset($bc['score']) ? (float) $bc['score'] : null,
-    ];
 }
 
 /** @return array<string, mixed>|null */

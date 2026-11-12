@@ -41,7 +41,7 @@ function ce_client_active_source_count(PDO $pdo, string $clientId): int
         return 0;
     }
 
-    $sql = 'SELECT COUNT(*) FROM sources WHERE client_id = :client_id';
+    $sql = "SELECT COUNT(*) FROM sources WHERE client_id = :client_id AND category <> 'asana'";
     if (ce_table_has_column($pdo, 'sources', 'active')) {
         $sql .= ' AND COALESCE(active, 1) = 1';
     }
@@ -59,7 +59,7 @@ function ce_client_last_source_check_at(PDO $pdo, string $clientId): ?DateTimeIm
         return null;
     }
 
-    $sql = 'SELECT MAX(last_checked_at) AS last_check FROM sources WHERE client_id = :client_id';
+    $sql = "SELECT MAX(last_checked_at) AS last_check FROM sources WHERE client_id = :client_id AND category <> 'asana'";
     if (ce_table_has_column($pdo, 'sources', 'active')) {
         $sql .= ' AND COALESCE(active, 1) = 1';
     }
@@ -142,7 +142,7 @@ function ce_fetch_active_sources_for_client(PDO $pdo, string $clientId): array
 {
     ce_ensure_sources_schema($pdo);
 
-    $sql = 'SELECT id, title, category FROM sources WHERE client_id = :client_id';
+    $sql = "SELECT id, title, category FROM sources WHERE client_id = :client_id AND category <> 'asana'";
     if (ce_table_has_column($pdo, 'sources', 'active')) {
         $sql .= ' AND COALESCE(active, 1) = 1';
     }

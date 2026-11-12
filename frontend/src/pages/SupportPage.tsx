@@ -6,6 +6,7 @@ import { borderedSectionClass, designStackClass } from '../design/identity.const
 import { fetchSupportInfo, type SupportInfo } from '../api/home'
 import { isApiConfigured } from '../api/client'
 import { SupportChatBox } from '../components/SupportChatBox'
+import { DEFAULT_DOCS_URL, DEFAULT_SUPPORT_EMAIL } from '../config/installContact'
 
 const SECTION_CLASS = borderedSectionClass
 
@@ -27,8 +28,8 @@ export function SupportPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const email = info?.email ?? 'support@igisnext.com'
-  const docsUrl = info?.docsUrl ?? 'https://igisnext.com'
+  const email = info?.email ?? DEFAULT_SUPPORT_EMAIL
+  const docsUrl = info?.docsUrl ?? DEFAULT_DOCS_URL
 
   return (
     <GridShell
@@ -56,7 +57,7 @@ export function SupportPage() {
               Onboarding-assistent
             </p>
             <div className="pt-[12px]">
-              <SupportChatBox askKey={askKey} fromPath={fromPath} />
+              <SupportChatBox askKey={askKey} fromPath={fromPath} supportEmail={email} />
             </div>
           </section>
 

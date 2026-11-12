@@ -220,7 +220,7 @@ export function PlanReview({
                     to={`/article/${slot.slotId}`}
                     className="text-[14px] leading-[18px] font-semibold text-ce-blue no-underline"
                   >
-                    Schrijven
+                    Schrijf dit thema
                   </Link>
                 </div>
                 <p className={`${bodyClass} mt-[6px]`}>

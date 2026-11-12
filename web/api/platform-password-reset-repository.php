@@ -19,7 +19,7 @@ function ce_ensure_platform_password_reset_schema(PDO $pdo): void
         return;
     }
 
-    $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_platform_password_reset_tokens.sql';
+    $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_platform_password_reset_tokens.sql';
     if (is_readable($migration)) {
         try {
             $pdo->exec((string) file_get_contents($migration));
@@ -121,17 +121,18 @@ function ce_request_platform_password_reset(PDO $pdo, string $email): array
     $token = ce_create_platform_password_reset_token($pdo, $userId, $email);
     $url = ce_platform_password_reset_page_url($token);
 
+    $product = ce_product_name();
     $textBody = implode("\n", [
         'Hallo,',
         '',
-        'Je hebt een nieuw wachtwoord aangevraagd voor het Content Engine platform-dashboard.',
+        'Je hebt een nieuw wachtwoord aangevraagd voor het ' . $product . ' platform-dashboard.',
         '',
         'Open deze link om een nieuw wachtwoord in te stellen (geldig 1 uur):',
         $url,
         '',
         'Als je dit niet hebt aangevraagd, kun je deze mail negeren.',
         '',
-        '— Content Engine',
+        '— ' . $product,
     ]);
 
     $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
@@ -143,7 +144,7 @@ function ce_request_platform_password_reset(PDO $pdo, string $email): array
         . '<p><a href="' . $safeUrl . '">Nieuw wachtwoord instellen</a> (geldig 1 uur)</p>'
         . '<p>Als je dit niet hebt aangevraagd, kun je deze mail negeren.</p>';
 
-    $mail = ce_send_mail($email, 'Content Engine — platform wachtwoord resetten', $textBody, $htmlBody);
+    $mail = ce_send_mail($email, $product . ' — platform wachtwoord resetten', $textBody, $htmlBody);
     if (!$mail['ok']) {
         error_log('CE platform password reset mail failed: ' . ($mail['error'] ?? 'unknown'));
     }

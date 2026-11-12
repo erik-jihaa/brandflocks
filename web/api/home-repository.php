@@ -253,7 +253,7 @@ function ce_fetch_home_sources_insight(PDO $pdo, ?string $clientId): array
     $byCategory = [];
     if ($clientId !== null && ce_table_exists($pdo, 'sources')) {
         $stmt = $pdo->prepare(
-            'SELECT category, COUNT(*) AS n FROM sources WHERE client_id = :id GROUP BY category'
+            "SELECT category, COUNT(*) AS n FROM sources WHERE client_id = :id AND category <> 'asana' GROUP BY category"
         );
         $stmt->execute(['id' => $clientId]);
         foreach ($stmt->fetchAll() ?: [] as $row) {
@@ -343,14 +343,6 @@ function ce_build_sources_expand_tips(array $byCategory, int $total): array
             'id' => 'expand-blogs',
             'label' => 'Voeg blogoverzicht toe',
             'reason' => 'Onderliggende blogposts vullen research aan',
-        ];
-    }
-
-    if (!isset($byCategory['trello'])) {
-        $tips[] = [
-            'id' => 'expand-trello',
-            'label' => 'Koppel Trello',
-            'reason' => 'Eigen PR-concepten wegen mee in research',
         ];
     }
 
@@ -1179,7 +1171,7 @@ SQL;
 }
 
 /**
- * §1.6 — optionele koppelingen die nog niet gelegd zijn (podcast + mailbox + Trello).
+ * §1.6 — optionele koppelingen die nog niet gelegd zijn (podcast + mailbox).
  *
  * @return list<array{id: string, label: string, path: string}>
  */
@@ -1210,7 +1202,6 @@ function ce_build_home_pending_connections(PDO $pdo, ?string $clientId): array
     foreach (
         [
             'mailbox' => ['label' => 'mailbox', 'path' => '/sources/new/mailbox'],
-            'trello' => ['label' => 'Trello', 'path' => '/sources/new/trello'],
         ] as $key => $meta
     ) {
         $entry = $integrations[$key] ?? null;
@@ -1296,7 +1287,7 @@ function ce_fetch_home_dashboard(PDO $pdo): array
 
     $sourcesCount = 0;
     if ($clientId !== null && ce_table_exists($pdo, 'sources')) {
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM sources WHERE client_id = :id');
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sources WHERE client_id = :id AND category <> 'asana'");
         $stmt->execute(['id' => $clientId]);
         $sourcesCount = (int) $stmt->fetchColumn();
     }
@@ -1550,8 +1541,8 @@ function ce_fetch_support_info(): array
     }
 
     return [
-        'email' => $email !== '' ? $email : 'support@igisnext.com',
-        'docsUrl' => trim((string) (getenv('CE_DOCS_URL') ?: 'https://igisnext.com')),
+        'email' => $email !== '' ? $email : ce_install_contact_defaults()['support'],
+        'docsUrl' => trim(ce_config_value('CE_DOCS_URL', 'docs_url', ce_install_contact_defaults()['docs'])),
         'humanReviewConfigured' => $humanReview !== '',
     ];
 }

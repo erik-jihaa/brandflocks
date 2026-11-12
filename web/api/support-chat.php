@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/client-context.php';
+require_once __DIR__ . '/event-log-repository.php';
 require_once __DIR__ . '/support-chat-repository.php';
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -42,7 +43,7 @@ if ($result['budget']['blocked'] && $result['reply'] === '') {
     ce_json_response([
         'reply' => '',
         'budget' => $result['budget'],
-        'error' => 'Het chatbudget voor deze tenant is bereikt. Mail support@igisnext.com voor verdere hulp.',
+        'error' => 'Het chatbudget voor deze tenant is bereikt. Mail ' . ce_support_email() . ' voor verdere hulp.',
     ], 429);
 }
 

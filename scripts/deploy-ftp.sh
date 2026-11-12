@@ -3,7 +3,8 @@
 #
 #   ./scripts/deploy-ftp.sh              # .env (bestaand gedrag)
 #   ./scripts/deploy-ftp.sh staging      # .env.staging
-#   ./scripts/deploy-ftp.sh brandflocks  # .env.brandflocks (Antagonist tests/training)
+#   ./scripts/deploy-ftp.sh brandflocks  # .env.brandflocks (eigen subdomein / testserver)
+#   ./scripts/deploy-ftp.sh brandflocks-target  # .env.brandflocks-target (staging.brandflocks.nl)
 #   ./scripts/deploy-ftp.sh production   # .env.production, vraagt bevestiging
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -11,8 +12,8 @@ WEB="$ROOT/web"
 FRONTEND="$ROOT/frontend"
 
 TARGET_ENV="${1:-}"
-if [[ -n "$TARGET_ENV" && ! "$TARGET_ENV" =~ ^(local|staging|brandflocks|production)$ ]]; then
-  echo "Onbekende omgeving: $TARGET_ENV (kies local, staging, brandflocks of production)" >&2
+if [[ -n "$TARGET_ENV" && ! "$TARGET_ENV" =~ ^(local|staging|brandflocks|brandflocks-target|production)$ ]]; then
+  echo "Onbekende omgeving: $TARGET_ENV (kies local, staging, brandflocks, brandflocks-target of production)" >&2
   exit 1
 fi
 
@@ -52,18 +53,37 @@ print(value or 'production')
 PY
 )"
 if [[ -n "$TARGET_ENV" ]]; then
-  DEPLOY_ENV="$TARGET_ENV"
+  if [[ "$TARGET_ENV" == "brandflocks-target" ]]; then
+    # .env.brandflocks-target — profielnaam; CE_ENV in het bestand is meestal `staging` (Bf-staging op Antagonist).
+    DEPLOY_ENV="$(
+      python3 - "$ENV_FILE" <<'PY'
+import sys
+from pathlib import Path
+value = ''
+for line in Path(sys.argv[1]).read_text().splitlines():
+    line = line.strip()
+    if line.startswith('CE_ENV=') and '=' in line:
+        value = line.split('=', 1)[1].strip().strip('"').strip("'").split(' #')[0].strip()
+print(value or 'brandflocks')
+PY
+    )"
+  else
+    DEPLOY_ENV="$TARGET_ENV"
+  fi
 fi
 
 echo "==> Omgeving: $DEPLOY_ENV  (env-bestand: $(basename "$ENV_FILE"))"
+
+# Profielnaam voor isolatiecheck (moet overeenkomen met bestandsnaam .env.<profiel>)
+ISOLATION_ENV="${TARGET_ENV:-$DEPLOY_ENV}"
 
 # Een staging-deploy met productie-FTP en productie-DB is de duurste fout die dit script
 # kan maken, en die configuratie ziet er in het bestand normaal uit. Daarom hier en niet
 # alleen in de documentatie.
 if [[ "$DEPLOY_ENV" != "production" && "$ENV_FILE" != "$ROOT/.env" ]]; then
-  if ! "$ROOT/scripts/check-env-isolation.sh" "$DEPLOY_ENV"; then
+  if ! "$ROOT/scripts/check-env-isolation.sh" "$ISOLATION_ENV"; then
     echo >&2
-    echo "Deploy afgebroken: .env.$DEPLOY_ENV is niet losgekoppeld van productie." >&2
+    echo "Deploy afgebroken: $(basename "$ENV_FILE") is niet losgekoppeld van productie." >&2
     exit 1
   fi
   echo
@@ -116,7 +136,6 @@ done
 echo "==> Syncing SQL migrations naar web/migrations/"
 MIGRATIONS_SRC="$ROOT/scripts/migrations"
 MIGRATIONS_DST="$WEB/migrations"
-rm -rf "$MIGRATIONS_DST"
 mkdir -p "$MIGRATIONS_DST"
 shopt -s nullglob
 for sql in "$MIGRATIONS_SRC"/*.sql; do
@@ -232,6 +251,11 @@ ce07_webhook = ''
 ce_llm_visibility_webhook = ''
 review_email = 'erik@igisnext.com'
 mail_from = ''
+mail_envelope = ''
+product_name = 'Brandflocks'
+staging_label = ''
+platform_label = ''
+docs_url = ''
 public_base_url = 'https://ce.igisnext.com'
 allowed_origins = 'https://ce.igisnext.com,http://localhost:5173'
 wp_site = ''
@@ -241,8 +265,6 @@ wp_db_name = ''
 wp_db_user = ''
 wp_db_pass = ''
 wp_author_id = '1'
-trello_key = ''
-trello_token = ''
 google_client_id = ''
 google_client_secret = ''
 linkedin_client_id = ''
@@ -301,6 +323,26 @@ for line in env_path.read_text().splitlines():
         parsed = parse_env_value(val)
         if parsed:
             mail_from = parsed
+    elif key == 'CE_MAIL_ENVELOPE':
+        parsed = parse_env_value(val)
+        if parsed:
+            mail_envelope = parsed
+    elif key == 'CE_PRODUCT_NAME':
+        parsed = parse_env_value(val)
+        if parsed:
+            product_name = parsed
+    elif key == 'CE_STAGING_LABEL':
+        parsed = parse_env_value(val)
+        if parsed:
+            staging_label = parsed
+    elif key == 'CE_PLATFORM_LABEL':
+        parsed = parse_env_value(val)
+        if parsed:
+            platform_label = parsed
+    elif key == 'CE_DOCS_URL':
+        parsed = parse_env_value(val)
+        if parsed:
+            docs_url = parsed
     elif key == 'WORDPRESS_SITE_URL':
         parsed = parse_env_value(val)
         if parsed:
@@ -329,14 +371,6 @@ for line in env_path.read_text().splitlines():
         parsed = parse_env_value(val)
         if parsed:
             wp_author_id = parsed
-    elif key == 'TRELLO_API_KEY':
-        parsed = parse_env_value(val)
-        if parsed:
-            trello_key = parsed
-    elif key == 'TRELLO_TOKEN':
-        parsed = parse_env_value(val)
-        if parsed:
-            trello_token = parsed
     elif key == 'GOOGLE_CLIENT_ID':
         parsed = parse_env_value(val)
         if parsed:
@@ -425,8 +459,6 @@ for line in env_path.read_text().splitlines():
         if parsed:
             support_imap_host = parsed
 
-trello_boards_webhook = f"{n8n_api_url}/webhook/ce-trello-boards" if n8n_api_url else ''
-
 content = f"""<?php
 
 declare(strict_types=1);
@@ -434,6 +466,10 @@ declare(strict_types=1);
 /** Auto-generated by scripts/deploy-ftp.sh — do not commit */
 return [
     'ce_env' => {php_str(ce_env)},
+    'product_name' => {php_str(product_name)},
+    'staging_label' => {php_str(staging_label)},
+    'platform_label' => {php_str(platform_label)},
+    'docs_url' => {php_str(docs_url)},
     'support_email' => {php_str(support_email)},
     'pilot_alert_emails' => {php_str(pilot_alert_emails)},
     'support_imap_email' => {php_str(support_imap_email)},
@@ -449,6 +485,7 @@ return [
     'ce_llm_visibility_webhook_url' => {php_str(ce_llm_visibility_webhook)},
     'review_email' => {php_str(review_email)},
     'mail_from' => {php_str(mail_from)},
+    'mail_envelope' => {php_str(mail_envelope)},
     'public_base_url' => {php_str(public_base_url)},
     'allowed_origins' => {php_str(allowed_origins)},
     'wordpress_site_url' => {php_str(wp_site)},
@@ -458,9 +495,6 @@ return [
     'wp_db_user' => {php_str(wp_db_user)},
     'wp_db_pass' => {php_str(wp_db_pass)},
     'wordpress_author_id' => {int(wp_author_id) if str(wp_author_id).isdigit() else 1},
-    'trello_api_key' => {php_str(trello_key)},
-    'trello_token' => {php_str(trello_token)},
-    'trello_boards_webhook_url' => {php_str(trello_boards_webhook)},
     'google_client_id' => {php_str(google_client_id)},
     'google_client_secret' => {php_str(google_client_secret)},
     'linkedin_client_id' => {php_str(linkedin_client_id)},
@@ -508,5 +542,7 @@ echo "    API health: $BASE_URL/api/health"
 
 if [[ -x "$ROOT/scripts/smoke-test.sh" ]]; then
   echo "==> Smoke-test"
-  "$ROOT/scripts/smoke-test.sh" "$DEPLOY_ENV" || echo "WAARSCHUWING: smoke-test meldde problemen — controleer bovenstaande regels."
+  # Profielnaam (brandflocks-target), niet alleen CE_ENV — anders wordt de verkeerde .env gekozen.
+  SMOKE_ENV="${TARGET_ENV:-$DEPLOY_ENV}"
+  "$ROOT/scripts/smoke-test.sh" "$SMOKE_ENV" || echo "WAARSCHUWING: smoke-test meldde problemen — controleer bovenstaande regels."
 fi

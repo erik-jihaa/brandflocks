@@ -18,7 +18,7 @@ Totaal routes in `web/api/index.php`: **102**. Geen runtime-referentie: **8** (k
 - `/sources/calendar/oauth/callback`
 - `/themes/generate-now`
 
-Zoek ook in **`../JSON/`** (n8n) vóór je een admin-route verwijdert.
+Zoek ook in **`json/n8n/`** (n8n) vóór je een admin-route verwijdert.
 
 ## 2. PHP-functies met ≤1 referentie (definitie only)
 
@@ -42,12 +42,8 @@ Gecontroleerd: **1599** functies (`ce_*`, `hba_*`, … in `web/api/`).
 - `ce_hba_category_and_foe_share_kern_citation` — `web/api/hba-prompt.php`
 - `ce_hba_ce04_regel_feedback_ok` — `web/api/hba-hint-verificatie.php`
 - `ce_hba_constraint_breach_verificatie_from_raw` — `web/api/hba-prompt.php`
-- `ce_hba_content_score_tool_summary` — `web/api/hba-repository.php`
-- `ce_hba_count_content_score_test_articles` — `web/api/hba-repository.php`
 - `ce_hba_determinism_run_measurement` — `web/api/hba-determinism-repository.php`
 - `ce_hba_determinism_run_measurement_batch` — `web/api/hba-determinism-repository.php`
-- `ce_hba_dry_run_content_score_for_article` — `web/api/hba-repository.php`
-- `ce_hba_fetch_content_score_test_articles` — `web/api/hba-repository.php`
 - `ce_hba_flag_citaten_from_raw` — `web/api/hba-prompt.php`
 - `ce_hba_flags_verwijderd_from_raw` — `web/api/hba-prompt.php`
 - `ce_hba_format_score_for_display` — `web/api/hba-determinism-repository.php`
@@ -147,9 +143,9 @@ Operationele allowlist: `docs/operational-admin-routes.md`.
 - `/admin/republish-wp` — `docs/inventaris-dode-code.md`
 - `/admin/reset-client-content` — `scripts/reset-client-content.sh`, `scripts/provision-tenant.sh`, `docs/inventaris-dode-code.md`
 - `/admin/reset-content` — `scripts/reset-content-remote.sh`, `docs/inventaris-dode-code.md`
-- `/admin/run-migration` — `scripts/run-migration.sh`, `scripts/smoke-test.sh`, `scripts/migrations/README.md` (+1)
+- `/admin/run-migration` — `scripts/run-migration.sh`, `scripts/smoke-test.sh`, `web/migrations/README.md` (+1)
 - `/admin/schema-export` — `scripts/export-production-schema.sh`, `docs/inventaris-dode-code.md`
-- `/admin/schema-migrations-init` — `scripts/export-production-schema.sh`, `scripts/sync-staging-from-production.sh`, `scripts/migrations/README.md` (+1)
+- `/admin/schema-migrations-init` — `scripts/export-production-schema.sh`, `scripts/sync-staging-from-production.sh`, `web/migrations/README.md` (+1)
 - `/admin/scraper-sync` — `docs/inventaris-dode-code.md`
 - `/admin/set-password` — `scripts/test-tenant-idor.py`, `scripts/test-tenant-isolation.py`, `scripts/reset-login-password.sh` (+1)
 - `/admin/set-platform-password` — `scripts/reset-platform-password.sh`, `docs/inventaris-dode-code.md`

@@ -62,7 +62,7 @@ function ce_integrations_sources_for_client(PDO $pdo, string $clientId, ?string 
         return [];
     }
 
-    $sql = 'SELECT * FROM sources WHERE client_id = :client_id';
+    $sql = "SELECT * FROM sources WHERE client_id = :client_id AND category <> 'asana'";
     $params = ['client_id' => $clientId];
     if ($category !== null) {
         $sql .= ' AND category = :category';
@@ -438,7 +438,6 @@ function ce_platform_integration_issues_light(PDO $pdo, string $clientId, array 
     $issues = [];
     $labels = [
         'mailbox' => 'Mailbox',
-        'trello' => 'Trello',
         'calendar' => 'Google Calendar',
         'ga4' => 'Google Analytics (GA4)',
         'apify_scraper' => 'Apify-scraper',
@@ -448,7 +447,6 @@ function ce_platform_integration_issues_light(PDO $pdo, string $clientId, array 
 
     $checks = [
         'mailbox' => ce_integrations_source_category_status($pdo, $clientId, 'mailbox', 'Mailbox'),
-        'trello' => ce_integrations_source_category_status($pdo, $clientId, 'trello', 'Trello'),
         'website_cms' => ce_integrations_website_cms_status_overview_light($pdo, $clientId, $clientRow),
     ];
 
@@ -564,7 +562,6 @@ function ce_integrations_status_for_client(PDO $pdo, string $clientId): array
         'calendar' => ce_integrations_calendar_status($pdo, $clientId),
         'mailbox' => ce_integrations_source_category_status($pdo, $clientId, 'mailbox', 'Mailbox'),
         'apify_scraper' => ce_integrations_apify_status($pdo, $clientId),
-        'trello' => ce_integrations_source_category_status($pdo, $clientId, 'trello', 'Trello'),
         'website_cms' => ce_integrations_website_cms_status($pdo, $clientId, $clientRow),
         'linkedin_publish' => ce_integrations_linkedin_publish_status($pdo, $clientId, $extras),
         'ga4' => ce_integrations_ga4_status($pdo, $clientId),

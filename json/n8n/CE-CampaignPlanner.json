@@ -1,0 +1,239 @@
+{
+  "name": "CE-CampaignPlanner",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce-campaign-plan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "cp-webhook",
+      "name": "Webhook \u2014 Campaign Plan",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        128
+      ],
+      "webhookId": "ce-campaign-plan-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = $input.first()?.json ?? {};\nconst body = raw.body ?? raw;\nconst theme = String(body.theme ?? '').trim();\nconst postCount = Math.min(6, Math.max(3, Number(body.postCount) || 4));\nconst targetAudience = String(body.targetAudience ?? '').trim();\nconst clientId = String(body.client_id ?? body.clientId ?? '').trim();\nif (!theme) throw new Error('theme is verplicht');\nif (!clientId) throw new Error('client_id is verplicht');\n\nreturn {\n  json: {\n    theme,\n    postCount,\n    targetAudience,\n    client_id: clientId,\n  },\n};\n"
+      },
+      "id": "cp-prepare",
+      "name": "Prepare Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, name, archetype, archetype_traits, adversary, brand_goal, tone_of_voice, writing_guide, default_tone, default_angle, default_platform FROM clients WHERE id = $1 LIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $json.client_id ] }}"
+        }
+      },
+      "id": "cp-get-client",
+      "name": "Get Client Strategy",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        128
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst prep = $('Prepare Prompt').first().json;\nconst client = $input.first().json;\n\nif (!client || !client.id) {\n  throw new Error('Geen client gevonden voor client_id: ' + prep.client_id);\n}\n\nconst audienceLine = prep.targetAudience\n  ? `Doelgroep: ${prep.targetAudience}.`\n  : 'Doelgroep: algemeen B2B LinkedIn-publiek.';\n\nconst strategyContext = [\n  client.archetype ? `Archetype: ${client.archetype}` : '',\n  client.archetype_traits ? `Archetyp-kenmerken: ${client.archetype_traits}` : '',\n  client.adversary ? `Tegenstander (adversary): ${client.adversary}` : '',\n  client.brand_goal ? `Merkdoel: ${client.brand_goal}` : '',\n  client.writing_guide ? `Schrijfwijzer:\\n${client.writing_guide}` : '',\n].filter(Boolean).join('\\n');\n\nconst userPrompt = `Plan een LinkedIn-contentcampagne voor ${client.name}.\n\nMERKSTRATEGIE:\n${strategyContext}\n\n${audienceLine}\nProbleem/thema (1 zin): ${prep.theme}\nAantal posts: ${prep.postCount}\n\nGenereer een campagneschema met ${prep.postCount} posts verspreid over opeenvolgende weken (week 1 t/m ${prep.postCount}).\nVarieer formaten: storytelling, steps (3-stappen), opinion, data (cijfers + verhaal).\nElke post heeft een kernboodschap (theme), invalshoek (angle \u2014 kies uit: archetype, adversary, general \u2014 passend bij de merkstrategie), hook (openingszin), format, tags (3-5 hashtags zonder #).\nPost 4 of later mag readyToPublish false zijn als productiedata ontbreekt \u2014 geef dan holdReason.\n\nAntwoord ALLEEN met valid JSON (geen markdown):\n{\n  \"campaignTitle\": \"...\",\n  \"posts\": [\n    {\n      \"postNumber\": 1,\n      \"week\": 1,\n      \"theme\": \"...\",\n      \"angle\": \"archetype|adversary|general\",\n      \"hook\": \"...\",\n      \"format\": \"storytelling\",\n      \"tags\": [\"tag1\", \"tag2\"],\n      \"readyToPublish\": true,\n      \"holdReason\": \"\"\n    }\n  ],\n  \"generatedAt\": \"ISO-8601\"\n}`;\n\nreturn {\n  json: {\n    theme: prep.theme,\n    postCount: prep.postCount,\n    client_id: prep.client_id,\n    client_name: client.name,\n    claudeBody: {\n      model: 'claude-sonnet-4-6',\n      max_tokens: 4096,\n      system: 'Je bent campagneplanner voor LinkedIn B2B-content. Je kent de merkstrategie van de klant en past die toe bij het plannen van de campagne. Output uitsluitend JSON volgens het gevraagde schema. Geen markdown fences.',\n      messages: [{ role: 'user', content: userPrompt }],\n    },\n  },\n};\n"
+      },
+      "id": "cp-build-prompt",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.claudeBody) }}",
+        "options": {}
+      },
+      "id": "cp-claude",
+      "name": "Claude \u2014 Genereer campagneschema",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        720,
+        128
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst inputJson = $input.first().json;\nlet rawContent = '';\n\nif (inputJson.content && Array.isArray(inputJson.content)) {\n  rawContent = inputJson.content\n    .filter((b) => b.type === 'text' || b.text)\n    .map((b) => b.text || '')\n    .join('');\n} else if (inputJson.message?.content) {\n  const msg = inputJson.message.content;\n  rawContent = Array.isArray(msg) ? msg.map((b) => b.text || '').join('') : String(msg);\n} else if (inputJson.text) {\n  rawContent = inputJson.text;\n} else {\n  rawContent = '{}';\n}\n\nlet cleanJson = rawContent.replace(/```json/gi, '').replace(/```/g, '').trim();\nlet parsed = {};\ntry {\n  parsed = JSON.parse(cleanJson);\n} catch (e) {\n  parsed = {\n    campaignTitle: 'Fout bij plannen',\n    posts: [],\n    error: 'JSON parse fout: ' + e.message,\n    generatedAt: new Date().toISOString(),\n  };\n}\n\nif (!parsed.generatedAt) {\n  parsed.generatedAt = new Date().toISOString();\n}\n\nif (!Array.isArray(parsed.posts)) {\n  parsed.posts = [];\n}\n\nreturn [{ json: parsed }];\n"
+      },
+      "id": "cp-parse",
+      "name": "Parse JSON response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "cp-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "content": "CE Campaign Planner v2\n\nPOST { theme, postCount, targetAudience?, client_id }\nHaalt client-strategie op uit DB \u2192 Claude genereert merkbewust campagneschema.\nFrontend voegt posts individueel toe via Fastlane \u2014 geen contentgeneratie hier.",
+        "height": 120,
+        "width": 380
+      },
+      "id": "cp-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -64
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook \u2014 Campaign Plan": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "Get Client Strategy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client Strategy": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Claude \u2014 Genereer campagneschema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude \u2014 Genereer campagneschema": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

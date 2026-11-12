@@ -115,8 +115,13 @@ function ce_create_fastlane(PDO $pdo, array $body): array
 
     require_once __DIR__ . '/objectives-repository.php';
     ce_ensure_objectives_schema($pdo);
+    $brandGoalForWriting = ce_client_brand_architecture_goal_text($pdo, $clientId);
+    // Stap 1a: merkdoel (brand_goal) is leidend; oude objectives-uuid's niet meer opslaan als merkdoel gevuld is.
     $objectiveId = (string) ($meta['objective'] ?? '');
-    if ($objectiveId !== '') {
+    if ($brandGoalForWriting !== '') {
+        $objectiveId = '';
+        $meta['objective'] = '';
+    } elseif ($objectiveId !== '') {
         $objCheck = $pdo->prepare(
             'SELECT id FROM objectives WHERE id = :id AND client_id = :client_id LIMIT 1'
         );
@@ -761,6 +766,31 @@ function ce_ensure_article_stub_for_slot(PDO $pdo, string $slotId): array
         throw new RuntimeException('Slot heeft geen titel voor artikel-stub');
     }
 
+    $campaignId = trim((string) ($slot['campaign_id'] ?? ''));
+    if ($campaignId !== '' && ce_table_exists($pdo, 'content_slots')) {
+        require_once __DIR__ . '/tone-styles.php';
+        $campCols = ['id', 'campaign_id', 'campaign_fase', 'campaign_opdracht'];
+        if (ce_table_has_column($pdo, 'content_slots', 'campaign_anker')) {
+            $campCols[] = 'campaign_anker';
+        }
+        if (ce_table_has_column($pdo, 'content_slots', 'campaign_instructie')) {
+            $campCols[] = 'campaign_instructie';
+        }
+        $campStmt = $pdo->prepare(
+            'SELECT ' . implode(', ', $campCols) . ' FROM content_slots WHERE id = :id LIMIT 1'
+        );
+        $campStmt->execute(['id' => $slotId]);
+        $campRow = $campStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        $campMeta = ce_campagne_context_meta_from_slot_row($pdo, $campRow);
+        if (($meta['rationale'] ?? '') === '' && ($campMeta['campagne_opdracht'] ?? '') !== '') {
+            $meta['rationale'] = (string) $campMeta['campagne_opdracht'];
+        }
+        $platformCol = trim((string) ($slot['campaign_platform'] ?? ''));
+        if (($meta['platform'] ?? '') === '' && $platformCol !== '') {
+            $meta['platform'] = ce_platform_to_ui($platformCol);
+        }
+    }
+
     $articleId = ce_uuid_v4();
     ce_insert_fastlane_article($pdo, $articleId, $slotId, $title, $meta);
 
@@ -805,6 +835,8 @@ function ce_trigger_ce03_write(string $slotId, bool $fireAndForget = true, ?arra
             'objective_label',
             'objective_description',
             'objective_writing_style',
+            'objective_source',
+            'brand_goal',
             'objectives_catalog',
         ] as $key) {
             if (!array_key_exists($key, $meta)) {

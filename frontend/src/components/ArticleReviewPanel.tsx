@@ -43,6 +43,8 @@ type ArticleReviewPanelProps = {
   onMarkPlaced?: (platform: string) => void
   /** Tijdens CE-03 genereren — zelfde knop, niet klikbaar */
   reeditDisabled?: boolean
+  /** Indienen alleen bij echte artikeltekst (niet bij themeOnly / lege stub). */
+  hasArticleText?: boolean
 }
 
 const REEDIT_LABEL = 'Opnieuw bewerken'
@@ -84,6 +86,7 @@ export function ArticleReviewPanel({
   markingPlaced = false,
   onMarkPlaced,
   reeditDisabled = false,
+  hasArticleText = true,
 }: ArticleReviewPanelProps) {
   const [confirmPublishOpen, setConfirmPublishOpen] = useState(false)
   const busy = submitting || saving || publishing || reediting
@@ -92,6 +95,7 @@ export function ArticleReviewPanel({
   const primarySubmitLabel = noReviewer
       ? 'Publiceer'
       : 'Indienen ter goedkeuring'
+  const showSubmit = hasArticleText
 
   function handleHumanSubmit() {
     if (noReviewer && !confirmPublishOpen) {
@@ -250,9 +254,11 @@ export function ArticleReviewPanel({
           Opnieuw bewerken leest je aantekeningen in de copy en maakt daar een nieuwe versie van.
         </p>
         <div className={pillActionsRowClass}>
-        <PillButton variant="main" onClick={handleHumanSubmit} disabled={busy} loading={submitting || publishing}>
-          {primarySubmitLabel}
-        </PillButton>
+        {showSubmit ? (
+          <PillButton variant="main" onClick={handleHumanSubmit} disabled={busy} loading={submitting || publishing}>
+            {primarySubmitLabel}
+          </PillButton>
+        ) : null}
         {onReedit ? (
           <PillButton variant="second" onClick={onReedit} disabled={busy || reeditDisabled} loading={reediting}>
             {REEDIT_LABEL}
@@ -311,18 +317,20 @@ export function ArticleReviewPanel({
   return (
     <div className="space-y-[12px]">
       <div className={pillActionsRowClass}>
-        <PillButton variant="main" onClick={handleHumanSubmit} disabled={busy} loading={submitting || publishing}>
-          {primarySubmitLabel}
-        </PillButton>
+        {showSubmit ? (
+          <PillButton variant="main" onClick={handleHumanSubmit} disabled={busy} loading={submitting || publishing}>
+            {primarySubmitLabel}
+          </PillButton>
+        ) : null}
         {onReedit ? (
           <PillButton variant="second" onClick={onReedit} disabled={busy || reeditDisabled} loading={reediting}>
             {REEDIT_LABEL}
           </PillButton>
-        ) : (
+        ) : showSubmit ? (
           <PillButton variant="second" onClick={() => onSubmit('ai')} disabled={busy} loading={submitting}>
             {REEDIT_LABEL}
           </PillButton>
-        )}
+        ) : null}
         {onSave && (
           <PillButton variant="second" onClick={onSave} disabled={busy} loading={saving}>
             Opslaan
@@ -338,11 +346,13 @@ export function ArticleReviewPanel({
       {reeditNotice ? (
         <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{reeditNotice}</p>
       ) : null}
-      <p className="m-0 text-[13px] leading-[17px] text-ce-beige">
-        {noReviewer
-          ? 'Geen tegenlezer — Publiceer zet het artikel direct live (na goedkeuring in CE).'
-          : 'Opnieuw bewerken verwerkt je aantekeningen in de copy tot een nieuwe versie.'}
-      </p>
+      {showSubmit ? (
+        <p className="m-0 text-[13px] leading-[17px] text-ce-beige">
+          {noReviewer
+            ? 'Geen tegenlezer — Publiceer zet het artikel direct live (na goedkeuring in CE).'
+            : 'Opnieuw bewerken verwerkt je aantekeningen in de copy tot een nieuwe versie.'}
+        </p>
+      ) : null}
     </div>
   )
 }

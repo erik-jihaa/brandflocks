@@ -413,7 +413,7 @@ function ce_support_reply_ticket(
         $message,
         '',
         '---',
-        'Antwoord op je vraag via Content Engine'
+        'Antwoord op je vraag via ' . ce_product_name()
             . ($tenantName !== '' ? ' (' . $tenantName . ')' : '')
             . '.',
         'Nieuwe vragen? Mail ' . $supportInbox . '.',

@@ -10,12 +10,14 @@ import {
   type SupportChatContext,
   type SupportChatMessage,
 } from '../api/supportChat'
+import { DEFAULT_SUPPORT_EMAIL } from '../config/installContact'
 
 const MAX_INPUT_CHARS = 1500
 
 type SupportChatBoxProps = {
   askKey?: string
   fromPath?: string
+  supportEmail?: string
 }
 
 function formatEur(value: number): string {
@@ -23,7 +25,11 @@ function formatEur(value: number): string {
 }
 
 /** Support — onboarding-chatbot (API-keys, sources); spend-cap per tenant */
-export function SupportChatBox({ askKey, fromPath }: SupportChatBoxProps) {
+export function SupportChatBox({
+  askKey,
+  fromPath,
+  supportEmail = DEFAULT_SUPPORT_EMAIL,
+}: SupportChatBoxProps) {
   const [messages, setMessages] = useState<SupportChatMessage[]>([])
   const [input, setInput] = useState('')
   const [budget, setBudget] = useState<SupportChatBudget | null>(null)
@@ -132,7 +138,7 @@ export function SupportChatBox({ askKey, fromPath }: SupportChatBoxProps) {
   return (
     <div>
       <p className="m-0 text-[14px] leading-[21px] text-ce-beige">
-        Vraag hulp bij onboarding: API-keys vinden (Trello, WordPress), koppelingen (Analytics,
+        Vraag hulp bij onboarding: API-keys vinden (WordPress, Apify), koppelingen (Analytics,
         LinkedIn) en bronnen instellen. De assistent beantwoordt alleen vragen over deze app.
       </p>
 
@@ -164,8 +170,8 @@ export function SupportChatBox({ askKey, fromPath }: SupportChatBoxProps) {
       {blocked ? (
         <p className="m-0 mt-[16px] text-[14px] leading-[21px] text-ce-black">
           Het chatbudget voor deze tenant is bereikt ({formatEur(budget?.limitEur ?? 5)}). Mail{' '}
-          <a href="mailto:support@igisnext.com" className="text-ce-blue underline">
-            support@igisnext.com
+          <a href={`mailto:${supportEmail}`} className="text-ce-blue underline">
+            {supportEmail}
           </a>{' '}
           voor verdere hulp.
         </p>
@@ -184,7 +190,7 @@ export function SupportChatBox({ askKey, fromPath }: SupportChatBoxProps) {
                 void send()
               }
             }}
-            placeholder="Bijv. Waar vind ik mijn Trello API-key?"
+            placeholder="Bijv. Hoe koppel ik WordPress?"
             aria-label="Vraag aan de onboarding-assistent"
             className="h-[40px] min-w-0 flex-1 rounded-[20px] border-0 bg-ce-pink px-[20px] text-[14px] leading-[18px] text-ce-black outline-none placeholder:text-ce-beige focus:ring-[1.5px] focus:ring-ce-blue"
           />

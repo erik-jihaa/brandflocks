@@ -1,0 +1,303 @@
+{
+  "name": "CE-07 (Performance Rapportage) [Bf app]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce07-performance-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce07-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        400
+      ],
+      "webhookId": "ce07-performance-report-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = $input.first()?.json ?? {};\nconst body = raw.body ?? raw;\nconst clientId = String(body.client_id ?? body.clientId ?? '').trim();\nconst periodStart = String(body.period_start ?? body.periodStart ?? '').slice(0, 10);\nconst periodEnd = String(body.period_end ?? body.periodEnd ?? '').slice(0, 10);\nconst scope = String(body.scope ?? 'general').trim() || 'general';\nconst scopeArticleId = String(body.scope_article_id ?? body.scopeArticleId ?? '').trim();\nif (!periodStart || !periodEnd) throw new Error('period_start and period_end required');\nreturn { json: { client_id: clientId, period_start: periodStart, period_end: periodEnd, scope, scope_article_id: scopeArticleId } };\n"
+      },
+      "id": "ce07-parse",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.id, c.name, c.archetype, c.adversary, c.brand_goal,\n  bn.geloofwaardigheidstest, bn.mechanisme, bn.foe AS narrative_foe,\n  bl.markt_archetype AS branche_archetype\nFROM clients c\nLEFT JOIN brand_narratives bn ON bn.client_id = c.id AND COALESCE(bn.is_current, 1) = 1\nLEFT JOIN branche_library bl ON bl.branche_code = bn.branche_code\nWHERE (NULLIF($1, '') IS NULL OR c.id = $1)\nORDER BY c.name ASC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Parse Input').item.json.client_id ] }}"
+        }
+      },
+      "id": "ce07-get-client",
+      "name": "Get Client",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1060,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT a.id, COALESCE(a.headline_human, a.headline) AS headline,\n  COALESCE(a.angle_final, a.angle_suggested, 'general') AS angle,\n  COALESCE(a.tone_final, a.tone_suggested, 'b2b') AS tone,\n  COALESCE(a.interaction_views, 0) AS views,\n  COALESCE(a.interaction_likes, 0) AS likes,\n  COALESCE(a.interaction_comments, 0) AS comments,\n  DATE(a.published_at) AS publish_date,\n  hs.contentrol,\n  hs.brand_contribution_score,\n  hs.architecture_risk_flags AS hba_flags,\n  JSON_UNQUOTE(JSON_EXTRACT(hs.raw_llm_response, '$.hoofdoordeel')) AS hba_hoofdoordeel\nFROM articles a\nJOIN content_slots s ON s.id = a.slot_id\nLEFT JOIN hba_scores hs ON hs.id = (\n  SELECT hs2.id FROM hba_scores hs2\n  WHERE hs2.post_id = a.id\n  ORDER BY hs2.scored_at DESC\n  LIMIT 1\n)\nWHERE s.client_id = $1\n  AND (\n    a.published_at IS NULL\n    OR DATE(a.published_at) BETWEEN $2 AND $3\n  )\n  AND COALESCE(a.status, '') IN ('published', 'archived', 'approved', 'draft', 'written')\n  AND ($4 = 'general' OR NULLIF($5, '') IS NULL OR a.id = $5)",
+        "options": {
+          "queryReplacement": "={{ [ $('Get Client').item.json.id, $('Parse Input').item.json.period_start, $('Parse Input').item.json.period_end, $('Parse Input').item.json.scope, $('Parse Input').item.json.scope_article_id ] }}"
+        }
+      },
+      "id": "ce07-get-articles",
+      "name": "Get Articles",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst parse = $('Parse Input').item.json;\nconst client = $('Get Client').item.json;\nconst rows = $('Get Articles').all().map((i) => i.json).filter((r) => r.id);\n\nfunction engagement(r) {\n  return Number(r.views || 0) + Number(r.likes || 0) + Number(r.comments || 0);\n}\nfunction parseFlags(raw) {\n  if (!raw) return [];\n  if (Array.isArray(raw)) return raw.map(String);\n  try {\n    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n    return Array.isArray(parsed) ? parsed.map(String) : [];\n  } catch {\n    return [];\n  }\n}\nfunction onStrategy(r) {\n  const hoofd = String(r.hba_hoofdoordeel || '').trim();\n  if (hoofd !== '') return hoofd === 'op_merk';\n  const bc = Number(r.brand_contribution_score);\n  return Number.isFinite(bc) && bc >= 6.0;\n}\nfunction eligibleBestPost(p) {\n  const hoofd = String(p.hbaHoofdoordeel || '').trim();\n  if (hoofd === 'regelbreuk' || hoofd === 'tegenkracht') return false;\n  return true;\n}\nfunction bestPostRank(p) {\n  const hoofd = String(p.hbaHoofdoordeel || '').trim();\n  if (hoofd === 'op_merk') return 3;\n  if (hoofd === 'neutraal') return 2;\n  if (hoofd === 'categorietaal') return 0;\n  return 1;\n}\n\nconst posts = rows.map((r) => ({\n  id: r.id,\n  headline: r.headline || 'Untitled',\n  angle: r.angle || 'general',\n  tone: r.tone || 'b2b',\n  contentrol: r.contentrol || null,\n  brandContribution: r.brand_contribution_score != null ? Number(r.brand_contribution_score) : null,\n  hbaHoofdoordeel: r.hba_hoofdoordeel || null,\n  hbaFlags: parseFlags(r.hba_flags),\n  engagement: engagement(r),\n  views: Number(r.views || 0),\n  likes: Number(r.likes || 0),\n  comments: Number(r.comments || 0),\n  publish_date: String(r.publish_date || '').slice(0, 10),\n  on_strategy: onStrategy(r),\n}));\n\nconst strategyPosts = posts.filter((p) => p.on_strategy);\nconst generalPosts = posts.filter((p) => !p.on_strategy);\nconst total = posts.length;\n\nconst pctOnStrategy = total ? Math.round((strategyPosts.length / total) * 1000) / 10 : 0;\nconst pctGeneral = total ? Math.round((generalPosts.length / total) * 1000) / 10 : 0;\n\nconst toneCounts = {};\nfor (const p of posts) {\n  const t = String(p.tone || 'b2b').toLowerCase();\n  toneCounts[t] = (toneCounts[t] || 0) + 1;\n}\n\nconst contentrolCounts = {\n  positionering: 0,\n  bewijs: 0,\n  educatie: 0,\n  activatie: 0,\n  community: 0,\n  service: 0,\n  employer_culture: 0,\n  reactief: 0,\n};\nfor (const p of posts) {\n  const role = String(p.contentrol || '').toLowerCase();\n  if (contentrolCounts[role] != null) contentrolCounts[role] += 1;\n}\n\nfunction avgEng(list) {\n  if (!list.length) return 0;\n  return Math.round((list.reduce((s, p) => s + p.engagement, 0) / list.length) * 10) / 10;\n}\nfunction medianEng(list) {\n  if (!list.length) return 0;\n  const sorted = list.map((p) => p.engagement).sort((a, b) => a - b);\n  const mid = Math.floor(sorted.length / 2);\n  return sorted.length % 2 ? sorted[mid] : Math.round(((sorted[mid - 1] + sorted[mid]) / 2) * 10) / 10;\n}\n\nconst engStrategy = avgEng(strategyPosts);\nconst engGeneral = avgEng(generalPosts);\nlet diffPct = 0;\nif (engGeneral > 0) {\n  diffPct = Math.round(((engStrategy - engGeneral) / engGeneral) * 1000) / 10;\n} else if (engStrategy > 0) {\n  diffPct = 100;\n}\n\nlet best = null;\nfor (const p of posts) {\n  if (!eligibleBestPost(p)) continue;\n  if (!best) {\n    best = p;\n    continue;\n  }\n  if (p.engagement > best.engagement) {\n    best = p;\n    continue;\n  }\n  if (p.engagement === best.engagement && bestPostRank(p) > bestPostRank(best)) {\n    best = p;\n  }\n}\n\nconst mean = total ? posts.reduce((s, p) => s + p.engagement, 0) / total : 0;\nconst outliers = posts\n  .filter((p) => total > 2 && p.engagement > mean * 1.5 && p.engagement > 0)\n  .slice(0, 5)\n  .map((p) => ({\n    article_id: p.id,\n    headline: p.headline,\n    angle_final: p.angle,\n    engagement: p.engagement,\n    publish_date: p.publish_date,\n  }));\n\nconst dayMap = new Map();\nfor (const p of posts) {\n  const d = p.publish_date || parse.period_start;\n  if (!dayMap.has(d)) {\n    dayMap.set(d, {\n      publish_date: d,\n      strategy_views: 0,\n      strategy_likes: 0,\n      strategy_comments: 0,\n      general_views: 0,\n      general_likes: 0,\n      general_comments: 0,\n    });\n  }\n  const row = dayMap.get(d);\n  const prefix = p.on_strategy ? 'strategy' : 'general';\n  row[`${prefix}_views`] += p.views;\n  row[`${prefix}_likes`] += p.likes;\n  row[`${prefix}_comments`] += p.comments;\n}\nconst dailyBreakdown = [...dayMap.values()].sort((a, b) => a.publish_date.localeCompare(b.publish_date));\n\nfunction makeUuid() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = (Math.random() * 16) | 0;\n    const v = c === 'x' ? r : (r & 0x3) | 0x8;\n    return v.toString(16);\n  });\n}\n\nreturn {\n  json: {\n    report_id: makeUuid(),\n    client_id: client.id,\n    client_name: client.name,\n    archetype: client.archetype || '',\n    adversary: client.adversary || '',\n    period_start: parse.period_start,\n    period_end: parse.period_end,\n    scope: parse.scope,\n    scope_article_id: parse.scope_article_id || null,\n    pct_on_strategy: pctOnStrategy,\n    pct_general: pctGeneral,\n    tone_distribution: toneCounts,\n    angle_distribution: contentrolCounts,\n    geloofwaardigheidstest: client.geloofwaardigheidstest || '',\n    brand_mechanisme: client.mechanisme || '',\n    brand_archetype_markt: client.branche_archetype || '',\n    archetype_same_as_market: String(client.archetype || '').trim() !== ''\n      && String(client.branche_archetype || '').trim() !== ''\n      && String(client.archetype || '').trim().toLowerCase() === String(client.branche_archetype || '').trim().toLowerCase(),\n    hba_posts: posts.map((p) => ({\n      article_id: p.id,\n      headline: p.headline,\n      hoofdoordeel: p.hbaHoofdoordeel,\n      flags: p.hbaFlags,\n      brand_contribution: p.brandContribution,\n      engagement: p.engagement,\n      on_strategy: p.on_strategy,\n    })),\n    execution_rate: total ? Math.min(100, Math.round((posts.filter((p) => p.publish_date).length / total) * 1000) / 10) : 0,\n    engagement_on_strategy: engStrategy,\n    engagement_general: engGeneral,\n    engagement_diff_pct: diffPct,\n    median_on_strategy: medianEng(strategyPosts),\n    median_general: medianEng(generalPosts),\n    article_count_strategy: strategyPosts.length,\n    article_count_general: generalPosts.length,\n    article_count_total: total,\n    outlier_posts: outliers,\n    best_performing_post: best\n      ? {\n          article_id: best.id,\n          headline: best.headline,\n          angle_final: best.angle,\n          engagement: best.engagement,\n          publish_date: best.publish_date,\n        }\n      : null,\n    daily_breakdown: dailyBreakdown,\n  },\n};\n"
+      },
+      "id": "ce07-compute",
+      "name": "Compute Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 2048,\n  system: \"Je schrijft performance-rapportages voor \" + $json.client_name + \". Archetype: \" + $json.archetype + \". Tegenkracht/adversary: \" + $json.adversary + \". Regel van het merk (geloofwaardigheidstest): \" + ($json.geloofwaardigheidstest || \"niet ingevuld\") + \". Mechanisme: \" + ($json.brand_mechanisme || \"niet ingevuld\") + \".\\n\\nOp strategie = HBA-hoofdoordeel op_merk (niet engagement of kop).\\nEen post met hoofdoordeel regelbreuk wordt nooit aanbevolen om opnieuw te plaatsen, te promoten of als voorbeeld te gebruiken, ongeacht het bereik. Noem zo\\u2019n post als aandachtspunt: wat de post deed en welke grens van het merk hij raakte.\\nEen aanbeveling mag nooit de redenering van de tegenkracht van het merk volgen. Controleer elke aanbeveling tegen de tegenkracht voordat je hem opneemt.\" + ($json.archetype_same_as_market ? \"\\n\\nMerk-archetype en markt-archetype vallen samen: content-adviezen moeten een concreet element van het mechanisme of de regel noemen; warm en menselijk zonder regel of mechanisme is geen merkadvies.\" : \"\") + \"\\n\\nSchrijf in het Nederlands, concreet en actionable. Geen interne labels (hoofdoordeel, flags, archetype-namen als vakterm).\",\n  messages: [{\n    role: \"user\",\n    content: \"Periode: \" + $json.period_start + \" t/m \" + $json.period_end + \"\\nScope: \" + $json.scope + \"\\nPosts totaal: \" + $json.article_count_total + \" (op strategie/op_merk: \" + $json.article_count_strategy + \", overig: \" + $json.article_count_general + \")\\nPct op strategie (hoofdoordeel op_merk): \" + $json.pct_on_strategy + \"%\\nEngagement op-strategie: \" + $json.engagement_on_strategy + \" vs overig: \" + $json.engagement_general + \" (verschil \" + $json.engagement_diff_pct + \"%)\\nTone: \" + JSON.stringify($json.tone_distribution) + \"\\nHBA per post: \" + JSON.stringify($json.hba_posts) + \"\\nBeste post (engagement, geen regelbreuk/tegenkracht): \" + JSON.stringify($json.best_performing_post) + \"\\nOutliers: \" + JSON.stringify($json.outlier_posts) + \"\\n\\nBeantwoord: wat gebeurde er belangrijks? reageerde op_merk-content beter? welke posts raakten de regel? uitschieters? consistentie merk? concrete aanbevelingen die de regel of het mechanisme versterken.\"\n  }],\n  tools: [{\n    name: \"write_report_insight\",\n    description: \"Synthese narrative voor performance report\",\n    input_schema: {\n      type: \"object\",\n      properties: { narrative: { type: \"string\" } },\n      required: [\"narrative\"]\n    }\n  }],\n  tool_choice: { type: \"tool\", name: \"write_report_insight\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce07-claude",
+      "name": "Claude Insight",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1720,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst m = $('Compute Metrics').item.json;\nconst claude = $('Claude Insight').item.json;\nconst narrative = claude?.content?.[0]?.input?.narrative\n  || claude?.content?.[0]?.text\n  || 'Geen narrative gegenereerd.';\nreturn {\n  json: {\n    ...m,\n    narrative: String(narrative).trim(),\n  },\n};\n"
+      },
+      "id": "ce07-prepare-save",
+      "name": "Prepare Save",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO performance_reports (\n  id, client_id, period_start, period_end, scope, scope_article_id,\n  pct_on_strategy, pct_general, tone_distribution, execution_rate,\n  engagement_on_strategy, engagement_general, engagement_diff_pct,\n  article_count_strategy, article_count_general, article_count_total,\n  median_on_strategy, median_general,\n  outlier_posts, best_performing_post, daily_breakdown, narrative\n) VALUES (\n  $1, $2, $3, $4, $5, NULLIF($6, ''),\n  $7, $8, $9, $10,\n  $11, $12, $13, $14, $15, $16,\n  $17, $18, $19, $20, $21, $22\n)",
+        "options": {
+          "queryReplacement": "={{ [ $json.report_id, $json.client_id, $json.period_start, $json.period_end, $json.scope, $json.scope_article_id || '', $json.pct_on_strategy, $json.pct_general, JSON.stringify({ ...($json.tone_distribution || {}), _angle: $json.angle_distribution || {} }), $json.execution_rate, $json.engagement_on_strategy, $json.engagement_general, $json.engagement_diff_pct, $json.article_count_strategy, $json.article_count_general, $json.article_count_total, $json.median_on_strategy, $json.median_general, JSON.stringify($json.outlier_posts), JSON.stringify($json.best_performing_post), JSON.stringify($json.daily_breakdown), $json.narrative ] }}"
+        }
+      },
+      "id": "ce07-insert",
+      "name": "Insert Report",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2160,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst r = $('Prepare Save').item.json;\nreturn {\n  json: {\n    ok: true,\n    report_id: r.report_id,\n    period_start: r.period_start,\n    period_end: r.period_end,\n    scope: r.scope,\n    engagement_diff_pct: r.engagement_diff_pct,\n    narrative: r.narrative,\n  },\n};\n"
+      },
+      "id": "ce07-respond-build",
+      "name": "Build Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2380,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "ce07-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2600,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Get Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client": {
+      "main": [
+        [
+          {
+            "node": "Get Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles": {
+      "main": [
+        [
+          {
+            "node": "Compute Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Metrics": {
+      "main": [
+        [
+          {
+            "node": "Claude Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Insight": {
+      "main": [
+        [
+          {
+            "node": "Prepare Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Save": {
+      "main": [
+        [
+          {
+            "node": "Insert Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Report": {
+      "main": [
+        [
+          {
+            "node": "Build Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Response": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

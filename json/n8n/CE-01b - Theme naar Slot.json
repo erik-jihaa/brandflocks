@@ -1,0 +1,564 @@
+{
+  "name": "CE-01b (Theme naar Slot) [Bf app]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce01b-theme-to-slot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce01b-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        400
+      ],
+      "webhookId": "ce01b-theme-to-slot-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = $input.first()?.json ?? {};\nconst body = raw.body ?? raw;\nconst themeId = String(body.theme_id ?? body.themeId ?? '').trim();\nif (!themeId) throw new Error('Missing theme_id');\nreturn { json: { theme_id: themeId } };\n"
+      },
+      "id": "ce01b-parse",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT t.*, c.name AS client_name, c.archetype, c.adversary, c.brand_goal,\n  COALESCE(c.posts_per_week, 1) AS posts_per_week\nFROM themes t\nJOIN clients c ON c.id = t.client_id\nWHERE t.id = $1\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Parse Input').item.json.theme_id ] }}"
+        }
+      },
+      "id": "ce01b-get-theme",
+      "name": "Get Theme",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1060,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first()?.json ?? {};\nif (!row.id) throw new Error('Theme not found');\nreturn { json: row };"
+      },
+      "id": "ce01b-validate-theme",
+      "name": "Validate Theme",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, status FROM content_slots\nWHERE theme_id = $1\n  AND COALESCE(status, '') NOT IN ('archived', 'archive', 'deleted')\nORDER BY created_at ASC",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Theme').item.json.id ] }}"
+        }
+      },
+      "id": "ce01b-check-existing",
+      "name": "Check Existing Slots",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1500,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-existing",
+              "leftValue": "={{ $('Check Existing Slots').all().filter(i => i.json.id).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ce01b-if-existing",
+      "name": "If Slots Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT posts_per_week, roles FROM content_rhythms\nWHERE client_id = $1 AND active = 1\nORDER BY created_at DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Theme').item.json.client_id ] }}"
+        }
+      },
+      "id": "ce01b-get-rhythm",
+      "name": "Get Content Rhythm",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1940,
+        640
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(DISTINCT s.id) AS slot_count\nFROM content_slots s\nINNER JOIN themes t ON t.id = s.theme_id\nWHERE s.client_id = $1\n  AND COALESCE(s.status, '') NOT IN ('archived', 'archive', 'deleted')\n  AND DATE(t.cycle_week) = DATE($2)",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Theme').item.json.client_id, $('Validate Theme').item.json.cycle_week ] }}"
+        }
+      },
+      "id": "ce01b-count-week-slots",
+      "name": "Count Week Slots",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2160,
+        640
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM research_items\nWHERE theme_id = $1\n  AND COALESCE(feedback, 'none') != 'forgotten'\n  AND (\n    feedback = 'liked'\n    OR NOT EXISTS (\n      SELECT 1 FROM research_items r2\n      WHERE r2.theme_id = $1 AND r2.feedback = 'liked'\n    )\n  )\nORDER BY created_at ASC\nLIMIT 20",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Theme').item.json.id ] }}"
+        }
+      },
+      "id": "ce01b-get-research",
+      "name": "Get Research",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1940,
+        520
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst theme = $('Get Theme').item.json;\nconst researchRows = $('Get Research').all().map((i) => i.json).filter((r) => r.id);\nconst liked = researchRows.filter((r) => r.feedback === 'liked');\nconst usedFallback = liked.length === 0 && researchRows.length > 0;\nconst selected = liked.length > 0 ? liked : researchRows;\n\nconst research_summary = selected.length\n  ? selected.map((r) => `[${r.id}] ${r.title}\\nSnippet: ${r.snippet || ''}\\nRationale: ${r.item_rationale || ''}\\nURL: ${r.url || ''}`).join('\\n\\n')\n  : 'Geen research-items beschikbaar.';\n\nreturn {\n  json: {\n    ...theme,\n    research_items: selected,\n    research_summary,\n    used_fallback: usedFallback,\n    research_count: selected.length,\n  },\n};\n"
+      },
+      "id": "ce01b-build-context",
+      "name": "Build Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 2048,\n  system: \"Je vertaalt een goedgekeurd content-thema naar concrete agenda-slots voor \" + $json.client_name + \". Archetype: \" + ($json.archetype || \"\") + \". Adversary: \" + ($json.adversary || \"\") + \".\",\n  messages: [{\n    role: \"user\",\n    content: \"THEMA: \" + $json.title + \"\\nMotivation: \" + ($json.motivation || \"\") + \"\\nRationale: \" + ($json.rationale || \"\") + \"\\nCycle week: \" + ($json.cycle_week || \"onbekend\") + \"\\n\\nGESELECTEERDE RESEARCH (\" + ($json.used_fallback ? \"fallback: geen likes, alle items\" : \"geliked\") + \"):\\n\" + $json.research_summary + \"\\n\\nPlan exact 1 agenda-slot. Vul goal, search_terms, phase_key (ISO-weeknummer als string), publish_date (YYYY-MM-DD binnen cycle_week).\"\n  }],\n  tools: [{\n    name: \"plan_content_slots\",\n    description: \"Concrete content_slots voor dit thema\",\n    input_schema: {\n      type: \"object\",\n      properties: {\n        slots: {\n          type: \"array\",\n          items: {\n            type: \"object\",\n            properties: {\n              theme: { type: \"string\" },\n              goal: { type: \"string\" },\n              search_terms: { type: \"string\" },\n              phase_key: { type: \"string\" },\n              publish_date: { type: \"string\" }\n            },\n            required: [\"goal\", \"search_terms\", \"phase_key\"]\n          }\n        }\n      },\n      required: [\"slots\"]\n    }\n  }],\n  tool_choice: { type: \"tool\", name: \"plan_content_slots\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce01b-claude",
+      "name": "Claude Plan Slots",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2380,
+        520
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Build Context').item.json;\nconst claude = $('Claude Plan Slots').item.json;\nconst input = claude?.content?.[0]?.input ?? {};\nconst rhythmRow = $('Get Content Rhythm').first()?.json ?? {};\nconst weekCount = Number($('Count Week Slots').first()?.json?.slot_count ?? 0);\nlet rhythmRoles = [];\ntry {\n  const parsed = typeof rhythmRow.roles === 'string' ? JSON.parse(rhythmRow.roles) : rhythmRow.roles;\n  if (Array.isArray(parsed)) rhythmRoles = parsed;\n} catch {\n  rhythmRoles = [];\n}\nconst rhythmRoleRaw = rhythmRoles.length\n  ? rhythmRoles[weekCount % rhythmRoles.length]\n  : null;\nconst rhythm_role = rhythmRoleRaw\n  ? String(rhythmRoleRaw.role_name || rhythmRoleRaw.roleName || '').trim()\n  : null;\n\nconst planned = Array.isArray(input.slots) && input.slots.length ? input.slots : [{\n  theme: ctx.title,\n  goal: ctx.rationale || ctx.motivation || '',\n  search_terms: ctx.title,\n  phase_key: ctx.phase_key || '',\n  publish_date: ctx.cycle_week || null,\n}];\n\nfunction makeUuid() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = (Math.random() * 16) | 0;\n    const v = c === 'x' ? r : (r & 0x3) | 0x8;\n    return v.toString(16);\n  });\n}\n\nfunction isoWeekFromDate(iso) {\n  if (!iso) return '';\n  const d = new Date(String(iso).slice(0, 10) + 'T12:00:00Z');\n  const day = d.getUTCDay() || 7;\n  d.setUTCDate(d.getUTCDate() + 4 - day);\n  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));\n  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);\n  return String(week);\n}\n\nconst out = [];\nfor (const slot of planned) {\n  const phaseKey = String(slot.phase_key || ctx.phase_key || isoWeekFromDate(ctx.cycle_week) || '1').trim();\n  out.push({\n    json: {\n      slot_id: makeUuid(),\n      client_id: ctx.client_id,\n      theme_id: ctx.id,\n      theme: String(slot.theme || ctx.title || 'Theme').trim(),\n      goal: String(slot.goal || ctx.rationale || ctx.motivation || '').trim(),\n      search_terms: String(slot.search_terms || slot.theme || ctx.title || '').trim(),\n      phase_key: phaseKey,\n      publish_date: slot.publish_date ? String(slot.publish_date).slice(0, 10) : (ctx.cycle_week ? String(ctx.cycle_week).slice(0, 10) : null),\n      status: 'themed',\n      rhythm_role,\n      used_fallback: ctx.used_fallback,\n    },\n  });\n}\n\nif (out.length === 0) {\n  throw new Error('No content slots planned');\n}\n\nreturn out.slice(0, 1);\n"
+      },
+      "id": "ce01b-prepare-slots",
+      "name": "Prepare Slot Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO content_slots (id, client_id, theme_id, status, phase_key, theme, goal, rhythm_role)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        "options": {
+          "queryReplacement": "={{ [ $json.slot_id, $json.client_id, $json.theme_id, $json.status, $json.phase_key, $json.theme, $json.goal, $json.rhythm_role ] }}"
+        }
+      },
+      "id": "ce01b-insert-slot",
+      "name": "Insert Content Slot",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2820,
+        520
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Check Existing Slots').all().map((i) => i.json).filter((r) => r.id).map((r) => ({ json: { slot_id: r.id } }));"
+      },
+      "id": "ce01b-use-existing",
+      "name": "Use Existing Slots",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fromNew = ($('Prepare Slot Rows').all?.() ?? []).map((i) => i.json.slot_id).filter(Boolean);\nif (fromNew.length) return fromNew.map((id) => ({ json: { slot_id: id } }));\nreturn $input.all().map((i) => i.json).filter((r) => r.slot_id).map((r) => ({ json: { slot_id: r.slot_id } }));"
+      },
+      "id": "ce01b-collect-slots",
+      "name": "Collect Slot IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE themes SET status = 'converted_to_slot' WHERE id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Theme').item.json.id ] }}"
+        }
+      },
+      "id": "ce01b-update-theme",
+      "name": "Update Theme Status",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        3260,
+        400
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "taJrWdU0RBkbtU0R",
+          "name": "Content Engine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst inserted = ($('Prepare Slot Rows').all?.() ?? []).map((i) => i.json).filter((r) => r.slot_id);\nconst existing = $('Check Existing Slots').all().map((i) => i.json).filter((r) => r.id);\nconst ctx = $('Build Context').item?.json ?? $('Validate Theme').item.json;\nconst slotIds = inserted.length ? inserted.map((r) => r.slot_id) : existing.map((r) => r.id);\nreturn {\n  json: {\n    ok: true,\n    theme_id: ctx.id,\n    slots_created: inserted.length,\n    slot_ids: slotIds,\n    used_research_fallback: ctx.used_fallback === true,\n    research_items_used: ctx.research_count || 0,\n  },\n};\n"
+      },
+      "id": "ce01b-respond-build",
+      "name": "Build Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3480,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "ce01b-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3920,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Get Theme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Theme": {
+      "main": [
+        [
+          {
+            "node": "Validate Theme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Theme": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Slots": {
+      "main": [
+        [
+          {
+            "node": "If Slots Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Slots Exist": {
+      "main": [
+        [
+          {
+            "node": "Use Existing Slots",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Content Rhythm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Content Rhythm": {
+      "main": [
+        [
+          {
+            "node": "Count Week Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Week Slots": {
+      "main": [
+        [
+          {
+            "node": "Get Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Research": {
+      "main": [
+        [
+          {
+            "node": "Build Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Context": {
+      "main": [
+        [
+          {
+            "node": "Claude Plan Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Plan Slots": {
+      "main": [
+        [
+          {
+            "node": "Prepare Slot Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Slot Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Content Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Content Slot": {
+      "main": [
+        [
+          {
+            "node": "Collect Slot IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use Existing Slots": {
+      "main": [
+        [
+          {
+            "node": "Collect Slot IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Slot IDs": {
+      "main": [
+        [
+          {
+            "node": "Update Theme Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Theme Status": {
+      "main": [
+        [
+          {
+            "node": "Build Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Response": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

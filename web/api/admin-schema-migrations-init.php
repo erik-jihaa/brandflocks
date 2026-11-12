@@ -14,27 +14,17 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 }
 
 /** @return list<string> */
-function ce_retroactive_migration_filenames(): array
+function ce_pre_baseline_migration_filenames(): array
 {
-    return [
-        'add_article_feedback_table.sql',
-        'add_article_self_review.sql',
-        'add_campaign_end_date.sql',
-        'add_campaign_start_date.sql',
-        'add_campaigns_table.sql',
-        'add_campagne_preview_p1.sql',
-        'add_campagne_preview_p2.sql',
-        'add_campagne_preview_p3.sql',
-        'add_campagne_preview_p4.sql',
-        'add_campagne_preview_p5.sql',
-        'add_client_images_table.sql',
-        'add_linkedin_posts_table.sql',
-        'add_objectives_table.sql',
-        'add_publish_mode.sql',
-        'add_report_article_counts.sql',
-        'add_scrape_runs_table.sql',
-        'add_source_checks_per_week.sql',
-    ];
+    $dir = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11';
+    if (!is_dir($dir)) {
+        return [];
+    }
+    $files = glob($dir . '/*.sql') ?: [];
+    $names = array_map('basename', $files);
+    sort($names);
+
+    return array_values($names);
 }
 
 $pdo = ce_db();
@@ -53,7 +43,7 @@ $insert = $pdo->prepare(
 );
 
 $inserted = [];
-foreach (ce_retroactive_migration_filenames() as $filename) {
+foreach (ce_pre_baseline_migration_filenames() as $filename) {
     $insert->execute(['filename' => $filename]);
     if ($insert->rowCount() > 0) {
         $inserted[] = $filename;

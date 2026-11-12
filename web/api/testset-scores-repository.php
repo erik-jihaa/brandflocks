@@ -21,7 +21,7 @@ function ce_ensure_testset_blind_scores_schema(PDO $pdo): void
         return;
     }
 
-    $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_testset_blind_scores.sql';
+    $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_testset_blind_scores.sql';
     if (!is_readable($migration)) {
         $migration = dirname(__DIR__) . '/migrations/add_testset_blind_scores.sql';
     }

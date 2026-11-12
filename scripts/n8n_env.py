@@ -1,17 +1,21 @@
 """n8n environment helpers — separate webhook paths and workflow names per CE_ENV."""
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
+N8N_JSON_DIR = ROOT / "json" / "n8n"
 
 ENV_LABEL_SUFFIX = {
     "production": "",
     "local": " [local]",
     "staging": " [staging]",
+    "brandflocks": " [Bf app]",
+    "brandflocks-target": " [Bf staging]",
 }
 
 # Base webhook path → .env key (used by setup-staging-n8n.sh)
@@ -105,7 +109,7 @@ def workflow_name_label() -> str:
 
 def strip_path_suffix(path: str) -> str:
     clean = path.strip("/")
-    for suffix in ("-staging", "-local"):
+    for suffix in ("-brandflocks-staging", "-brandflocks-fork", "-brandflocks", "-staging", "-local"):
         if clean.endswith(suffix):
             return clean[: -len(suffix)]
     return clean
@@ -128,7 +132,16 @@ def webhook_url(base: str) -> str:
 
 
 def strip_env_label(name: str) -> str:
-    return re.sub(r" \[(staging|local)\]$", "", name or "")
+    return re.sub(r" \[(staging|local|Bf app|Bf staging)\]$", "", name or "")
+
+
+def ce_api_base() -> str:
+    """HTTP-base voor CE API-calls in gegenereerde workflows (n8n → PHP)."""
+    return (
+        os.environ.get("CE_API_BASE_URL")
+        or os.environ.get("CE_PUBLIC_BASE_URL")
+        or "https://ce.igisnext.com"
+    ).rstrip("/")
 
 
 def _rewrite_webhook_url(url: str, api_base: str) -> str:
@@ -149,6 +162,53 @@ def _rewrite_webhook_urls_in_code(code: str, api_base: str) -> str:
         lambda match: _rewrite_webhook_url(match.group(0), api_base),
         code,
     )
+
+
+def _rewrite_ce_api_url(url: str) -> str:
+    """Vervang CE/staging-host door Brandflocks API-base bij push."""
+    if not isinstance(url, str) or "/api/" not in url:
+        return url
+    if "igisnext.com" not in url and "brandflocks.nl" not in url:
+        return url
+    match = re.match(r"https?://[^/]+(/.*)", url.strip())
+    if not match:
+        return url
+    return ce_api_base() + match.group(1)
+
+
+def _js_string_literal(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
+def _inject_brandflocks_code_literals(code: str) -> str:
+    """Vul API-base en reset-token in Code nodes (geen n8n $env Variables nodig)."""
+    if target_env() not in ("brandflocks", "brandflocks-target"):
+        return code
+    base = ce_api_base()
+    token = os.environ.get("CE_RESET_TOKEN", "").strip()
+    code = re.sub(
+        r"const ceBase = envVar\('CE_PUBLIC_BASE_URL'\)[^;]*;",
+        f"const ceBase = {_js_string_literal(base)};",
+        code,
+    )
+    code = re.sub(
+        r"const ceResetToken = envVar\('CE_RESET_TOKEN'\);",
+        f"const ceResetToken = {_js_string_literal(token)};",
+        code,
+    )
+    return code
+
+
+def _patch_reset_token_header(params: dict[str, Any]) -> None:
+    token = os.environ.get("CE_RESET_TOKEN", "").strip()
+    if not token:
+        return
+    headers = params.get("headerParameters")
+    if not isinstance(headers, dict):
+        return
+    for row in headers.get("parameters", []) or []:
+        if isinstance(row, dict) and row.get("name") == "X-CE-Reset-Token":
+            row["value"] = token
 
 
 def patch_workflow_for_env(workflow: dict[str, Any]) -> dict[str, Any]:
@@ -176,11 +236,18 @@ def patch_workflow_for_env(workflow: dict[str, Any]) -> dict[str, Any]:
             url = params.get("url", "")
             if isinstance(url, str) and "/webhook/" in url:
                 params["url"] = _rewrite_webhook_url(url, api_base)
+            elif isinstance(url, str) and target_env() in ("brandflocks", "brandflocks-target"):
+                params["url"] = _rewrite_ce_api_url(url)
+            _patch_reset_token_header(params)
 
         elif node_type == "n8n-nodes-base.code":
             code = params.get("jsCode", "")
-            if isinstance(code, str) and "/webhook/" in code:
-                params["jsCode"] = _rewrite_webhook_urls_in_code(code, api_base)
+            if isinstance(code, str):
+                if target_env() in ("brandflocks", "brandflocks-target"):
+                    code = _inject_brandflocks_code_literals(code)
+                if "/webhook/" in code:
+                    code = _rewrite_webhook_urls_in_code(code, api_base)
+                params["jsCode"] = code
 
         elif node_type == "n8n-nodes-base.mySql":
             cred_id = os.environ.get("N8N_MYSQL_CREDENTIAL_ID", "").strip()
@@ -189,7 +256,7 @@ def patch_workflow_for_env(workflow: dict[str, Any]) -> dict[str, Any]:
                 node["credentials"] = {
                     "mySql": {
                         "id": cred_id,
-                        "name": cred_name or "Content Engine [staging]",
+                        "name": cred_name or "Content Engine",
                     }
                 }
 

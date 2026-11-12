@@ -1,0 +1,321 @@
+{
+  "name": "CE-04 (Review & Publish) [Bf app]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce04-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ce04-webhook-001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        1488
+      ],
+      "webhookId": "ce04-review-id-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst slotId = body.slot_id ?? body?.body?.slot_id ?? $json.slot_id ?? null;\n\nif (!slotId || String(slotId).trim() === '') {\n  throw new Error('Missing slot_id. Stuur { \"slot_id\": \"<uuid>\" }.');\n}\n\nreturn { json: { slot_id: String(slotId).trim() } };"
+      },
+      "id": "ce04-parse-001",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT a.*, s.phase_key, s.theme, s.goal, s.status AS slot_status, c.name AS client_name, c.archetype, c.archetype_traits, c.adversary, c.brand_goal, c.tone_of_voice, c.writing_guide, (SELECT bn.geloofwaardigheidstest FROM brand_narratives bn WHERE bn.client_id = s.client_id AND bn.is_current = 1 ORDER BY bn.version DESC LIMIT 1) AS hba_geloofwaardigheidstest, (SELECT bn.verboden_logica FROM brand_narratives bn WHERE bn.client_id = s.client_id AND bn.is_current = 1 ORDER BY bn.version DESC LIMIT 1) AS hba_verboden_logica\nFROM articles a\nJOIN content_slots s ON s.id = a.slot_id\nJOIN clients c ON c.id = s.client_id\nWHERE a.slot_id = $1\nORDER BY a.id DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [ $('Parse Input').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-get-article",
+      "name": "Get Article",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first()?.json ?? {};\nconst slotId = $('Parse Input').first().json.slot_id;\n\nif (!row.id) {\n  throw new Error(`Geen artikel gevonden voor slot_id: ${slotId}`);\n}\n\nconst contentHuman = row.content_human || '';\nconst contentAi = row.content_ai || '';\nconst contentForReview = contentHuman || contentAi;\n\nif (!contentForReview.trim()) {\n  throw new Error('Artikel heeft geen content om te reviewen.');\n}\n\nconst regelTest = String(row.hba_geloofwaardigheidstest || '').trim();\nlet verboden = [];\ntry {\n  const raw = row.hba_verboden_logica;\n  const parsed = typeof raw === 'string' && raw.trim() !== '' ? JSON.parse(raw) : raw;\n  verboden = Array.isArray(parsed) ? parsed.map((v) => String(v).trim()).filter(Boolean) : [];\n} catch (e) {\n  verboden = [];\n}\nconst regelLines = [];\nif (regelTest !== '') regelLines.push(`Geloofwaardigheidstest: ${regelTest}`);\nif (verboden.length) regelLines.push(`Verboden logica:\\n- ${verboden.join('\\n- ')}`);\n\nreturn {\n  json: {\n    ...row,\n    slot_id: slotId,\n    article_id: row.id,\n    content_for_review: contentForReview,\n    content_baseline: contentAi,\n    hashtags: row.hashtags_final || row.hashtags_suggested || '',\n    tone: row.tone_final || row.tone_suggested || 'b2b',\n    angle: row.angle_final || row.angle_suggested || 'general',\n    platform: row.platform_final || row.platform_suggested || 'linkedin',\n    regels_merk: regelLines.length ? regelLines.join('\\n') : 'Geen regels vastgelegd.',\n    hba_geloofwaardigheidstest: regelTest,\n    hba_verboden_items: verboden\n  }\n};"
+      },
+      "id": "ce04-validate-article",
+      "name": "Validate Article",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 4096,\n  system: \"Je bent senior redacteur voor \" + $json.client_name + \".\\n\\nMERK:\\nArchetype: \" + $json.archetype + \" \u2014 \" + $json.archetype_traits + \"\\nTegenstander: \" + $json.adversary + \"\\nMerkdoel: \" + $json.brand_goal + \"\\n\\nSchrijfwijzer:\\n\" + $json.writing_guide + \"\\n\\nTone of voice:\\n\" + $json.tone_of_voice + \"\\n\\nREGELS VAN HET MERK:\\n\" + $json.regels_merk + \"\\n\\nREGELBREUK: wanneer gaat een tekst in tegen een regel van het merk?\\n\\nDe regel van het merk is de geloofwaardigheidstest: wat het merk aantoonbaar wel\\nof juist niet doet, ook als dat geld of groei kost. Een tekst breekt de regel als\\nhij iets aanbiedt, aankondigt, belooft of als vanzelfsprekend neerzet dat het merk\\nvolgens die test juist niet doet, ook als de regel zelf nergens in de tekst staat.\\nKijk naar wat de lezer na het lezen gaat doen of geloven, niet naar losse woorden.\\n\\nEen regelbreuk is altijd een handeling: iets wat het merk doet, aanbiedt, tekent\\nof als werkwijze heeft, en wat de regel verbiedt. Een woord of een claim is nooit\\neen regelbreuk. \\\"Partner\\\", \\\"snel\\\", \\\"effici\u00ebnt\\\" of \\\"betrouwbaar\\\" breken geen regel.\\nZe kunnen wel categorietaal zijn, of logica van de tegenkracht.\\n\\nDe verboden logica telt alleen mee als het verboden punt een handeling of aanbod\\nbeschrijft dat tegen de geloofwaardigheidstest ingaat, zoals korting op oudere\\nvoorraad of een wachtlijst wegwerken met invalkrachten. Verboden punten die\\ngangbare branchetaal zijn (zoals partner, persoonlijke zorg, of vers gebrand\\nzonder de regel) zijn geen regelbreuk: meld die als category_fallback. Verboden\\npunten die de redenering van de tegenkracht overnemen (zoals koffie als brandstof,\\nfeatures als hoofdargument, effici\u00ebntie als prestatie) meld je als foe_vervaging.\\n\\nWel een regelbreuk:\\n- een aanbod, actie of aankondiging die de geloofwaardigheidstest ondergraaft;\\n- een nieuw feit over het merk dat met de test in strijd is: een contract, een\\n  samenwerking, een werkwijze.\\n- Voorbeeld: \\\"Wij zijn trots op ons nieuwe partnerschap met [ERP-leverancier]\\\"\\n  is een regelbreuk bij een merk dat geen resellercontracten aangaat. Het merk\\n  gaat een partnerschap aan.\\n\\nGeen regelbreuk:\\n- de regel noemen, uitleggen, verdedigen of erop voortbouwen, ook als de tekst\\n  daarbij het verboden onderwerp noemt (\\\"Geen Black Friday bij ons, en dit is\\n  waarom\\\");\\n- branchetaal of vlakke claims (dat is category_fallback);\\n  Voorbeeld: \\\"Wij zijn uw betrouwbare partner\\\" is geen regelbreuk. Er wordt geen\\n  partnerschap met een leverancier gemeld. Dit is categorietaal.\\n- een onderwerp dat de regel niet raakt;\\n- de logica van de tegenkracht zonder verboden handeling (dat is foe_vervaging).\\n  Voorbeeld: \\\"Dankzij slimmere routes zijn onze zorgverleners minder onderweg\\\"\\n  is geen regelbreuk. Het merk doet niets wat de regel verbiedt.\\n\\nMeld alleen een regelbreuk als je een concrete zin uit de tekst kunt aanwijzen en\\nde specifieke handeling uit de geloofwaardigheidstest waar die zin tegenin gaat.\\nZet die zin in flag_citaten.constraint_breach. Zet in\\nflag_citaten.constraint_breach_uitleg het antwoord op: \\\"Welke handeling uit de\\nregel doet het merk volgens deze zin toch?\\\" Zonder die uitleg is het geen\\nregelbreuk. In constraint_breach_uitleg mag je de regel niet anders weergeven\\ndan in de geloofwaardigheidstest staat \u2014 geen verzachting, geen andere grens\\n(bijvoorbeeld \\\"bijna zes weken\\\" als de regel zes weken is).\\nBij twijfel: geen regelbreuk.\\n\\nREGEL LETTERLIJK: noemt je de regel van het merk, dan geef je hem weer zoals\\nhij in de geloofwaardigheidstest (regels) staat. Geen afgeleide grens, geen\\nandere getallen, geen verzachting.\\n\\nSchrijf nooit \\\"nadert\\\", \\\"rond\\\" of \\\"bijna\\\" als je de regel bedoelt \u2014 ook niet\\nom een fout te benoemen, en ook niet tussen aanhalingstekens. Citeer alleen\\nzinnen die letterlijk in de brontekst staan. Staat de afgeleide grens niet\\nin de brontekst, verz\u00edn hem dan niet.\\n\\nSchrijf de regel in de woorden van de geloofwaardigheidstest (bijvoorbeeld\\n\\\"ouder dan zes weken\\\" of \\\"langer dan zes weken geleden gebrand\\\"). Een belofte\\ndie op de regel lijkt maar iets anders zegt, is geen uitwerking van de regel.\\n\\nGeef constructieve redactionele feedback op ingediende posts. Wees concreet: citeer korte fragmenten. Max 4 tekstpunten. Geef optioneel 1 beeld-feedback als er geen afbeelding is ge\u00fcpload. Controleer daarnaast altijd expliciet of de post een regel van het merk breekt, volgens de definitie van REGELBREUK hierboven. Een regelbreuk meld je alleen in het veld regelbreuk, niet ook als tekstpunt.\",\n  messages: [\n    {\n      role: \"user\",\n      content: \"THEMA: \" + $json.theme + \"\\nFase: \" + $json.phase_key + \"\\n\\nHEADLINE:\\n\" + $json.headline + \"\\n\\nTEKST (human edit):\\n\" + $json.content_for_review + \"\\n\\nORIGINELE AI-TEKST:\\n\" + $json.content_baseline + \"\\n\\nHASHTAGS: \" + $json.hashtags + \"\\nTone: \" + $json.tone + \" | Angle: \" + $json.angle + \" | Platform: \" + $json.platform + \"\\n\\nReview deze ingediende post. Focus op merkfit, helderheid, tone, en afwijkingen t.o.v. het AI-concept. Breekt de ingediende tekst een regel van het merk? Vul dan regelbreuk: regel = exacte kopie (woord voor woord) van de ene geschonden regel uit REGELS VAN HET MERK \u2014 meestal de geloofwaardigheidstest-regel, anders \u00e9\u00e9n regel uit verboden logica. Geen parafrase, geen samenvatting; citaat = de letterlijke zin uit de ingediende tekst. Geen regelbreuk, of geen regels vastgelegd: regelbreuk = null. Forceer geen regelbreuk. Output via tool.\"\n    }\n  ],\n  tools: [\n    {\n      name: \"submit_review\",\n      description: \"Redactionele feedback voor de Content Engine UI\",\n      input_schema: {\n        type: \"object\",\n        properties: {\n          summary: { type: \"string\" },\n          text_feedback: {\n            type: \"array\",\n            items: {\n              type: \"object\",\n              properties: {\n                comment: { type: \"string\" },\n                excerpt: { type: \"string\" },\n                action_label: { type: \"string\" }\n              },\n              required: [\"comment\"]\n            }\n          },\n          image_feedback: {\n            type: \"object\",\n            properties: {\n              comment: { type: \"string\" },\n              action_label: { type: \"string\" }\n            }\n          },\n          regelbreuk: {\n            type: [\"object\", \"null\"],\n            properties: {\n              regel: { type: \"string\" },\n              citaat: { type: \"string\" }\n            },\n            required: [\"regel\", \"citaat\"]\n          }\n        },\n        required: [\"summary\", \"text_feedback\", \"regelbreuk\"]\n      }\n    }\n  ],\n  tool_choice: { type: \"tool\", name: \"submit_review\" }\n}) }}",
+        "options": {}
+      },
+      "id": "ce04-claude-review",
+      "name": "Claude Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2256,
+        1488
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GhgOhw7oQpIMZDDo",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const article = $('Validate Article').first().json;\n// Input is Clear Old Feedback (MySQL { success: true }); Anthropic response lives on Claude Review.\nconst claude = $('Claude Review').first().json;\n\nfunction extractSubmitReviewInput(response) {\n  const content = response?.content;\n  if (Array.isArray(content)) {\n    for (const block of content) {\n      if (\n        block\n        && block.type === 'tool_use'\n        && block.name === 'submit_review'\n        && block.input\n        && typeof block.input === 'object'\n      ) {\n        return block.input;\n      }\n    }\n    const legacy = content[0]?.input;\n    if (legacy && typeof legacy === 'object') {\n      return legacy;\n    }\n  }\n  return {};\n}\n\nconst input = extractSubmitReviewInput(claude);\nconst toolOutputMissing = !input || Object.keys(input).length === 0;\nconst stopReason = String(claude?.stop_reason || 'onbekend');\nconst rawPreview = JSON.stringify(claude ?? {}).slice(0, 300);\n\nconst textItems = Array.isArray(input.text_feedback) ? input.text_feedback : [];\nconst imageFb = input.image_feedback?.comment ? input.image_feedback : null;\nconst rawRegelbreuk = input.regelbreuk && typeof input.regelbreuk === 'object' ? input.regelbreuk : null;\n\nconst rows = [];\n\nfunction normalizeRegelWs(text) {\n  return String(text || '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction jullieRegelsLines(articleRow) {\n  const raw = String(articleRow.hba_geloofwaardigheidstest || '').trim();\n  if (!raw) return [];\n  return raw\n    .split(/\\r\\n|\\r|\\n/)\n    .map((line) => normalizeRegelWs(line))\n    .filter(Boolean);\n}\n\nfunction brandRegelPool(articleRow) {\n  return jullieRegelsLines(articleRow);\n}\n\nfunction resolveLiteralBrandRegel(candidate, pool) {\n  const c = normalizeRegelWs(candidate);\n  if (!pool.length) return c;\n  for (const line of pool) {\n    if (c && (line === c || line.includes(c) || c.includes(line))) return line;\n  }\n  if (c) {\n    const lower = c.toLowerCase();\n    for (const line of pool) {\n      const l = line.toLowerCase();\n      if (l.includes(lower) || lower.includes(l)) return line;\n    }\n  }\n  return pool[0];\n}\n\nfunction buildRegelbreukComment(literalRegel, citaat) {\n  const regel = normalizeRegelWs(literalRegel).replace(/\\.+$/, '');\n  let comment = `Dit stuk gaat in tegen je regel: \"${regel}.\"`;\n  const excerpt = String(citaat || '').trim();\n  if (excerpt) {\n    comment += ` In je tekst staat: \u00ab${excerpt}\u00bb.`;\n  }\n  return comment;\n}\n\nconst regelCandidate = normalizeRegelWs(rawRegelbreuk?.regel).replace(/^dat\\s+/i, '');\nif (regelCandidate !== '') {\n  const citaat = String(rawRegelbreuk?.citaat || '').trim();\n  const pool = brandRegelPool(article);\n  const literalRegel = resolveLiteralBrandRegel(regelCandidate, pool);\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'text',\n    reviewer_name: 'Hoofdredacteur',\n    comment: buildRegelbreukComment(literalRegel, citaat),\n    action_label: 'Verwijderen',\n    excerpt: citaat !== '' ? citaat : null,\n  });\n}\n\nfunction normalizeActionLabel(raw, fallback) {\n  const label = raw ? String(raw).trim() : '';\n  if (label === '' || label === 'Remove') return fallback;\n  if (label === 'New image') return 'Nieuwe afbeelding';\n  return label;\n}\n\nfor (const item of textItems) {\n  if (!item?.comment) continue;\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'text',\n    reviewer_name: 'Hoofdredacteur',\n    comment: String(item.comment).trim(),\n    action_label: normalizeActionLabel(item.action_label, 'Verwijderen'),\n    excerpt: item.excerpt ? String(item.excerpt) : null,\n  });\n}\n\nif (imageFb) {\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'image',\n    reviewer_name: 'Hoofdredacteur',\n    comment: String(imageFb.comment).trim(),\n    action_label: normalizeActionLabel(imageFb.action_label, 'Nieuwe afbeelding'),\n    excerpt: null,\n  });\n}\n\nif (rows.length === 0) {\n  const summary = String(input.summary || '').trim();\n  let comment;\n  if (toolOutputMissing) {\n    comment = `[CE-04] Review mislukt: tool-output niet gelezen. stop_reason=${stopReason}. Raw (300 tekens): ${rawPreview}`;\n  } else if (summary !== '') {\n    comment = summary;\n  } else {\n    comment = 'Geen specifieke feedback.';\n  }\n  rows.push({\n    slot_id: article.slot_id,\n    article_id: article.article_id,\n    feedback_type: 'text',\n    reviewer_name: 'Hoofdredacteur',\n    comment,\n    action_label: null,\n    excerpt: null,\n    ce04_parse_error: toolOutputMissing,\n  });\n}\n\nreturn rows.map((row) => ({ json: row }));"
+      },
+      "id": "ce04-build-rows",
+      "name": "Build Feedback Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM article_feedback WHERE slot_id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Article').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-clear-feedback",
+      "name": "Clear Old Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2368,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO article_feedback (id, slot_id, article_id, reviewer_name, feedback_type, comment, action_label, excerpt, status) VALUES (UUID(), $1, $2, $3, $4, $5, $6, $7, 'open')",
+        "options": {
+          "queryReplacement": "={{ [ $json.slot_id, $json.article_id, $json.reviewer_name, $json.feedback_type, $json.comment, $json.action_label, $json.excerpt ] }}"
+        }
+      },
+      "id": "ce04-insert-feedback",
+      "name": "Insert Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2592,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE articles SET status = 'feedback' WHERE slot_id = $1",
+        "options": {
+          "queryReplacement": "={{ [ $('Validate Article').item.json.slot_id ] }}"
+        }
+      },
+      "id": "ce04-set-status-api",
+      "name": "Set Status Feedback",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        2704,
+        1488
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "CtexbQVBC9XoqnJ5",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, slot_id: $('Validate Article').item.json.slot_id, status: 'feedback', feedback_count: $('Insert Feedback').all().length }) }}",
+        "options": {}
+      },
+      "id": "ce04-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2816,
+        1488
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Get Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Article": {
+      "main": [
+        [
+          {
+            "node": "Validate Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Article": {
+      "main": [
+        [
+          {
+            "node": "Claude Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Review": {
+      "main": [
+        [
+          {
+            "node": "Clear Old Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Old Feedback": {
+      "main": [
+        [
+          {
+            "node": "Build Feedback Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Feedback Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Feedback": {
+      "main": [
+        [
+          {
+            "node": "Set Status Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status Feedback": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "747f0e47-7bea-4f03-beea-c9a343b35659",
+  "meta": {
+    "instanceId": "ecb28230bd473ffb1035d1b6de149528b24a8d731bea2c5bdc9ea965ed8b1bde"
+  },
+  "nodeGroups": [],
+  "id": "ucFfC6Kzmopql1kM",
+  "tags": []
+}

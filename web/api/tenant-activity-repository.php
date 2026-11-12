@@ -22,7 +22,7 @@ function ce_ensure_tenant_activity_schema(PDO $pdo): void
     $ensured = true;
 
     if (!ce_table_exists($pdo, 'tenant_activity_daily')) {
-        $migration = dirname(__DIR__, 2) . '/scripts/migrations/add_tenant_activity_daily.sql';
+        $migration = dirname(__DIR__) . '/migrations/archive/pre-baseline-2026-11/add_tenant_activity_daily.sql';
         if (is_readable($migration)) {
             try {
                 $pdo->exec((string) file_get_contents($migration));

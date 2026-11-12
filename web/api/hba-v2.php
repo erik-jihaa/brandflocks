@@ -102,8 +102,15 @@ if ($path === '/hba/theme-verdicts' && $method === 'GET') {
     $week = isset($_GET['week']) ? (string) $_GET['week'] : null;
     $themeId = trim((string) ($_GET['theme_id'] ?? $_GET['themeId'] ?? ''));
     $slotId = trim((string) ($_GET['slot_id'] ?? $_GET['slotId'] ?? ''));
-    $themeIds = $themeId !== '' ? [$themeId] : ($slotId !== '' ? [$slotId] : []);
-    ce_json_response(ce_hba_v2_load_theme_verdicts($pdo, $clientId, $week !== '' ? $week : null, $themeIds));
+    $themeIds = ce_hba_v2_merge_theme_filter_ids($themeId, $slotId);
+    try {
+        if ($clientId === null || $clientId === '') {
+            ce_json_response(['ok' => false, 'error' => 'Geen client gevonden', 'verdicts' => []]);
+        }
+        ce_json_response(ce_hba_v2_load_theme_verdicts($pdo, $clientId, $week !== '' ? $week : null, $themeIds));
+    } catch (Throwable $e) {
+        ce_json_response(['ok' => false, 'error' => $e->getMessage(), 'verdicts' => []]);
+    }
 }
 
 if ($path === '/hba/theme-verdicts' && $method === 'POST') {
@@ -113,8 +120,15 @@ if ($path === '/hba/theme-verdicts' && $method === 'POST') {
     $week = isset($body['week']) ? (string) $body['week'] : null;
     $themeId = trim((string) ($body['theme_id'] ?? $body['themeId'] ?? ''));
     $slotId = trim((string) ($body['slot_id'] ?? $body['slotId'] ?? ''));
-    $themeIds = $themeId !== '' ? [$themeId] : ($slotId !== '' ? [$slotId] : []);
-    ce_json_response(ce_hba_v2_run_theme_verdicts($pdo, $clientId, $week, $themeIds));
+    $themeIds = ce_hba_v2_merge_theme_filter_ids($themeId, $slotId);
+    try {
+        if ($clientId === null || $clientId === '') {
+            ce_json_response(['ok' => false, 'error' => 'Geen client gevonden', 'verdicts' => []]);
+        }
+        ce_json_response(ce_hba_v2_run_theme_verdicts($pdo, $clientId, $week, $themeIds));
+    } catch (Throwable $e) {
+        ce_json_response(['ok' => false, 'error' => $e->getMessage(), 'verdicts' => []]);
+    }
 }
 
 if ($path === '/hba/research-verdicts' && $method === 'GET') {
@@ -122,6 +136,9 @@ if ($path === '/hba/research-verdicts' && $method === 'GET') {
     $clientId = ce_resolve_client_id($pdo);
     $slot = isset($_GET['slot']) ? (string) $_GET['slot'] : '';
     try {
+        if ($clientId === null || $clientId === '') {
+            ce_json_response(['ok' => false, 'error' => 'Geen client gevonden', 'verdicts' => []]);
+        }
         ce_json_response(ce_hba_v2_load_research_verdicts($pdo, $clientId, $slot));
     } catch (Throwable $e) {
         ce_json_response(['ok' => false, 'error' => $e->getMessage()]);
@@ -134,6 +151,9 @@ if ($path === '/hba/research-verdicts' && $method === 'POST') {
     $body = ce_read_json_body();
     $slot = isset($body['slot']) ? (string) $body['slot'] : (isset($_GET['slot']) ? (string) $_GET['slot'] : '');
     try {
+        if ($clientId === null || $clientId === '') {
+            ce_json_response(['ok' => false, 'error' => 'Geen client gevonden', 'verdicts' => []]);
+        }
         ce_json_response(ce_hba_v2_run_research_verdicts($pdo, $clientId, $slot));
     } catch (Throwable $e) {
         ce_json_response(['ok' => false, 'error' => $e->getMessage()]);

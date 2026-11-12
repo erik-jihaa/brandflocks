@@ -76,4 +76,7 @@ export type ThemeDto = {
   editorOptions?: string[]
   rhythmRole?: string | null
   rhythmRoleLabel?: string | null
+  copyModus?: string | null
+  copyModusOverride?: boolean
+  copyModusLabel?: string | null
 }

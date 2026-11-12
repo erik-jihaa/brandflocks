@@ -13,7 +13,6 @@ python3 "$ROOT/scripts/generate-ce-linkedin-sync-workflow.py"
 python3 "$ROOT/scripts/generate-ce03-workflow.py"
 python3 "$ROOT/scripts/generate-ce04-workflow.py"
 python3 "$ROOT/scripts/generate-ce-llm-visibility-workflow.py"
-python3 "$ROOT/scripts/generate-trello-boards-workflow.py"
 
 echo "CE workflow JSON regenerated ($CE_N8N_TARGET)."
 echo "Overgeslagen (ronde A, generators weg): CE-02, CE-Sources Sync — zie CE-Cursor."

@@ -1,23 +1,34 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiFetch, isApiConfigured } from '../api/client'
+import {
+  DEFAULT_PRODUCT_BRANDING,
+  parseProductBranding,
+  type ProductBranding,
+} from '../config/productBranding'
 
 type HealthResponse = {
   ok?: boolean
   environment?: string
   db?: string
+  branding?: ProductBranding
 }
 
 type BannerScope = 'platform' | 'tenant'
 
-const STAGING_LABELS: Record<BannerScope, string> = {
-  platform: 'CF_Platform — testomgeving, geen productie-tenants',
-  tenant: 'CF_Staging — testomgeving, geen productie-tenants',
-}
-
-const LOCAL_LABELS: Record<BannerScope, string> = {
-  platform: 'CF_Platform (local) — ontwikkelomgeving',
-  tenant: 'CF_Staging (local) — ontwikkelomgeving',
+function bannerLabel(
+  environment: string,
+  scope: BannerScope,
+  branding: ProductBranding,
+): string {
+  const base = scope === 'platform' ? branding.platformLabel : branding.stagingLabel
+  if (environment === 'local') {
+    return `${base} (local) — ontwikkelomgeving`
+  }
+  if (environment === 'staging') {
+    return `${base} — testomgeving, geen productie-tenants`
+  }
+  return `${base} (${environment}) — niet-productieomgeving`
 }
 
 function BrandBall({ variant }: { variant: 'white' | 'green' }) {
@@ -39,12 +50,13 @@ function BrandBall({ variant }: { variant: 'white' | 'green' }) {
 }
 
 /**
- * Zichtbare band bij staging/lokaal. Voorkomt de klassieke fout: denken dat je in
- * de testomgeving zit terwijl je op productie werkt (of andersom).
+ * Zichtbare band bij staging/lokaal/named installs. Voorkomt de klassieke fout: denken
+ * dat je in de testomgeving zit terwijl je op productie werkt (of andersom).
  */
 export function EnvironmentBanner() {
   const { pathname } = useLocation()
   const [environment, setEnvironment] = useState<string | null>(null)
+  const [branding, setBranding] = useState<ProductBranding>(DEFAULT_PRODUCT_BRANDING)
 
   useEffect(() => {
     if (!isApiConfigured()) {
@@ -55,7 +67,9 @@ export function EnvironmentBanner() {
     let cancelled = false
     void apiFetch<HealthResponse>('/health')
       .then((data) => {
-        if (!cancelled) setEnvironment(data.environment ?? null)
+        if (cancelled) return
+        setEnvironment(data.environment ?? null)
+        setBranding(parseProductBranding(data.branding))
       })
       .catch(() => {
         if (!cancelled) setEnvironment(null)
@@ -69,10 +83,7 @@ export function EnvironmentBanner() {
   if (environment === null || environment === 'production') return null
 
   const scope: BannerScope = pathname.startsWith('/platform') ? 'platform' : 'tenant'
-  const label =
-    environment === 'local'
-      ? LOCAL_LABELS[scope]
-      : STAGING_LABELS[scope] ?? `${environment.toUpperCase()} — niet-productieomgeving`
+  const label = bannerLabel(environment, scope, branding)
 
   return (
     <div

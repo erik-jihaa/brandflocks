@@ -2,6 +2,24 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+
+function ce_mail_extract_address(string $value): string
+{
+    $value = trim($value);
+    if ($value === '') {
+        return '';
+    }
+    if (preg_match('/<([^>]+)>/', $value, $matches)) {
+        $value = trim($matches[1]);
+    }
+    if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        return '';
+    }
+
+    return $value;
+}
+
 function ce_mail_from_address(): string
 {
     ce_load_env();
@@ -19,12 +37,52 @@ function ce_mail_from_address(): string
         return $from;
     }
 
-    $host = $_SERVER['HTTP_HOST'] ?? 'ce.igisnext.com';
+    $defaults = ce_install_contact_defaults();
+    if (ce_is_brandflocks_install()) {
+        return ce_product_name() . ' <' . $defaults['review'] . '>';
+    }
 
-    return "Content Engine <noreply@{$host}>";
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    return ce_product_name() . " <noreply@{$host}>";
 }
 
-/** @return array{ok: bool, error?: string} */
+/** SMTP envelope (-f) — op shared hosting vaak verplicht voor geldig afzenderdomein. */
+function ce_mail_envelope_address(?string $fromHeader = null): string
+{
+    ce_load_env();
+    $explicit = trim((string) (getenv('CE_MAIL_ENVELOPE') ?: ''));
+    if ($explicit === '') {
+        $local = dirname(__DIR__) . '/includes/ce.local.php';
+        if (is_readable($local)) {
+            $config = require $local;
+            if (is_array($config)) {
+                $explicit = trim((string) ($config['mail_envelope'] ?? ''));
+            }
+        }
+    }
+
+    $parsed = ce_mail_extract_address($explicit);
+    if ($parsed !== '') {
+        return $parsed;
+    }
+
+    $fromHeader ??= ce_mail_from_address();
+    $parsed = ce_mail_extract_address($fromHeader);
+    if ($parsed !== '') {
+        return $parsed;
+    }
+
+    if (ce_is_brandflocks_install()) {
+        return ce_install_contact_defaults()['review'];
+    }
+
+    $support = ce_mail_extract_address(ce_install_contact_defaults()['support']);
+
+    return $support !== '' ? $support : '';
+}
+
+/** @return array{ok: bool, error?: string, from?: string, envelope?: string} */
 function ce_send_mail(string $to, string $subject, string $textBody, ?string $htmlBody = null, ?string $replyTo = null): array
 {
     $to = trim($to);
@@ -33,14 +91,17 @@ function ce_send_mail(string $to, string $subject, string $textBody, ?string $ht
     }
 
     $from = ce_mail_from_address();
+    $envelope = ce_mail_envelope_address($from);
     $reply = trim((string) ($replyTo ?? ''));
     if ($reply !== '' && !filter_var($reply, FILTER_VALIDATE_EMAIL)) {
         $reply = '';
     }
+
+    $fromAddr = ce_mail_extract_address($from);
     $headers = [
         'MIME-Version: 1.0',
         'From: ' . $from,
-        'Reply-To: ' . ($reply !== '' ? $reply : $from),
+        'Reply-To: ' . ($reply !== '' ? $reply : ($fromAddr !== '' ? $fromAddr : $from)),
         'X-Mailer: PHP/' . PHP_VERSION,
     ];
 
@@ -60,11 +121,19 @@ function ce_send_mail(string $to, string $subject, string $textBody, ?string $ht
     }
 
     $subjectEncoded = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    $ok = @mail($to, $subjectEncoded, $body, implode("\r\n", $headers));
+    $params = $envelope !== '' ? '-f' . $envelope : '';
+    $ok = $params !== ''
+        ? @mail($to, $subjectEncoded, $body, implode("\r\n", $headers), $params)
+        : @mail($to, $subjectEncoded, $body, implode("\r\n", $headers));
 
     if (!$ok) {
-        return ['ok' => false, 'error' => 'mail() mislukt op de server'];
+        return [
+            'ok' => false,
+            'error' => 'mail() mislukt op de server',
+            'from' => $from,
+            'envelope' => $envelope,
+        ];
     }
 
-    return ['ok' => true];
+    return ['ok' => true, 'from' => $from, 'envelope' => $envelope];
 }

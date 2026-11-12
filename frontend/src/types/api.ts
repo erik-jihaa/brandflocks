@@ -82,6 +82,17 @@ export type ArticleDto = {
   id: string
   slotId: string
   weekLabel: string
+  /** Campagneslot zonder artikeltekst — toon thema-startscherm i.p.v. lege editor. */
+  themeOnly?: boolean
+  themeId?: string
+  campaignId?: string | null
+  campaignTitle?: string | null
+  campaignFaseLabel?: string | null
+  publishDate?: string | null
+  slotOrigin?: string | null
+  copyModus?: string | null
+  copyModusOverride?: boolean
+  copyModusLabel?: string | null
   headline: string
   headlineAi?: string
   content: string
@@ -126,6 +137,8 @@ export type ArticleDto = {
   reviewMode?: ReviewMode | 'hba' | 'none'
   /** CE-03 loopt nog of wordt hervat — poll tot body binnen is */
   writingPending?: boolean
+  /** PATCH/rewrite heeft CE-03 zojuist gestart */
+  writing?: boolean
   hbaScore?: HbaScoreDto | null
   hbaHint?: import('../api/hbaV2').HbaArticleHint | null
   hbaContentrolOverride?: string | null

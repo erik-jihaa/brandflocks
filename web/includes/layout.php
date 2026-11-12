@@ -32,7 +32,7 @@ function ce_render_layout_start(string $title, string $activeNav = 'agenda', ?st
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= htmlspecialchars($title) ?> · Content Engine</title>
+  <title><?= htmlspecialchars($title) ?> · Brandflocks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@ function ce_render_layout_start(string $title, string $activeNav = 'agenda', ?st
     <aside class="sidebar" aria-label="Hoofdnavigatie">
       <div class="sidebar__logo">
         <a href="<?= ce_url() ?>">
-          <img src="<?= ce_url('svg/iGiSNext_Blue-main.svg') ?>" alt="iGiSNext" class="platform-logo" width="180" height="32">
+          <img src="<?= ce_url('svg/iGiSNext_Blue-main.svg') ?>" alt="Brandflocks" class="platform-logo" width="180" height="32">
         </a>
       </div>
 

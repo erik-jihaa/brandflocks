@@ -98,14 +98,6 @@ export function checkSource(
     .finally(() => window.clearTimeout(timer))
 }
 
-export function fetchTrelloBoards(): Promise<{
-  configured: boolean
-  boards: Array<{ id: string; name: string; url: string }>
-  note?: string
-}> {
-  return apiFetch('/sources/trello/boards')
-}
-
 export function updateSource(sourceId: string, payload: UpdateSourcePayload): Promise<SourceDto> {
   return apiFetch(`/sources/${sourceId}`, {
     method: 'PATCH',
@@ -169,24 +161,6 @@ export function updateSourceBudget(
   maxUnitsPerRun?: number | null,
 ): Promise<SourceDto> {
   return updateSource(sourceId, { budgetPerUnit, maxUnitsPerRun })
-}
-
-export function discoverAsanaProjects(
-  asanaPatRef: string,
-  sourceId?: string,
-): Promise<{
-  ok: boolean
-  projects: Array<{
-    gid: string
-    name: string
-    workspaceGid: string
-    workspaceName: string
-  }>
-}> {
-  return apiFetch('/sources/asana/discover', {
-    method: 'POST',
-    body: JSON.stringify({ asanaPatRef, sourceId }),
-  })
 }
 
 export async function uploadSourceDocument(

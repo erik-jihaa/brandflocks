@@ -186,7 +186,11 @@ foreach ($rows as $row) {
         $row['slot_status'] ?? null,
         $openFeedbackCount,
     );
-    $phase = ce_resolve_agenda_phase($row['slot_status'] ?? null, $row['article_id'] ?? null);
+    $phase = ce_resolve_agenda_phase(
+        $row['slot_status'] ?? null,
+        $row['article_id'] ?? null,
+        isset($row['slot_origin']) ? (string) $row['slot_origin'] : null,
+    );
     $editorName = trim((string) ($row['editor_final'] ?? ''));
     if ($editorName === '') {
         $editorName = trim((string) ($row['editor_suggested'] ?? ''));

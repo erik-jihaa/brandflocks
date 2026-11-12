@@ -91,7 +91,7 @@ function ce_config_value(string $envKey, string $localKey, string $default = '')
     return $value !== '' ? $value : $default;
 }
 
-/** local | staging | production — bepaalt guards, logtags en de omgevingsbanner. */
+/** local | staging | production | named install (bv. brandflocks). Alleen `production` is live. */
 function ce_env(): string
 {
     static $env = null;
@@ -100,13 +100,73 @@ function ce_env(): string
     }
 
     $value = strtolower(ce_config_value('CE_ENV', 'ce_env', 'production'));
+    $value = preg_replace('/[^a-z0-9_-]/', '', $value) ?? '';
+    if ($value === '') {
+        return $env = 'production';
+    }
 
-    return $env = in_array($value, ['local', 'staging', 'production'], true) ? $value : 'production';
+    return $env = $value;
 }
 
 function ce_is_production(): bool
 {
     return ce_env() === 'production';
+}
+
+/** Standaard contact/domein wanneer env of ce.local.php niets zet (Brandflocks vs CE-naslag). */
+function ce_is_brandflocks_install(): bool
+{
+    $env = ce_env();
+    if ($env === 'brandflocks') {
+        return true;
+    }
+
+    return strcasecmp(ce_product_name(), 'Brandflocks') === 0;
+}
+
+/** @return array{support: string, review: string, docs: string, appHost: string} */
+function ce_install_contact_defaults(): array
+{
+    if (ce_is_brandflocks_install()) {
+        return [
+            'support' => 'support@brandflocks.nl',
+            'review' => 'erik@brandflocks.nl',
+            'docs' => 'https://brandflocks.nl',
+            'appHost' => 'app.brandflocks.nl',
+        ];
+    }
+
+    return [
+        'support' => 'support@igisnext.com',
+        'review' => 'erik@igisnext.com',
+        'docs' => 'https://igisnext.com',
+        'appHost' => 'ce.igisnext.com',
+    ];
+}
+
+/** Productnaam voor UI, mails en browser-tab. Default Brandflocks; override per bureau. */
+function ce_product_name(): string
+{
+    $name = trim(ce_config_value('CE_PRODUCT_NAME', 'product_name', 'Brandflocks'));
+
+    return $name !== '' ? $name : 'Brandflocks';
+}
+
+/**
+ * @return array{productName: string, siteTitle: string, stagingLabel: string, platformLabel: string}
+ */
+function ce_product_branding(): array
+{
+    $product = ce_product_name();
+    $staging = trim(ce_config_value('CE_STAGING_LABEL', 'staging_label', $product . ' staging'));
+    $platform = trim(ce_config_value('CE_PLATFORM_LABEL', 'platform_label', $product . ' platform'));
+
+    return [
+        'productName' => $product,
+        'siteTitle' => $product,
+        'stagingLabel' => $staging !== '' ? $staging : ($product . ' staging'),
+        'platformLabel' => $platform !== '' ? $platform : ($product . ' platform'),
+    ];
 }
 
 /** @return array{host:string,name:string,user:string,pass:string,port:string} */
@@ -151,7 +211,8 @@ function ce_allowed_origins(): array
         }
     }
     if ($raw === false || trim((string) $raw) === '') {
-        $raw = 'https://ce.igisnext.com,http://localhost:5173';
+        $defaults = ce_install_contact_defaults();
+        $raw = 'https://' . $defaults['appHost'] . ',http://localhost:5173';
     }
 
     return array_values(array_filter(array_map('trim', explode(',', (string) $raw))));

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create or update an n8n workflow from JSON, activate it, place in CE folder."""
+"""Create or update an n8n workflow from JSON, activate it, place in env folder."""
 from __future__ import annotations
 
 import json
@@ -10,6 +10,7 @@ import urllib.request
 from pathlib import Path
 
 from n8n_env import load_env, patch_workflow_for_env, target_env, webhook_path, webhook_url
+from n8n_folder import workflow_folder_id
 
 
 def request(method: str, url: str, api_key: str, data: dict | None = None) -> dict:
@@ -123,7 +124,12 @@ def main() -> None:
 
     api_url = os.environ.get("N8N_API_URL", "").rstrip("/")
     api_key = os.environ.get("N8N_API_KEY", "")
-    folder_id = os.environ.get("N8N_CE_FOLDER_ID", "").strip()
+    folder_id = workflow_folder_id()
+    if target_env() in ("brandflocks", "brandflocks-target") and not folder_id:
+        raise SystemExit(
+            "N8N_BF_FOLDER_ID ontbreekt voor BrandFlocks — "
+            "draai ./scripts/ensure-n8n-bf-folder.py brandflocks"
+        )
 
     if not api_url or not api_key:
         env_file = ".env" if env_target == "production" else f".env.{env_target}"
