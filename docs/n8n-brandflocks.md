@@ -58,6 +58,18 @@ Gebruik **niet** het ID van `Content Engine [staging]` — dat is een andere dat
 
 **Host voor n8n Cloud:** `brandflocks.nl` (niet `localhost`). In DirectAdmin → MariaDB/MySQL → **Remote access** het IP van n8n toestaan (zie fout in n8n-executie: `Access denied for user … @'x.x.x.x'`). Zonder remote access werkt alleen de app-PHP; workflows CE-01/02/03/04 niet.
 
+## Anthropic (Claude HTTP-nodes)
+
+CE-02/03/04 gebruiken **httpHeaderAuth** `Header Auth account` (`x-api-key`), niet alleen `ANTHROPIC_API_KEY` in PHP. Als n8n-executies eindigen met *Authorization failed - please check your credentials*, staat de key in n8n verlopen of leeg — de app kan nog wél HBA via PHP draaien.
+
+Sync vanuit `.env.brandflocks`:
+
+```bash
+CE_ENV=brandflocks python3 ./scripts/sync-n8n-anthropic-header.py
+```
+
+Optioneel: `N8N_ANTHROPIC_HEADER_CREDENTIAL_ID` / `N8N_ANTHROPIC_HEADER_CREDENTIAL_NAME` als de credential anders heet.
+
 ## Isolatie
 
 ```bash

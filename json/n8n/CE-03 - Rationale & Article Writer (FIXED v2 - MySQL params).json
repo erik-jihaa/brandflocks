@@ -48,7 +48,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -84,7 +84,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -237,7 +237,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -260,7 +260,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -283,7 +283,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -305,7 +305,7 @@
       "parameters": {
         "jsCode": "\nconst research = $('Get Research').all().map((item) => item.json);\nconst content = $('Claude Step B').first()?.json?.content?.[0]?.input?.content || '';\n\nconst lines = research.map((row) => {\n  const reliability = String(row.reliability || '').trim();\n  const stance = String(row.stance || '').trim();\n  const title = String(row.title || '').trim();\n  const rationale = String(row.item_rationale || row.snippet || '').trim();\n  if (!title || title.toLowerCase() === 'untitled') {\n    return null;\n  }\n  const meta = [\n    reliability !== '' ? `reliability=${reliability}` : null,\n    stance !== '' ? `stance=${stance}` : null,\n  ].filter(Boolean).join(', ');\n  const prefix = meta !== '' ? `[${meta}]` : '[geen metadata]';\n  return `${prefix} ${title}: ${rationale}`;\n}).filter(Boolean);\n\nconst fmtSlot = $('Merge Theme Conflict').first()?.json?.slot ?? {};\nconst slotRow = { ...($('Get Slot').first()?.json ?? {}), ...fmtSlot };\nconst regelTest = String(slotRow.hba_geloofwaardigheidstest || '').trim();\nlet verboden = [];\ntry {\n  const raw = slotRow.hba_verboden_logica;\n  const parsed = typeof raw === 'string' && raw.trim() !== '' ? JSON.parse(raw) : raw;\n  verboden = Array.isArray(parsed) ? parsed.map((v) => String(v).trim()).filter(Boolean) : [];\n} catch (e) {\n  verboden = [];\n}\nlet bewijsvelden = [];\ntry {\n  const raw = slotRow.hba_bewijsvelden;\n  const parsed = typeof raw === 'string' && raw.trim() !== '' ? JSON.parse(raw) : raw;\n  bewijsvelden = Array.isArray(parsed) ? parsed.map((v) => String(v).trim()).filter(Boolean) : [];\n} catch (e) {\n  bewijsvelden = [];\n}\nconst regelLines = [];\nif (regelTest !== '') regelLines.push(`Geloofwaardigheidstest: ${regelTest}`);\nif (verboden.length) regelLines.push(`Verboden logica:\\n- ${verboden.join('\\n- ')}`);\nconst bewijsText = bewijsvelden.length\n  ? bewijsvelden.map((v) => `- ${v}`).join('\\n')\n  : 'Geen bewijsvelden vastgelegd.';\nconst vorm = String(slotRow.aanspreekvorm || slotRow.hba_aanspreekvorm || '').trim().toLowerCase();\nconst aanspreekvormMerk = vorm === 'u' || vorm === 'je' ? vorm : 'niet vastgelegd';\n\nreturn {\n  json: {\n    content_ai: String(content),\n    research_summary: lines.length ? lines.join('\\n') : 'Geen research items gekoppeld.',\n    regels_merk: regelLines.length ? regelLines.join('\\n') : 'Geen regels vastgelegd.',\n    bewijsvelden_merk: bewijsText,\n    aanspreekvorm_merk: aanspreekvormMerk,\n  },\n};\n"
       },
-      "id": "327f154b-0ccc-4d1d-8950-fcc0812dc6a6",
+      "id": "c7c86904-9227-40ea-9137-f7837f02750e",
       "name": "Prepare Self Review",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -338,7 +338,7 @@
         "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 1400,\n  system: \"Je bent een kritische eindredacteur die het zojuist geschreven artikel controleert tegen de onderliggende research, de bewijsvelden en de merkarchitectuur. Wees specifiek, geen algemene opmerkingen zoals 'het artikel is goed geschreven'.\\n\\nNEDERLANDS \u2014 VERMIJD CALQUE-WOORDEN\\n\\nSchrijf natuurlijk, spreektalig Nederlands. Let specifiek op woorden die grammaticaal correct\\nzijn maar ontstaan zijn als letterlijke vertaling van een Engels begrip, en daardoor net anders\\nklinken dan hoe een Nederlandse schrijver het zou zeggen. Herken dit patroon zelf en kies het\\nalledaagse alternatief, ook als het gevraagde woord niet op onderstaande lijst staat.\\n\\nBekende voorbeelden (vermijd, tenzij het vaktaal in de tekst zelf is):\\n- \\\"expliciteren / ge\u00ebxpliciteerd\\\" (van \\\"make explicit\\\") \u2192 gebruik \\\"vastleggen\\\", \\\"opschrijven\\\",\\n  \\\"onder woorden brengen\\\", \\\"duidelijk maken\\\"\\n- \\\"additioneel\\\" (van \\\"additional\\\") \u2192 \\\"extra\\\"\\n- \\\"faciliteren\\\" (van \\\"facilitate\\\") \u2192 \\\"mogelijk maken\\\", \\\"helpen\\\"\\n- \\\"actioneren\\\" (van \\\"action\\\" als werkwoord) \u2192 \\\"oppakken\\\", \\\"uitvoeren\\\"\\n- \\\"leveren\\\" als vertaling van \\\"deliver\\\" in abstracte zin (\\\"waarde leveren\\\") \u2192 concreter maken:\\n  wat gebeurt er dan precies\\n\\nVuistregel: als een woord vaker in een vertaald Engels rapport voorkomt dan in een gesprek aan de\\nkeukentafel, kies dan het keukentafel-woord \u2014 tenzij het een vakterm is die in deze tekst bewust\\nwordt gebruikt (zoals HBA-begrippen: Hero, Foe, hygi\u00ebnefactor \u2014 die blijven staan).\",\n  messages: [{\n    role: \"user\",\n    content: \"ARTIKEL:\\n\" + $json.content_ai + \"\\n\\nONDERLIGGENDE RESEARCH (de items waarop dit artikel gebaseerd zou moeten zijn):\\n\" + $json.research_summary + \"\\n\\nREGELS VAN HET MERK:\\n\" + $json.regels_merk + \"\\n\\nBEWIJSVELDEN VAN HET MERK:\\n\" + $json.bewijsvelden_merk + \"\\n\\nAANSPREEKVORM VAN HET MERK:\\n\" + $json.aanspreekvorm_merk + \"\\n\\nREGELBREUK: wanneer gaat een tekst in tegen een regel van het merk?\\n\\nDe regel van het merk is de geloofwaardigheidstest: wat het merk aantoonbaar wel\\nof juist niet doet, ook als dat geld of groei kost. Een tekst breekt de regel als\\nhij iets aanbiedt, aankondigt, belooft of als vanzelfsprekend neerzet dat het merk\\nvolgens die test juist niet doet, ook als de regel zelf nergens in de tekst staat.\\nKijk naar wat de lezer na het lezen gaat doen of geloven, niet naar losse woorden.\\n\\nEen regelbreuk is altijd een handeling: iets wat het merk doet, aanbiedt, tekent\\nof als werkwijze heeft, en wat de regel verbiedt. Een woord of een claim is nooit\\neen regelbreuk. \\\"Partner\\\", \\\"snel\\\", \\\"effici\u00ebnt\\\" of \\\"betrouwbaar\\\" breken geen regel.\\nZe kunnen wel categorietaal zijn, of logica van de tegenkracht.\\n\\nDe verboden logica telt alleen mee als het verboden punt een handeling of aanbod\\nbeschrijft dat tegen de geloofwaardigheidstest ingaat, zoals korting op oudere\\nvoorraad of een wachtlijst wegwerken met invalkrachten. Verboden punten die\\ngangbare branchetaal zijn (zoals partner, persoonlijke zorg, of vers gebrand\\nzonder de regel) zijn geen regelbreuk: meld die als category_fallback. Verboden\\npunten die de redenering van de tegenkracht overnemen (zoals koffie als brandstof,\\nfeatures als hoofdargument, effici\u00ebntie als prestatie) meld je als foe_vervaging.\\n\\nWel een regelbreuk:\\n- een aanbod, actie of aankondiging die de geloofwaardigheidstest ondergraaft;\\n- een nieuw feit over het merk dat met de test in strijd is: een contract, een\\n  samenwerking, een werkwijze.\\n- Voorbeeld: \\\"Wij zijn trots op ons nieuwe partnerschap met [ERP-leverancier]\\\"\\n  is een regelbreuk bij een merk dat geen resellercontracten aangaat. Het merk\\n  gaat een partnerschap aan.\\n\\nGeen regelbreuk:\\n- de regel noemen, uitleggen, verdedigen of erop voortbouwen, ook als de tekst\\n  daarbij het verboden onderwerp noemt (\\\"Geen Black Friday bij ons, en dit is\\n  waarom\\\");\\n- branchetaal of vlakke claims (dat is category_fallback);\\n  Voorbeeld: \\\"Wij zijn uw betrouwbare partner\\\" is geen regelbreuk. Er wordt geen\\n  partnerschap met een leverancier gemeld. Dit is categorietaal.\\n- een onderwerp dat de regel niet raakt;\\n- de logica van de tegenkracht zonder verboden handeling (dat is foe_vervaging).\\n  Voorbeeld: \\\"Dankzij slimmere routes zijn onze zorgverleners minder onderweg\\\"\\n  is geen regelbreuk. Het merk doet niets wat de regel verbiedt.\\n\\nMeld alleen een regelbreuk als je een concrete zin uit de tekst kunt aanwijzen en\\nde specifieke handeling uit de geloofwaardigheidstest waar die zin tegenin gaat.\\nZet die zin in flag_citaten.constraint_breach. Zet in\\nflag_citaten.constraint_breach_uitleg het antwoord op: \\\"Welke handeling uit de\\nregel doet het merk volgens deze zin toch?\\\" Zonder die uitleg is het geen\\nregelbreuk. In constraint_breach_uitleg mag je de regel niet anders weergeven\\ndan in de geloofwaardigheidstest staat \u2014 geen verzachting, geen andere grens\\n(bijvoorbeeld \\\"bijna zes weken\\\" als de regel zes weken is).\\nBij twijfel: geen regelbreuk.\\n\\nMERKBEWERING \u2014 wat telt voor stap D (self_review.merk_beweringen)?\\n\\nBeoordeel de hele passage in context, niet losse zinnen. Geef per bewering het citaat en de bron. Als een zin voortbouwt op een eerdere onderbouwde bewering in dezelfde passage, zet bron op die eerdere bewering (steunt_op: citaat van die eerdere zin) en gebruik dezelfde bron \u2014 geen geen_bron.\\n\\nTelt als merkbewering (controleerbaar over dit merk):\\n- wat het merk doet, heeft, levert, belooft, of een concreet getal noemt;\\n- voorbeelden: \\\"wij branden in kleine batches\\\", \\\"de branddatum staat op de zak\\\", \\\"elke eerste donderdag van de maand\\\", \\\"koffie ouder dan zes weken gaat naar de voedselbank\\\".\\n\\nTelt niet \u2014 neem deze niet op in merk_beweringen:\\n- mening, standpunt of argument zonder feitelijke claim (\\\"daar is geen reden voor\\\", \\\"kortingen op slechte koffie zijn makkelijk\\\");\\n- uitspraak over de categorie, branche of anderen, niet over dit merk;\\n- aanspreking van de lezer, vraag, oproep of instructie (\\\"check de branddatum\\\", \\\"kom langs\\\");\\n- retoriek of vergelijking zonder nieuw merkfeit.\\n\\nBronnen (precies \u00e9\u00e9n per bewering):\\n- merkarchitectuur \u2014 regel, werkwijze of geloofwaardigheidstest uit de merkarchitectuur;\\n- bewijsveld \u2014 expliciet bewijsveld van het merk;\\n- research \u2014 onderliggend research-item;\\n- geen_bron \u2014 alleen als het w\u00e9l een merkbewering is maar nergens te herleiden valt (zeldzaam na bovenstaande filters).\\n\\nAls je twijfelt of iets een merkbewering is: laat het weg in plaats van geen_bron te gebruiken.\\n\\nOPDRACHT: Beantwoord kort en concreet:\\n1. Welke claim of bewering in het artikel is het minst goed onderbouwd door de research hierboven (geen onderbouwing, of gebaseerd op een item met reliability = low)? Citeer de zin uit het artikel.\\n2. Is er een aanname in het artikel die niet expliciet uit de research volgt (het model 'vult zelf in')? Zo ja, welke?\\n3. Mist het artikel een tegengeluid dat wel in de research aanwezig was (een item met stance = spreekt_tegen dat niet verwerkt is)?\\n4. Breekt het artikel een regel van het merk, volgens de definitie van REGELBREUK hierboven? Zo ja: vul regelbreuk. regel = de geschonden regel als bijzin die grammaticaal past na 'Dit stuk gaat in tegen je regel dat' (bijvoorbeeld: 'je nooit een prijs noemt voordat je het werk ter plekke hebt gezien'), in gewone taal, zonder woorden als geloofwaardigheidstest of verboden logica. citaat = de letterlijke zin uit het artikel die ertegenin gaat. Zo nee, of als er geen regels zijn vastgelegd: regelbreuk = null.\\n5. MERKBEWERINGEN: volg de definitie MERKBEWERING hierboven. Beoordeel het artikel als gehele passage in context \u2014 geen losse zinnen zonder voorgaande context. Per merkbewering: citaat, bron (merkarchitectuur | bewijsveld | research | geen_bron), en optioneel steunt_op = citaat van een eerdere bewering in dezelfde passage waar deze op voortbouwt (zelfde bron als die eerdere bewering). Laat retoriek, standpunten en lezer-aansprekingen weg.\\nAls vraag 1 tot en met 3 niets concreets opleveren, antwoord dan kort dat het artikel goed aansluit bij de research \u2014 forceer geen kritiekpunt. Ook bij vraag 4: forceer geen regelbreuk.\\nOutput als JSON via de tool.\"\n  }],\n  tools: [{\n    name: \"self_review\",\n    description: \"Zelfcontrole van artikel tegen research, bewijsvelden en merkregels\",\n    input_schema: {\n      type: \"object\",\n      properties: {\n        weakest_claim: { type: [\"string\", \"null\"] },\n        unsupported_assumption: { type: [\"string\", \"null\"] },\n        missed_counterpoint: { type: [\"string\", \"null\"] },\n        regelbreuk: {\n          type: [\"object\", \"null\"],\n          properties: {\n            regel: { type: \"string\" },\n            citaat: { type: \"string\" }\n          },\n          required: [\"regel\", \"citaat\"]\n        },\n        merk_beweringen: {\n          type: \"array\",\n          items: {\n            type: \"object\",\n            properties: {\n              citaat: { type: \"string\" },\n              bron: { type: \"string\", enum: [\"merkarchitectuur\", \"bewijsveld\", \"research\", \"geen_bron\"] },\n              steunt_op: { type: [\"string\", \"null\"] }\n            },\n            required: [\"citaat\", \"bron\"]\n          }\n        }\n      },\n      required: [\"weakest_claim\", \"unsupported_assumption\", \"missed_counterpoint\", \"regelbreuk\", \"merk_beweringen\"]\n    }\n  }],\n  tool_choice: { type: \"tool\", name: \"self_review\" }\n}) }}",
         "options": {}
       },
-      "id": "695b098f-aae1-48cc-9807-65f94a8e7b78",
+      "id": "f9d6886a-8f3f-4d08-b77a-6c62a991da9f",
       "name": "Claude Step D",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -357,7 +357,7 @@
       "parameters": {
         "jsCode": "\nconst req = $('Parse Input').first().json;\nconst slotId = String(req.slot_id || '').trim();\nconst ceBase = \"https://app.brandflocks.nl\";\nconst ceResetToken = \"z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I\";\n\nfunction hasText(value) {\n  return value !== undefined && value !== null && String(value).trim() !== '';\n}\n\nconst missing = [];\nif (!hasText(req.grenzen_block) && !hasText(req.hba_grenzen_block)) {\n  missing.push('grenzen_block');\n}\nif (!hasText(req.write_directive)) {\n  missing.push('write_directive');\n}\nif (!hasText(req.nl_writing_style_block)) {\n  missing.push('nl_writing_style_block');\n}\nif (!hasText(req.aanspreekvorm_block)) {\n  missing.push('aanspreekvorm_block');\n}\n\nconst fetchMeta = missing.length > 0 && slotId !== '' && ceResetToken !== '';\n\nreturn {\n  json: {\n    ...req,\n    slot_id: slotId,\n    _fetchMeta: fetchMeta,\n    _missingMeta: missing,\n    url: `${ceBase}/api/ce03/slot-meta`,\n    token: ceResetToken,\n  },\n};\n"
       },
-      "id": "7b76d0d2-4198-407e-93df-fc10296aabda",
+      "id": "6efc464f-d906-4ae7-a289-ccd9a70f9a61",
       "name": "Prepare CE03 Slot Meta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -377,7 +377,7 @@
           ]
         }
       },
-      "id": "0a91ecc2-9919-4a88-a8df-92e60e26b552",
+      "id": "f79e9a90-8ff7-49a8-9064-9e5c164e75c4",
       "name": "CE03 Meta Needed?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
@@ -399,7 +399,7 @@
             },
             {
               "name": "X-CE-Reset-Token",
-              "value": "={{$json.token}}"
+              "value": "z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I"
             }
           ]
         },
@@ -415,7 +415,7 @@
           }
         }
       },
-      "id": "f6b3532a-8a9f-49d6-9233-ce8f7d040553",
+      "id": "b1a634f6-06db-4845-a425-5a5f3673869d",
       "name": "Fetch CE03 Slot Meta",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -428,7 +428,7 @@
       "parameters": {
         "jsCode": "\nconst base = $('Prepare CE03 Slot Meta').first().json;\nconst fetchedWrap = $input.first()?.json ?? {};\nconst meta = fetchedWrap.meta && typeof fetchedWrap.meta === 'object' ? fetchedWrap.meta : {};\n\nconst out = { ...base };\nfor (const key of ['_fetchMeta', '_missingMeta', 'url', 'token']) {\n  delete out[key];\n}\n\nconst mergeKeys = [\"write_directive\", \"tone_final\", \"angle_final\", \"platform_final\", \"platform_intended\", \"platform_label\", \"platform_form_guidelines\", \"grenzen_block\", \"hba_grenzen_block\", \"nl_writing_style_block\", \"image_ratio_final\", \"objective_id\", \"objective_label\", \"objective_description\", \"objective_writing_style\", \"objectives_catalog\", \"tone_options\", \"default_tone\", \"aanspreekvorm\", \"aanspreekvorm_block\"];\nfor (const key of mergeKeys) {\n  if (!String(out[key] || '').trim() && meta[key] !== undefined && meta[key] !== null) {\n    const value = typeof meta[key] === 'string' ? meta[key] : JSON.stringify(meta[key]);\n    if (String(value).trim() !== '') {\n      out[key] = String(value).trim();\n    }\n  }\n}\n\nout.meta_merge_source = fetchedWrap.ok === true ? 'api' : 'webhook_only';\nreturn { json: out };\n"
       },
-      "id": "eecb1289-1436-4f2f-95ce-c67d2d7c4ed9",
+      "id": "e9ad0587-befa-4a86-bc05-8fa28b6bfc1e",
       "name": "Merge CE03 Slot Meta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -441,7 +441,7 @@
       "parameters": {
         "jsCode": "\nconst slotId = String($('Validate Data').first()?.json?.slot_id || '').trim();\nconst ceBase = \"https://app.brandflocks.nl\";\nconst ceResetToken = \"z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I\";\n\nif (!slotId || !ceResetToken) {\n  return { json: { skip: true, reason: 'missing_slot_or_token' } };\n}\n\nreturn {\n  json: {\n    skip: false,\n    slot_id: slotId,\n    url: `${ceBase}/api/hba/score`,\n    token: ceResetToken,\n  },\n};\n"
       },
-      "id": "f054a58f-be1d-48f6-ba7f-763b28cf4830",
+      "id": "7b85f337-8e5a-48c1-be7d-cfcd1f0c8c20",
       "name": "Prepare HBA Score",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -461,7 +461,7 @@
           ]
         }
       },
-      "id": "eaee9d12-2af6-4a12-9c96-b2c6fdeaa05c",
+      "id": "e9978632-bc1a-4bda-b808-afdf190da29f",
       "name": "HBA Score Enabled?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
@@ -483,7 +483,7 @@
             },
             {
               "name": "X-CE-Reset-Token",
-              "value": "={{$json.token}}"
+              "value": "z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I"
             }
           ]
         },
@@ -499,7 +499,7 @@
           }
         }
       },
-      "id": "833fa415-192e-4d4c-ab7c-519472c6c780",
+      "id": "fe1b3fc1-d35b-451b-af59-6ef9d68f2875",
       "name": "HBA Score Article",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -512,7 +512,7 @@
       "parameters": {
         "jsCode": "\nconst slotId = String($('Validate Data').first()?.json?.slot_id || '').trim();\nconst ceBase = \"https://app.brandflocks.nl\";\nconst ceResetToken = \"z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I\";\n\nif (!slotId || !ceResetToken) {\n  return { json: { skip: true, reason: 'missing_slot_or_token' } };\n}\n\nreturn {\n  json: {\n    skip: false,\n    slot_id: slotId,\n    url: `${ceBase}/api/admin/hba-article-hint-slot`,\n    token: ceResetToken,\n  },\n};\n"
       },
-      "id": "306caf8a-011a-4088-bd1a-94a3e1ee9644",
+      "id": "67063a99-bb25-4570-b34e-1cf44f579309",
       "name": "Prepare HBA Article Hint",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -532,7 +532,7 @@
           ]
         }
       },
-      "id": "ea2956df-8b7b-413c-87f4-dfb7440529dd",
+      "id": "51660a81-c210-44db-9bf5-79881f8ec4ce",
       "name": "HBA Article Hint Enabled?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
@@ -554,7 +554,7 @@
             },
             {
               "name": "X-CE-Reset-Token",
-              "value": "={{$json.token}}"
+              "value": "z9yAqsYtDmX-aJjpcwjqFdwkTFqoBs14Q4dVSJLAO3I"
             }
           ]
         },
@@ -570,7 +570,7 @@
           }
         }
       },
-      "id": "08999eaf-2583-4852-adb8-130241f896a4",
+      "id": "e99d2c62-1e01-4c44-a74e-d4bc9f418a24",
       "name": "HBA Article Hint",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -583,7 +583,7 @@
       "parameters": {
         "jsCode": "\nconst fmt = $('Format Data').first().json;\nconst slot = fmt.slot || {};\nconst theme = String(slot.theme || slot.title || '').trim();\nconst regelTest = String(slot.hba_geloofwaardigheidstest || '').trim();\nlet verboden = [];\ntry {\n  const raw = slot.hba_verboden_logica;\n  const parsed = typeof raw === 'string' && raw.trim() !== '' ? JSON.parse(raw) : raw;\n  verboden = Array.isArray(parsed) ? parsed.map((v) => String(v).trim()).filter(Boolean) : [];\n} catch (e) {\n  verboden = [];\n}\nlet bewijsvelden = [];\ntry {\n  const raw = slot.hba_bewijsvelden;\n  const parsed = typeof raw === 'string' && raw.trim() !== '' ? JSON.parse(raw) : raw;\n  bewijsvelden = Array.isArray(parsed) ? parsed.map((v) => String(v).trim()).filter(Boolean) : [];\n} catch (e) {\n  bewijsvelden = [];\n}\nconst regelLines = [];\nif (regelTest !== '') regelLines.push(`Geloofwaardigheidstest: ${regelTest}`);\nif (verboden.length) regelLines.push(`Verboden logica:\\n- ${verboden.join('\\n- ')}`);\nconst regelsMerk = regelLines.length ? regelLines.join('\\n') : '';\nconst bewijsText = bewijsvelden.length ? bewijsvelden.map((v) => `- ${v}`).join('\\n') : 'Geen bewijsvelden vastgelegd.';\nconst researchText = String(fmt.research_summary || '').trim() || 'Geen research items gekoppeld.';\nconst skipThemeConflict = regelsMerk === '' || theme === '';\n\nreturn {\n  json: {\n    ...fmt,\n    theme_title: theme,\n    regels_merk: regelsMerk,\n    bewijsvelden_merk: bewijsText,\n    research_summary: researchText,\n    skip_theme_conflict: skipThemeConflict,\n  },\n};\n"
       },
-      "id": "fcd174f7-0bea-4025-bd21-8f58d592dcc5",
+      "id": "732020c4-610e-46b4-81f1-6e56ce4ea2e6",
       "name": "Prepare Theme Conflict",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -603,7 +603,7 @@
           ]
         }
       },
-      "id": "fa23d8b0-f24b-4334-9a58-83fcdf23c836",
+      "id": "bea5e52b-eaf8-4e9e-9ed4-a6f2d1c24584",
       "name": "Theme Conflict Skip?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
@@ -636,7 +636,7 @@
         "jsonBody": "={{ JSON.stringify({\n  model: \"claude-sonnet-4-6\",\n  max_tokens: 1400,\n  temperature: 0,\n  system: \"Je bent strategisch redacteur. Je beoordeelt of een gepland thema botst met vaste merkregels, en of het thema een feit over het merk aanneemt dat het merk niet heeft. Gebruik gewone klanttaal \u2014 geen jargon (geen geloofwaardigheidstest, verboden logica). Standaardkeuze bij conflict: schrijf de versie die de regel verdedigt (resolution a), tenzij geen geloofwaardige regelversie bestaat (resolution b). Neem nooit een resultaat, samenwerking of cijfer over dat niet in de merkfeiten of de research staat.\",\n  messages: [{\n    role: \"user\",\n    content: \"THEMA VOOR DE POST:\\n\" + $json.theme_title + \"\\n\\nREGELS VAN HET MERK:\\n\" + $json.regels_merk + \"\\n\\nBEWIJSVELDEN VAN HET MERK:\\n\" + $json.bewijsvelden_merk + \"\\n\\nRESEARCH BIJ DIT SLOT:\\n\" + $json.research_summary + \"\\n\\nVRAAG 1 \u2014 CONFLICT: Kan dit thema alleen goed uitgewerkt worden door iets te doen of te beloven wat de regel verbiedt?\\n- conflict = true als het thema de schrijver verleidt de regel te breken (bijv. kortingactie terwijl het merk nooit kort, partnerschap met leverancier terwijl het merk onafhankelijk blijft, wachtlijst weggewerkt terwijl het merk geen invalkrachten inzet).\\n- conflict = false als het thema ook vanuit de regel te schrijven is zonder de regel te breken.\\n\\nVRAAG 2 \u2014 PREMISSE: neemt het thema iets aan over het merk als feit (een resultaat, een samenwerking, een prestatie, een cijfer) dat niet in de brand narrative, de bewijsvelden of de research staat? Of is dat resultaat alleen te halen met een middel dat de regel verbiedt?\\nZo ja: theme_premisse = true. Neem die premisse niet over. Schrijf over de regel zelf: waarom het merk dit niet doet, en wat het in plaats daarvan doet. Vervang nooit alleen het middel terwijl je het resultaat uit het thema laat staan.\\nVoorbeelden:\\n- Fout: \\\"Onze wachtlijst is in \u00e9\u00e9n maand opgelost, door \u00e9\u00e9n cli\u00ebnt door te verwijzen.\\\" Dat is hetzelfde resultaat met een ander middel, en het klopt niet.\\n- Goed: \\\"We hebben een wachtlijst. Daarom hebben we vorige maand twee nieuwe aanvragen doorverwezen. Liever dat dan een vijfde gezicht aan de deur.\\\"\\n- Fout: \\\"Wij werken samen met een ERP-leverancier, zonder contract.\\\" Het merk heeft die samenwerking niet.\\n- Goed: \\\"Er werd ons een partnerschap aangeboden. We hebben nee gezegd, en dit is waarom.\\\"\\n- theme_premisse = false alleen als het thema geen zo'n onbewezen feit of verboden resultaat als gegeven aanneemt.\\n\\nBij conflict=true of theme_premisse=true en resolution=a: geef write_instruction \u2014 concrete schrijfopdracht. Zelfde thema als kapstok, maar: verdedig de regel, neem de premisse niet over, verzin geen samenwerking/resultaat/cijfer dat niet in de bewijsvelden of research staat.\\nBij conflict=true of theme_premisse=true en resolution=b: geef user_message \u2014 korte zin in klanttaal v\u00f3\u00f3r het schrijven.\\nVul theme_premisse_wat: in \u00e9\u00e9n zin welke premisse het thema aannam (of leeg als theme_premisse=false).\\nVul theme_premisse_actie: wat de schrijver moet doen (bijv. \\\"niet overnemen; schrijven waarom we geen partnerschap aangaan\\\"), of leeg als theme_premisse=false.\\nOutput via tool.\"\n  }],\n  tools: [{\n    name: \"theme_conflict_check\",\n    description: \"Thema vs merkregels en premisse v\u00f3\u00f3r het schrijven\",\n    input_schema: {\n      type: \"object\",\n      properties: {\n        conflict: { type: \"boolean\" },\n        theme_premisse: { type: \"boolean\" },\n        theme_premisse_wat: { type: \"string\" },\n        theme_premisse_actie: { type: \"string\" },\n        resolution: { type: \"string\", enum: [\"a\", \"b\"] },\n        why: { type: \"string\" },\n        write_instruction: { type: \"string\" },\n        user_message: { type: \"string\" }\n      },\n      required: [\"conflict\", \"theme_premisse\", \"resolution\", \"why\"]\n    }\n  }],\n  tool_choice: { type: \"tool\", name: \"theme_conflict_check\" }\n}) }}",
         "options": {}
       },
-      "id": "7ca21472-3a31-449b-a9d8-bf5a4a7d3887",
+      "id": "12263c62-3375-448a-b45c-1131faca7a1d",
       "name": "Claude Theme Conflict",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -655,7 +655,7 @@
       "parameters": {
         "jsCode": "\nconst prep = $('Prepare Theme Conflict').first().json;\nconst slot = { ...(prep.slot || {}) };\nlet themeConflictMeta = {\n  had_conflict: false,\n  resolution: null,\n  why: null,\n  theme_premisse: false,\n  theme_premisse_wat: null,\n  theme_premisse_actie: null,\n};\n\nfunction extractThemeConflict(response) {\n  const content = response?.content;\n  if (!Array.isArray(content)) return null;\n  for (const block of content) {\n    if (block?.type === 'tool_use' && block.name === 'theme_conflict_check' && block.input) {\n      return block.input;\n    }\n  }\n  return null;\n}\n\nif (!prep.skip_theme_conflict) {\n  const input = extractThemeConflict($('Claude Theme Conflict').first()?.json) || {};\n  const hasConflict = input.conflict === true;\n  const hasPremisse = input.theme_premisse === true;\n  themeConflictMeta.theme_premisse = hasPremisse;\n  themeConflictMeta.theme_premisse_wat = String(input.theme_premisse_wat || '').trim() || null;\n  themeConflictMeta.theme_premisse_actie = String(input.theme_premisse_actie || '').trim() || null;\n  if (hasConflict || hasPremisse) {\n    const resolution = String(input.resolution || 'a').toLowerCase() === 'b' ? 'b' : 'a';\n    themeConflictMeta.had_conflict = hasConflict;\n    themeConflictMeta.resolution = resolution;\n    themeConflictMeta.why = String(input.why || '').trim() || null;\n    if (resolution === 'a') {\n      const block = String(input.write_instruction || '').trim();\n      if (block !== '') {\n        const prefix = 'THEMA, REGEL EN PREMISSE (verplicht \u2014 schrijf vanuit de regel, neem de premisse van het thema niet over als feit, breek de regel niet):\\n';\n        slot.write_directive = [String(slot.write_directive || '').trim(), prefix + block]\n          .filter(Boolean)\n          .join('\\n\\n');\n      }\n    } else {\n      const msg = String(input.user_message || input.why || '').trim();\n      if (msg !== '') {\n        slot.write_directive = [String(slot.write_directive || '').trim(), 'CONFLICT MET MERKREGEL (melding v\u00f3\u00f3r de post):\\n' + msg]\n          .filter(Boolean)\n          .join('\\n\\n');\n      }\n    }\n  }\n}\n\nreturn {\n  json: {\n    slot,\n    research_summary: prep.research_summary,\n    theme_conflict_meta: themeConflictMeta,\n  },\n};\n"
       },
-      "id": "c32d34cb-4ab7-42b5-be0c-6971eb770d7e",
+      "id": "fe141271-0672-40b7-9151-c03f8a6c43bf",
       "name": "Merge Theme Conflict",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,

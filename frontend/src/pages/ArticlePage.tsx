@@ -6,6 +6,7 @@ import { ArticleCard } from '../components/ArticleCard'
 import { ArticleMetaSidebar } from '../components/ArticleMetaSidebar'
 import { ImageUpload, resolveImageRatio } from '../components/ImageUpload'
 import { ArticleReviewPanel } from '../components/ArticleReviewPanel'
+import { PillButton, pillActionsRowClass } from '../components/PillButton'
 import { ArticleWritingNotice } from '../components/ArticleWritingNotice'
 import { LoadingDots } from '../components/LoadingDots'
 import { ReviewEditsPanel } from '../components/ReviewEditsPanel'
@@ -985,7 +986,22 @@ export function ArticlePage() {
         main={
           <div>
             {writing ? (
-              <ArticleWritingNotice slow={writingSlow} />
+              <>
+                <ArticleWritingNotice slow={writingSlow} />
+                <div className="mt-[18px] space-y-[12px]">
+                  <div className={pillActionsRowClass}>
+                    <PillButton variant="second" disabled>
+                      Opnieuw bewerken
+                    </PillButton>
+                  </div>
+                  <ActionNotice
+                    message={researchSubmitNotice}
+                    kind={researchSubmitNoticeKind}
+                    fading={researchSubmitNoticeFading}
+                    className="mb-0"
+                  />
+                </div>
+              </>
             ) : (
               <p className="m-0 text-[14px] leading-[18px] text-ce-black">
                 {error ??
@@ -1013,11 +1029,6 @@ export function ArticlePage() {
       metaAlign="flush"
       main={
         <>
-          <ActionNotice
-            message={researchSubmitNotice}
-            kind={researchSubmitNoticeKind}
-            fading={researchSubmitNoticeFading}
-          />
           {error && (
             <p className="mb-[12px] text-[14px] leading-[18px] text-ce-red">{error}</p>
           )}
@@ -1106,6 +1117,9 @@ export function ArticlePage() {
               publishNotice={publishNotice}
               publishNoticeKind={publishNoticeKind}
               publishNoticeFading={publishNoticeFading}
+              actionNotice={researchSubmitNotice}
+              actionNoticeKind={researchSubmitNoticeKind}
+              actionNoticeFading={researchSubmitNoticeFading}
               onSubmit={(mode) => void handleReview(mode)}
               onReedit={isApprovedOrPublished ? undefined : () => void handleReedit()}
               reeditDisabled={writing}

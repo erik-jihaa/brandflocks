@@ -72,7 +72,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -120,7 +120,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -143,7 +143,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -166,7 +166,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -189,7 +189,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       },
@@ -197,7 +197,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\nconst client = $('Get Active Clients').item.json;\nconst existingRows = $('Get Existing Themes').all().map((i) => i.json).filter((r) => r.cycle_week);\nconst perfRows = $('Get Performance').all().map((i) => i.json).filter((r) => r.headline || r.theme);\nconst sourceRows = $('Get Sources').all()\n  .map((i) => i.json)\n  .filter((r) => r.title)\n  .filter((r) => {\n    const cat = String(r.category || '').toLowerCase();\n    return cat !== 'linkedin' && cat !== 'scraper';\n  });\n\nfunction mondayOf(d) {\n  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = x.getUTCDay() || 7;\n  x.setUTCDate(x.getUTCDate() - day + 1);\n  return x.toISOString().slice(0, 10);\n}\n\nfunction addDays(iso, days) {\n  const d = new Date(iso + 'T12:00:00Z');\n  d.setUTCDate(d.getUTCDate() + days);\n  return d.toISOString().slice(0, 10);\n}\n\nconst existing = new Set(\n  existingRows\n    .map((r) => String(r.cycle_week || '').slice(0, 10))\n    .filter(Boolean),\n);\n\nfunction proposedCountForWeek(isoWeek) {\n  return existingRows.filter((r) => {\n    const week = String(r.cycle_week || '').slice(0, 10);\n    const status = String(r.status || 'proposed').toLowerCase();\n    return week === isoWeek && (status === 'proposed' || status === '');\n  }).length;\n}\n\nconst parseInput = $('Parse Run Input').item.json;\nconst forcedWeeks = Array.isArray(parseInput.refill_cycle_weeks)\n  ? parseInput.refill_cycle_weeks.map((w) => String(w).slice(0, 10)).filter(Boolean)\n  : [];\nconst forcedProposalCount = Math.max(\n  1,\n  Number(parseInput.proposal_count || parseInput.proposalCount || 3),\n);\n\nconst horizon = Math.max(1, Number(client.planning_horizon_weeks || 4));\nconst postsPerWeek = Math.max(1, Number(client.posts_per_week || 1));\nconst today = new Date();\nconst startMonday = mondayOf(today);\n\nconst horizonWeeks = [];\nfor (let w = 0; w < horizon; w += 1) {\n  horizonWeeks.push(addDays(startMonday, w * 7));\n}\n\nlet missingWeeks;\nlet weeksToFill;\nlet themesNeeded;\nlet proposalCount = postsPerWeek;\n\nif (forcedWeeks.length > 0) {\n  proposalCount = forcedProposalCount;\n  missingWeeks = forcedWeeks.filter((w) => proposedCountForWeek(w) < proposalCount);\n  weeksToFill = missingWeeks.length;\n  themesNeeded = missingWeeks.reduce(\n    (sum, w) => sum + Math.max(0, proposalCount - proposedCountForWeek(w)),\n    0,\n  );\n} else {\n  missingWeeks = horizonWeeks.filter((w) => !existing.has(w));\n  weeksToFill = missingWeeks.length;\n  themesNeeded = weeksToFill * postsPerWeek;\n}\n\nlet phases = [];\ntry {\n  phases = typeof client.phases === 'string' ? JSON.parse(client.phases) : client.phases || [];\n} catch {\n  phases = [];\n}\n\nconst performance_summary = perfRows.length\n  ? perfRows\n      .map((r) => {\n        const hoofd = r.hba_hoofdoordeel ? `, hoofdoordeel ${r.hba_hoofdoordeel}` : '';\n        return `- ${r.headline || r.theme || 'Post'} (engagement ${r.engagement || 0}${hoofd})`;\n      })\n      .join('\\n')\n  : 'Geen gepubliceerde posts met engagement-data (testposts uitgesloten).';\n\nconst trending_signals_summary = sourceRows.length\n  ? sourceRows\n      .map((s) => {\n        if (s.category === 'trello' && s.trello_board_id) {\n          return `- [trello] ${s.title} (board ${s.trello_board_id})`;\n        }\n        if (s.category === 'url_rss') {\n          return `- [rss] ${s.title} (feed \u2014 geen artikel-URL gebruiken)`;\n        }\n        if (s.category === 'blogs') {\n          return `- [blogs] ${s.title} (blogoverzicht \u2014 onderliggende posts, geen overzichts-URL gebruiken)`;\n        }\n        if (s.category === 'youtube') {\n          return `- [youtube] ${s.title} (kanaal-RSS \u2014 video-updates, geen transcripties)`;\n        }\n        if (s.category === 'document') {\n          return `- [document] ${s.title} (eigen PDF \u2014 interne kennis, geen extern nieuws)`;\n        }\n        if (s.category === 'drive') {\n          return `- [drive] ${s.title} (eigen Drive-document \u2014 interne kennis)`;\n        }\n        return `- [${s.category || s.source_kind || 'bron'}] ${s.title}${s.url ? ': ' + s.url : ''}`;\n      })\n      .join('\\n')\n  : 'Geen actieve bronnen geconfigureerd \u2014 baseer voorstellen op fasecyclus en performance.';\n\nconst rhythmRow = $('Get Content Rhythm').first()?.json ?? {};\nlet rhythmRoles = [];\nlet rhythmPostsPerWeek = postsPerWeek;\ntry {\n  const parsed = typeof rhythmRow.roles === 'string' ? JSON.parse(rhythmRow.roles) : rhythmRow.roles;\n  if (Array.isArray(parsed)) rhythmRoles = parsed;\n} catch {\n  rhythmRoles = [];\n}\nif (Number(rhythmRow.posts_per_week) > 0) {\n  rhythmPostsPerWeek = Number(rhythmRow.posts_per_week);\n}\n\nfunction rhythmLabel(name) {\n  const key = String(name || '').toLowerCase();\n  if (key === 'autoriteit') return 'Autoriteit';\n  if (key === 'inzicht') return 'Inzicht';\n  if (key.includes('product')) return 'Product of dienst';\n  return String(name || '').trim();\n}\n\nconst rhythmLines = rhythmRoles.map((role, index) => {\n  const name = String(role?.role_name || role?.roleName || '').trim();\n  if (!name) return '';\n  return `${index + 1}. ${rhythmLabel(name)} (${name})`;\n}).filter(Boolean);\n\nconst rhythm_summary = rhythmLines.length\n  ? `Vast content-ritme (${rhythmRoles.length} rollen per week):\\n${rhythmLines.join('\\n')}\\n\\nWijs per week thema 1 aan rol 1, thema 2 aan rol 2, enz. \u2014 herhaal het patroon cyclisch.`\n  : 'Geen content-ritme geconfigureerd \u2014 varieer tussen autoriteit, inzicht en product/dienst.';\n\nreturn {\n  json: {\n    client,\n    missingWeeks,\n    weeksToFill,\n    themesNeeded,\n    postsPerWeek: Math.max(postsPerWeek, rhythmPostsPerWeek),\n    proposalCount,\n    existingRows,\n    phases,\n    performance_summary,\n    trending_signals_summary,\n    rhythmRoles,\n    rhythm_summary,\n    skip: themesNeeded <= 0,\n  },\n};\n"
+        "jsCode": "\nconst client = $('Get Active Clients').item.json;\nconst existingRows = $('Get Existing Themes').all().map((i) => i.json).filter((r) => r.cycle_week);\nconst perfRows = $('Get Performance').all().map((i) => i.json).filter((r) => r.headline || r.theme);\nconst sourceRows = $('Get Sources').all()\n  .map((i) => i.json)\n  .filter((r) => r.title)\n  .filter((r) => {\n    const cat = String(r.category || '').toLowerCase();\n    return cat !== 'linkedin' && cat !== 'scraper';\n  });\n\nfunction mondayOf(d) {\n  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = x.getUTCDay() || 7;\n  x.setUTCDate(x.getUTCDate() - day + 1);\n  return x.toISOString().slice(0, 10);\n}\n\nfunction addDays(iso, days) {\n  const d = new Date(iso + 'T12:00:00Z');\n  d.setUTCDate(d.getUTCDate() + days);\n  return d.toISOString().slice(0, 10);\n}\n\nconst existing = new Set(\n  existingRows\n    .map((r) => String(r.cycle_week || '').slice(0, 10))\n    .filter(Boolean),\n);\n\nfunction proposedCountForWeek(isoWeek) {\n  return existingRows.filter((r) => {\n    const week = String(r.cycle_week || '').slice(0, 10);\n    const status = String(r.status || 'proposed').toLowerCase();\n    return week === isoWeek && (status === 'proposed' || status === '');\n  }).length;\n}\n\nconst parseInput = $('Parse Run Input').item.json;\nconst forcedWeeks = Array.isArray(parseInput.refill_cycle_weeks)\n  ? parseInput.refill_cycle_weeks.map((w) => String(w).slice(0, 10)).filter(Boolean)\n  : [];\nconst forcedProposalCount = Math.max(\n  1,\n  Number(parseInput.proposal_count || parseInput.proposalCount || 3),\n);\n\nconst horizon = Math.max(1, Number(client.planning_horizon_weeks || 4));\nconst postsPerWeek = Math.max(1, Number(client.posts_per_week || 1));\nconst today = new Date();\nconst startMonday = mondayOf(today);\n\nconst horizonWeeks = [];\nfor (let w = 0; w < horizon; w += 1) {\n  horizonWeeks.push(addDays(startMonday, w * 7));\n}\n\nlet missingWeeks;\nlet weeksToFill;\nlet themesNeeded;\nlet proposalCount = postsPerWeek;\n\nif (forcedWeeks.length > 0) {\n  proposalCount = forcedProposalCount;\n  missingWeeks = forcedWeeks.filter((w) => proposedCountForWeek(w) < proposalCount);\n  weeksToFill = missingWeeks.length;\n  themesNeeded = missingWeeks.reduce(\n    (sum, w) => sum + Math.max(0, proposalCount - proposedCountForWeek(w)),\n    0,\n  );\n} else {\n  missingWeeks = horizonWeeks.filter((w) => !existing.has(w));\n  weeksToFill = missingWeeks.length;\n  themesNeeded = weeksToFill * postsPerWeek;\n}\n\nlet phases = [];\ntry {\n  phases = typeof client.phases === 'string' ? JSON.parse(client.phases) : client.phases || [];\n} catch {\n  phases = [];\n}\n\nconst performance_summary = perfRows.length\n  ? perfRows\n      .map((r) => {\n        const hoofd = r.hba_hoofdoordeel ? `, hoofdoordeel ${r.hba_hoofdoordeel}` : '';\n        return `- ${r.headline || r.theme || 'Post'} (engagement ${r.engagement || 0}${hoofd})`;\n      })\n      .join('\\n')\n  : 'Geen gepubliceerde posts met engagement-data (testposts uitgesloten).';\n\nconst trending_signals_summary = sourceRows.length\n  ? sourceRows\n      .map((s) => {\n        if (s.category === 'url_rss') {\n          return `- [rss] ${s.title} (feed \u2014 geen artikel-URL gebruiken)`;\n        }\n        if (s.category === 'blogs') {\n          return `- [blogs] ${s.title} (blogoverzicht \u2014 onderliggende posts, geen overzichts-URL gebruiken)`;\n        }\n        if (s.category === 'youtube') {\n          return `- [youtube] ${s.title} (kanaal-RSS \u2014 video-updates, geen transcripties)`;\n        }\n        if (s.category === 'document') {\n          return `- [document] ${s.title} (eigen PDF \u2014 interne kennis, geen extern nieuws)`;\n        }\n        if (s.category === 'drive') {\n          return `- [drive] ${s.title} (eigen Drive-document \u2014 interne kennis)`;\n        }\n        return `- [${s.category || s.source_kind || 'bron'}] ${s.title}${s.url ? ': ' + s.url : ''}`;\n      })\n      .join('\\n')\n  : 'Geen actieve bronnen geconfigureerd \u2014 baseer voorstellen op fasecyclus en performance.';\n\nconst rhythmRow = $('Get Content Rhythm').first()?.json ?? {};\nlet rhythmRoles = [];\nlet rhythmPostsPerWeek = postsPerWeek;\ntry {\n  const parsed = typeof rhythmRow.roles === 'string' ? JSON.parse(rhythmRow.roles) : rhythmRow.roles;\n  if (Array.isArray(parsed)) rhythmRoles = parsed;\n} catch {\n  rhythmRoles = [];\n}\nif (Number(rhythmRow.posts_per_week) > 0) {\n  rhythmPostsPerWeek = Number(rhythmRow.posts_per_week);\n}\n\nfunction rhythmLabel(name) {\n  const key = String(name || '').toLowerCase();\n  if (key === 'autoriteit') return 'Autoriteit';\n  if (key === 'inzicht') return 'Inzicht';\n  if (key.includes('product')) return 'Product of dienst';\n  return String(name || '').trim();\n}\n\nconst rhythmLines = rhythmRoles.map((role, index) => {\n  const name = String(role?.role_name || role?.roleName || '').trim();\n  if (!name) return '';\n  return `${index + 1}. ${rhythmLabel(name)} (${name})`;\n}).filter(Boolean);\n\nconst rhythm_summary = rhythmLines.length\n  ? `Vast content-ritme (${rhythmRoles.length} rollen per week):\\n${rhythmLines.join('\\n')}\\n\\nWijs per week thema 1 aan rol 1, thema 2 aan rol 2, enz. \u2014 herhaal het patroon cyclisch.`\n  : 'Geen content-ritme geconfigureerd \u2014 varieer tussen autoriteit, inzicht en product/dienst.';\n\nreturn {\n  json: {\n    client,\n    missingWeeks,\n    weeksToFill,\n    themesNeeded,\n    postsPerWeek: Math.max(postsPerWeek, rhythmPostsPerWeek),\n    proposalCount,\n    existingRows,\n    phases,\n    performance_summary,\n    trending_signals_summary,\n    rhythmRoles,\n    rhythm_summary,\n    skip: themesNeeded <= 0,\n  },\n};\n"
       },
       "id": "ce01-compute",
       "name": "Compute Context",
@@ -310,7 +310,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       }
@@ -437,7 +437,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       },
@@ -541,7 +541,7 @@
       ],
       "credentials": {
         "mySql": {
-          "id": "CtexbQVBC9XoqnJ5",
+          "id": "2Ttxh5XT3BjJQdpj",
           "name": "Brandflocks [app]"
         }
       },

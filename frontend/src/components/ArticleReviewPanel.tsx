@@ -26,6 +26,10 @@ type ArticleReviewPanelProps = {
   publishNotice?: string | null
   publishNoticeKind?: SaveNoticeKind
   publishNoticeFading?: boolean
+  /** Korte feedback onder de knoppen (bv. na indienen research). */
+  actionNotice?: string | null
+  actionNoticeKind?: SaveNoticeKind
+  actionNoticeFading?: boolean
   onSubmit: (reviewMode: ReviewMode) => void
   onReedit?: () => void
   onSave?: () => void
@@ -70,6 +74,9 @@ export function ArticleReviewPanel({
   publishNotice,
   publishNoticeKind = 'success',
   publishNoticeFading = false,
+  actionNotice = null,
+  actionNoticeKind = 'success',
+  actionNoticeFading = false,
   onSubmit,
   onReedit,
   onSave,
@@ -280,6 +287,12 @@ export function ArticleReviewPanel({
           fading={saveNoticeFading}
           className="mt-0"
         />
+        <ActionNotice
+          message={actionNotice}
+          kind={actionNoticeKind}
+          fading={actionNoticeFading}
+          className="mb-0"
+        />
         {reeditNotice ? (
           <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{reeditNotice}</p>
         ) : null}
@@ -342,6 +355,12 @@ export function ArticleReviewPanel({
         kind={saveNoticeKind}
         fading={saveNoticeFading}
         className="mt-0"
+      />
+      <ActionNotice
+        message={actionNotice}
+        kind={actionNoticeKind}
+        fading={actionNoticeFading}
+        className="mb-0"
       />
       {reeditNotice ? (
         <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{reeditNotice}</p>
