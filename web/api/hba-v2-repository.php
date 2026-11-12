@@ -510,6 +510,24 @@ function ce_hba_v2_guardrail_inactive_footnote(PDO $pdo, string $clientId): stri
 }
 
 /**
+ * Onderzoek/thema-advies: volstaat ingevulde merkarchitectuur (geen architectuurcheck-PASS vereist).
+ *
+ * @return array<string, mixed>|null
+ */
+function ce_hba_v2_architecture_touchpoint_gate(PDO $pdo, string $clientId): ?array
+{
+    if (!ce_hba_v2_architecture_ready($pdo, $clientId)) {
+        return [
+            'ok' => false,
+            'error' => 'Vul eerst je merkarchitectuur in',
+            'code' => 'architecture_incomplete',
+        ];
+    }
+
+    return null;
+}
+
+/**
  * Blokkeert HBA-ingrijppunten zolang er geen guardrail PASS is (briefing §2.13).
  *
  * @return array<string, mixed>|null Block-response, of null wanneer guardrail actief is.
@@ -1023,7 +1041,9 @@ function ce_hba_v2_theme_verdicts_payload(array $cached): array
 function ce_hba_v2_load_theme_verdicts(PDO $pdo, string $clientId, ?string $week = null, array $themeIds = []): array
 {
     ce_ensure_hba_v2_schema($pdo);
-    $gate = ce_hba_v2_guardrail_gate($pdo, $clientId);
+    $gate = $themeIds !== []
+        ? ce_hba_v2_architecture_touchpoint_gate($pdo, $clientId)
+        : ce_hba_v2_guardrail_gate($pdo, $clientId);
     if ($gate !== null) {
         return array_merge($gate, ['verdicts' => [], 'watOntbreekt' => null]);
     }
@@ -1056,7 +1076,9 @@ function ce_hba_v2_load_theme_verdicts(PDO $pdo, string $clientId, ?string $week
 function ce_hba_v2_run_theme_verdicts(PDO $pdo, string $clientId, ?string $week = null, array $themeIdsFilter = []): array
 {
     ce_ensure_hba_v2_schema($pdo);
-    $gate = ce_hba_v2_guardrail_gate($pdo, $clientId);
+    $gate = $themeIdsFilter !== []
+        ? ce_hba_v2_architecture_touchpoint_gate($pdo, $clientId)
+        : ce_hba_v2_guardrail_gate($pdo, $clientId);
     if ($gate !== null) {
         return array_merge($gate, ['verdicts' => [], 'watOntbreekt' => null]);
     }
@@ -1481,7 +1503,7 @@ function ce_hba_v2_load_research_group(PDO $pdo, string $clientId, string $slotI
 function ce_hba_v2_load_research_verdicts(PDO $pdo, string $clientId, string $slotId): array
 {
     ce_ensure_hba_v2_schema($pdo);
-    $gate = ce_hba_v2_guardrail_gate($pdo, $clientId);
+    $gate = ce_hba_v2_architecture_touchpoint_gate($pdo, $clientId);
     if ($gate !== null) {
         return array_merge($gate, ['verdicts' => [], 'watOntbreekt' => null, 'itemCount' => 0]);
     }
@@ -1512,7 +1534,7 @@ function ce_hba_v2_load_research_verdicts(PDO $pdo, string $clientId, string $sl
 function ce_hba_v2_run_research_verdicts(PDO $pdo, string $clientId, string $slotId): array
 {
     ce_ensure_hba_v2_schema($pdo);
-    $gate = ce_hba_v2_guardrail_gate($pdo, $clientId);
+    $gate = ce_hba_v2_architecture_touchpoint_gate($pdo, $clientId);
     if ($gate !== null) {
         return array_merge($gate, ['verdicts' => [], 'watOntbreekt' => null]);
     }

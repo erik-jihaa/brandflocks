@@ -424,7 +424,7 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
                 ? $timeMatch[1]
                 : null,
             'phaseKey' => trim((string) ($slot['phase_key'] ?? '')) ?: null,
-            'status' => ce_status_to_ui($slot['status'] ?? null),
+            'status' => ce_slot_status_to_ui($slot['status'] ?? null),
             'faseKey' => trim((string) ($slot['campaign_fase'] ?? '')) ?: null,
             'faseLabel' => ce_campagne_preview_fase_label(
                 trim((string) ($row['template_key'] ?? '')),

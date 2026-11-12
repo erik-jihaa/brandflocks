@@ -206,6 +206,7 @@ export function ResearchPage() {
   const submittingRef = useRef(false)
   const submitNavigateTimerRef = useRef<number | null>(null)
   const autoResearchSlotRef = useRef<string | null>(null)
+  const visibleItemsCountRef = useRef(0)
   /** Na like/forget: geen auto CE-02 of redirect naar Article — alleen via Submit. */
   const suppressPipelineSideEffectsRef = useRef(false)
   /**
@@ -281,6 +282,11 @@ export function ResearchPage() {
       }
       const groups = normalizeThemeGroups(data)
       const limitedItems = groups.flatMap((group) => group.items)
+      if (limitedItems.length > 0) {
+        setError(null)
+        setAwaitingResearchPoll(false)
+        setPollingMore(false)
+      }
       setThemeGroups(groups)
       const anchorIdx = groups.findIndex((group) => group.slotId === data.slotId)
       setActiveThemeIndex(anchorIdx >= 0 ? anchorIdx : 0)
@@ -429,13 +435,21 @@ export function ResearchPage() {
         : themeGroups.flatMap((group) => group.items.slice(0, MAX_ITEMS)),
     [queueMode, themeGroups],
   )
+  visibleItemsCountRef.current = visibleItems.length
 
   const activeThemeItems = useMemo(() => activeThemeGroup?.items ?? [], [activeThemeGroup])
   const activeSlotId = activeThemeGroup?.slotId ?? ''
-  const activeItemKey = activeThemeItems.map((item) => item.id).join(',')
+  /** HBA altijd op de slot uit de URL (agenda/lijst), niet op een andere week-groep. */
+  const hbaSlotId = (routeSlotId ?? activeSlotId).trim()
+  const hbaThemeItems = useMemo(() => {
+    if (!hbaSlotId) return activeThemeItems
+    const group = themeGroups.find((g) => g.slotId === hbaSlotId)
+    return group?.items?.length ? group.items : activeThemeItems
+  }, [hbaSlotId, themeGroups, activeThemeItems])
+  const hbaItemKey = hbaThemeItems.map((item) => item.id).join(',')
 
   useEffect(() => {
-    if (usingMock || !activeSlotId || activeThemeItems.length === 0) {
+    if (usingMock || !hbaSlotId || hbaThemeItems.length === 0) {
       return
     }
 
@@ -488,11 +502,11 @@ export function ResearchPage() {
     setWatOntbreekt(null)
     setVerdictsLoading(true)
 
-    void fetchResearchVerdicts(activeSlotId)
+    void fetchResearchVerdicts(hbaSlotId)
       .then(apply)
       .catch(() => {})
 
-    void runResearchVerdicts(activeSlotId)
+    void runResearchVerdicts(hbaSlotId)
       .then((res) => {
         apply(res)
         if (!cancelled && !res.ok && res.code !== 'architecture_incomplete' && res.code !== 'guardrail_inactive' && !res.verdicts?.length) {
@@ -511,7 +525,7 @@ export function ResearchPage() {
     return () => {
       cancelled = true
     }
-  }, [usingMock, activeSlotId, activeItemKey, activeThemeItems.length])
+  }, [usingMock, hbaSlotId, hbaItemKey, hbaThemeItems.length])
 
   const activeThemeId = activeThemeGroup?.themeId ?? ''
   const activeThemeVerdictKey = activeThemeId || activeSlotId
@@ -549,11 +563,11 @@ export function ResearchPage() {
     }
 
     setThemeFitLoading(true)
-    void fetchThemeVerdicts(undefined, activeThemeId || undefined, activeSlotId || undefined)
+    void fetchThemeVerdicts(undefined, activeThemeId || undefined, hbaSlotId || undefined)
       .then(applyThemeFit)
       .catch(() => {})
 
-    void runThemeVerdicts(undefined, activeThemeId || undefined, activeSlotId || undefined)
+    void runThemeVerdicts(undefined, activeThemeId || undefined, hbaSlotId || undefined)
       .then(applyThemeFit)
       .catch(() => {})
       .finally(() => {
@@ -563,7 +577,7 @@ export function ResearchPage() {
     return () => {
       cancelled = true
     }
-  }, [usingMock, activeThemeId, activeThemeVerdictKey, activeSlotId])
+  }, [usingMock, activeThemeId, activeThemeVerdictKey, hbaSlotId])
 
   useEffect(() => {
     if ((!pollResearch && !awaitingResearchPoll) || !slotId || usingMock) {
@@ -580,6 +594,11 @@ export function ResearchPage() {
       if (attempts > 24) {
         setPollingMore(false)
         setAwaitingResearchPoll(false)
+        if (visibleItemsCountRef.current === 0) {
+          setError(
+            'Onderzoek leverde nog geen bruikbare bronnen op. Klik opnieuw op Onderzoek starten of voeg bronnen toe onder Sources.',
+          )
+        }
         window.clearInterval(interval)
         return
       }

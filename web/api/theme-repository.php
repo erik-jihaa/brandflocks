@@ -2134,7 +2134,7 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
     ce_assert_slot_client_access($pdo, $slotId, $clientId);
 
     $slotRow = ce_fetch_fastlane_slot_row($pdo, $slotId);
-    $slotStatus = $slotRow ? ce_status_to_ui((string) ($slotRow['status'] ?? '')) : '';
+    $slotStatus = $slotRow ? ce_slot_status_to_ui((string) ($slotRow['status'] ?? '')) : '';
     $anchorContext = ce_resolve_slot_research_context($pdo, $slotId);
     $phaseKey = (string) ($anchorContext['phaseKey'] ?? '');
     $postsPerWeek = ce_client_posts_per_week($pdo, $clientId);
@@ -2145,15 +2145,10 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
     $slotIds = array_slice($slotIds, 0, max(1, $postsPerWeek));
 
     $themeGroups = [];
-    $seenThemeIds = [];
     $seenThemeTitles = [];
     foreach ($slotIds as $weekSlotId) {
         $group = ce_fetch_research_theme_group($pdo, $weekSlotId);
-        $themeId = trim((string) ($group['themeId'] ?? ''));
         $themeTitleKey = preg_replace('/\s+/u', ' ', strtolower(trim((string) ($group['themeTitle'] ?? '')))) ?? '';
-        if ($themeId !== '' && isset($seenThemeIds[$themeId])) {
-            continue;
-        }
         if ($themeTitleKey !== '' && isset($seenThemeTitles[$themeTitleKey])) {
             $existingIndex = $seenThemeTitles[$themeTitleKey];
             $existing = $themeGroups[$existingIndex];
@@ -2172,10 +2167,10 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
                 $seenItemIds[$itemId] = true;
             }
             $themeGroups[$existingIndex]['items'] = array_slice($existingItems, 0, 10);
+            if ($weekSlotId === $slotId) {
+                $themeGroups[$existingIndex]['slotId'] = $slotId;
+            }
             continue;
-        }
-        if ($themeId !== '') {
-            $seenThemeIds[$themeId] = true;
         }
         if ($themeTitleKey !== '') {
             $seenThemeTitles[$themeTitleKey] = count($themeGroups);
@@ -2184,6 +2179,17 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
     }
 
     if ($themeGroups === []) {
+        $themeGroups[] = ce_fetch_research_theme_group($pdo, $slotId);
+    }
+
+    $anchorInGroups = false;
+    foreach ($themeGroups as $group) {
+        if (($group['slotId'] ?? '') === $slotId) {
+            $anchorInGroups = true;
+            break;
+        }
+    }
+    if (!$anchorInGroups) {
         $themeGroups[] = ce_fetch_research_theme_group($pdo, $slotId);
     }
 

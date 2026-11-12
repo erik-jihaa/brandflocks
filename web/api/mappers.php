@@ -150,6 +150,17 @@ function ce_status_to_ui(?string $value): string
     return $key !== '' ? $key : 'draft';
 }
 
+/** Pipeline-ENUM op `content_slots` — niet `proposed` als redactioneel pending lezen. */
+function ce_slot_status_to_ui(?string $value): string
+{
+    $key = strtolower(trim((string) $value));
+    if (in_array($key, ['proposed', 'researching'], true)) {
+        return 'themed';
+    }
+
+    return ce_status_to_ui($value);
+}
+
 function ce_article_row_has_real_body(?array $row): bool
 {
     if ($row === null) {
@@ -216,7 +227,7 @@ function ce_build_theme_start_api_payload(PDO $pdo, array $slot): array
         'imageRatio' => 'square',
         'platform' => $platformRaw !== '' ? ce_platform_to_ui($platformRaw) : '',
         'status' => 'themed',
-        'slotStatus' => ce_status_to_ui($slot['status'] ?? null),
+        'slotStatus' => ce_slot_status_to_ui($slot['status'] ?? null),
         'campaignId' => $campaignId !== '' ? $campaignId : null,
         'campaignTitle' => $camp['campagne_title'] ?? null,
         'campaignFaseLabel' => $faseLabel,
@@ -239,7 +250,7 @@ function ce_resolve_agenda_phase(?string $slotStatus, ?string $articleId, ?strin
         return 'theme';
     }
 
-    $slotUi = ce_status_to_ui($slotStatus);
+    $slotUi = ce_slot_status_to_ui($slotStatus);
     if ($slotUi === 'themed') {
         return 'theme';
     }
@@ -304,7 +315,7 @@ function ce_status_priority(string $uiStatus): int
 /** Meest ver gevorderde UI-status (article vs slot ENUM kunnen verschillen). */
 function ce_resolve_ui_status(?string $articleStatus, ?string $slotStatus): string
 {
-    $candidates = [ce_status_to_ui($articleStatus), ce_status_to_ui($slotStatus)];
+    $candidates = [ce_status_to_ui($articleStatus), ce_slot_status_to_ui($slotStatus)];
 
     return array_reduce(
         $candidates,
@@ -325,7 +336,7 @@ function ce_resolve_editorial_status(
     int $openFeedbackCount = 0,
 ): string {
     $articleRaw = trim((string) ($articleStatus ?? ''));
-    $slotUi = ce_status_to_ui($slotStatus);
+    $slotUi = ce_slot_status_to_ui($slotStatus);
 
     // Geen artikel yet — toon pipeline-fase van het slot (themed / research_done)
     if ($articleRaw === '') {
