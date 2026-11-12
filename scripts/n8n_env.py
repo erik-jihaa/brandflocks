@@ -253,6 +253,11 @@ def patch_workflow_for_env(workflow: dict[str, Any]) -> dict[str, Any]:
             cred_id = os.environ.get("N8N_MYSQL_CREDENTIAL_ID", "").strip()
             cred_name = os.environ.get("N8N_MYSQL_CREDENTIAL_NAME", "").strip()
             if cred_id:
+                if target_env() in ("brandflocks", "brandflocks-target") and cred_id == "CtexbQVBC9XoqnJ5":
+                    raise SystemExit(
+                        "N8N_MYSQL_CREDENTIAL_ID wijst nog op Content Engine [staging]. "
+                        "Maak Brandflocks [app] in n8n (Antagonist DB) en zet het juiste ID in .env."
+                    )
                 node["credentials"] = {
                     "mySql": {
                         "id": cred_id,

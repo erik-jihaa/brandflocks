@@ -5,8 +5,11 @@ declare(strict_types=1);
 /** Minimale snippet-lengte voor bruikbare research (briefing aandachtspunten §1). */
 const CE_RESEARCH_MIN_SNIPPET_LEN = 80;
 
-/** Minimaal aantal bruikbare items vóór CE-03. */
+/** Minimaal aantal bruikbare items vóór CE-03 (agenda / weekritme). */
 const CE_RESEARCH_MIN_USABLE_ITEMS = 3;
+
+/** Snel artikel (fastlane): één bruikbare bron of snippet is genoeg. */
+const CE_RESEARCH_MIN_USABLE_ITEMS_FASTLANE = 1;
 
 function ce_research_insufficient_message(): string
 {
@@ -63,11 +66,24 @@ function ce_count_usable_research_for_slot(PDO $pdo, string $slotId): int
     return $count;
 }
 
+function ce_research_min_usable_items_for_slot(PDO $pdo, string $slotId): int
+{
+    require_once __DIR__ . '/slot-repository.php';
+
+    $slot = ce_fetch_fastlane_slot_row($pdo, $slotId);
+    if ($slot !== null && ce_is_fastlane_research_slot($pdo, $slot)) {
+        return CE_RESEARCH_MIN_USABLE_ITEMS_FASTLANE;
+    }
+
+    return CE_RESEARCH_MIN_USABLE_ITEMS;
+}
+
 /** @return array{ok: bool, usableCount: int, message?: string} */
 function ce_research_slot_ready_for_write(PDO $pdo, string $slotId): array
 {
     $usable = ce_count_usable_research_for_slot($pdo, $slotId);
-    if ($usable >= CE_RESEARCH_MIN_USABLE_ITEMS) {
+    $minRequired = ce_research_min_usable_items_for_slot($pdo, $slotId);
+    if ($usable >= $minRequired) {
         return ['ok' => true, 'usableCount' => $usable];
     }
 

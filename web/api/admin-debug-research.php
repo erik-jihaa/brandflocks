@@ -170,15 +170,17 @@ try {
     ];
 }
 
+$researchReady = ce_research_slot_ready_for_write($pdo, $slotId);
+
 ce_json_response([
     'ok' => true,
     'client' => $clients[0],
     'clientsMatched' => $clients,
     'slotId' => $slotId,
     'usableCount' => $usableCount,
-    'minRequired' => CE_RESEARCH_MIN_USABLE_ITEMS,
+    'minRequired' => ce_research_min_usable_items_for_slot($pdo, $slotId),
     'minSnippetLength' => CE_RESEARCH_MIN_SNIPPET_LEN,
-    'wouldBlockCe03' => $usableCount < CE_RESEARCH_MIN_USABLE_ITEMS,
+    'wouldBlockCe03' => !($researchReady['ok'] ?? false),
     'insufficientMessage' => ce_research_insufficient_message(),
     'selfReviewPreview' => $article['self_review_preview'] ?? null,
     'items' => $rows,

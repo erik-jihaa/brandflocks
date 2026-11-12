@@ -54,6 +54,10 @@ Maak in n8n **twee** MySQL-credentials:
 
 Zet `N8N_MYSQL_CREDENTIAL_ID` + `N8N_MYSQL_CREDENTIAL_NAME` in het bijbehorende `.env.*`.
 
+Gebruik **niet** het ID van `Content Engine [staging]` — dat is een andere database (CE-02 faalt dan met *Theme or slot not found*).
+
+**Host voor n8n Cloud:** `brandflocks.nl` (niet `localhost`). In DirectAdmin → MariaDB/MySQL → **Remote access** het IP van n8n toestaan (zie fout in n8n-executie: `Access denied for user … @'x.x.x.x'`). Zonder remote access werkt alleen de app-PHP; workflows CE-01/02/03/04 niet.
+
 ## Isolatie
 
 ```bash
