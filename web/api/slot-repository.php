@@ -240,6 +240,9 @@ function ce_fastlane_slot_select_columns(PDO $pdo): array
     if (ce_table_has_column($pdo, 'content_slots', 'campaign_platform')) {
         $cols[] = 'campaign_platform';
     }
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_slot_index')) {
+        $cols[] = 'campaign_slot_index';
+    }
     if (ce_table_has_column($pdo, 'content_slots', 'publish_date')) {
         $cols[] = 'publish_date';
     }

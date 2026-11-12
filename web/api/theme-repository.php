@@ -1928,6 +1928,17 @@ function ce_resolve_slot_research_context(PDO $pdo, string $slotId): array
         }
     }
 
+    if ($slotRow !== null) {
+        require_once __DIR__ . '/mappers.php';
+        if (ce_slot_is_campaign_theme($slotRow)) {
+            require_once __DIR__ . '/campagne-preview-repository.php';
+            $campaignTitle = ce_campagne_resolve_slot_title($pdo, $slotRow);
+            if ($campaignTitle !== '') {
+                $slotTheme = $campaignTitle;
+            }
+        }
+    }
+
     if ($themeId !== '' && ce_table_exists($pdo, 'themes')) {
         $cols = ['title'];
         if (ce_table_has_column($pdo, 'themes', 'rationale')) {
@@ -1937,8 +1948,12 @@ function ce_resolve_slot_research_context(PDO $pdo, string $slotId): array
         $t->execute(['id' => $themeId]);
         $themeRow = $t->fetch();
         if ($themeRow) {
-            if (trim((string) ($themeRow['title'] ?? '')) !== '') {
-                $slotTheme = (string) $themeRow['title'];
+            $themeTitle = trim((string) ($themeRow['title'] ?? ''));
+            if (
+                $themeTitle !== ''
+                && ($slotRow === null || !ce_slot_is_campaign_theme($slotRow))
+            ) {
+                $slotTheme = $themeTitle;
             }
             $themeRationale = trim((string) ($themeRow['rationale'] ?? ''));
         }

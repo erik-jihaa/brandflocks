@@ -166,7 +166,7 @@ export function submitSlotResearch(slotId: string): Promise<{
   articleWriteTriggered?: boolean
   expectsArticleWrite?: boolean
   webhookTriggered?: boolean
-  reason?: string
+  reason?: 'article_exists' | 'insufficient_research' | 'missing_title' | 'not_eligible' | string
   message?: string
   usableResearchCount?: number
 }> {

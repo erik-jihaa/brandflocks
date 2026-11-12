@@ -800,6 +800,7 @@ export function ResearchPage() {
           ]),
         ]
         let writeSlotId: string | null = null
+        let writeWithArticleDraft = true
         let insufficientMessage: string | null = null
 
         for (const targetSlotId of slotIds) {
@@ -810,6 +811,10 @@ export function ResearchPage() {
           }
           if (result.articleWriteTriggered === true) {
             writeSlotId = targetSlotId
+            writeWithArticleDraft = true
+          } else if (result.expectsArticleWrite === true && result.reason === 'article_exists') {
+            writeSlotId = targetSlotId
+            writeWithArticleDraft = false
           }
         }
 
@@ -828,14 +833,20 @@ export function ResearchPage() {
           if (feedbackWarning) setError(feedbackWarning)
           reviewedSlotIdsRef.current = new Set()
           bumpAgendaRefresh()
-          showSubmitSuccess('Onderzoek ingediend — artikel wordt geschreven.')
+          const submitMessage = writeWithArticleDraft
+            ? 'Onderzoek ingediend — artikel wordt geschreven.'
+            : 'Onderzoek ingediend — je artikel staat klaar.'
+          showSubmitSuccess(submitMessage)
           scheduleNavigateAfterNotice(() =>
-            navigate(`/article/${writeSlotId}?writing=1`, {
-              state: {
-                researchSubmitted: true,
-                researchSubmitMessage: 'Onderzoek ingediend — artikel wordt geschreven.',
+            navigate(
+              writeWithArticleDraft ? `/article/${writeSlotId}?writing=1` : `/article/${writeSlotId}`,
+              {
+                state: {
+                  researchSubmitted: true,
+                  researchSubmitMessage: submitMessage,
+                },
               },
-            }),
+            ),
           )
           return
         }

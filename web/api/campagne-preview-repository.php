@@ -638,6 +638,99 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
 }
 
 /**
+ * Berekent weergavetitel voor campagne-slot (o.a. LinkedIn 2/6) op basis van volgorde per platform.
+ */
+function ce_campagne_resolve_slot_title(PDO $pdo, array $slotRow): string
+{
+    $slotId = trim((string) ($slotRow['id'] ?? ''));
+    $campaignId = trim((string) ($slotRow['campaign_id'] ?? ''));
+    $platform = strtolower(trim((string) ($slotRow['campaign_platform'] ?? '')));
+    if ($slotId === '' || $campaignId === '' || $platform === '') {
+        return trim((string) ($slotRow['theme'] ?? ''));
+    }
+
+    $cStmt = $pdo->prepare('SELECT title, template_key FROM campaigns WHERE id = :id LIMIT 1');
+    $cStmt->execute(['id' => $campaignId]);
+    $campaign = $cStmt->fetch(PDO::FETCH_ASSOC);
+    if (!is_array($campaign)) {
+        return trim((string) ($slotRow['theme'] ?? ''));
+    }
+
+    $campaignTitle = trim((string) ($campaign['title'] ?? ''));
+    $templateKey = trim((string) ($campaign['template_key'] ?? ''));
+    if ($campaignTitle === '') {
+        return trim((string) ($slotRow['theme'] ?? ''));
+    }
+
+    $orderSql = 'SELECT id FROM content_slots WHERE campaign_id = :cid AND campaign_platform = :platform';
+    if (ce_table_has_column($pdo, 'content_slots', 'publish_date')) {
+        $orderSql .= ' ORDER BY publish_date ASC, campaign_slot_index ASC';
+    } else {
+        $orderSql .= ' ORDER BY campaign_slot_index ASC';
+    }
+    $sStmt = $pdo->prepare($orderSql);
+    $sStmt->execute(['cid' => $campaignId, 'platform' => $platform]);
+    $platformSlotIds = [];
+    foreach ($sStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $id = trim((string) ($row['id'] ?? ''));
+        if ($id !== '') {
+            $platformSlotIds[] = $id;
+        }
+    }
+    if ($platformSlotIds === []) {
+        return trim((string) ($slotRow['theme'] ?? ''));
+    }
+
+    $indexOnPlatform = array_search($slotId, $platformSlotIds, true);
+    if ($indexOnPlatform === false) {
+        return trim((string) ($slotRow['theme'] ?? ''));
+    }
+
+    $totalOnPlatform = count($platformSlotIds);
+    $indexOnPlatform = (int) $indexOnPlatform + 1;
+    $platformLabel = ce_platform_to_ui($platform);
+    $title = $campaignTitle . ' — ' . $platformLabel . ' ' . $indexOnPlatform . '/' . $totalOnPlatform;
+
+    $faseKey = trim((string) ($slotRow['campaign_fase'] ?? ''));
+    if ($faseKey !== '') {
+        $faseLabel = ce_campagne_preview_fase_label($templateKey !== '' ? $templateKey : null, $faseKey);
+        if (is_string($faseLabel) && trim($faseLabel) !== '') {
+            $title = trim($faseLabel) . ' — ' . $title;
+        }
+    }
+
+    return $title;
+}
+
+/** Zet content_slots.theme + gekoppelde themes.title gelijk aan ce_campagne_resolve_slot_title. */
+function ce_campagne_sync_slot_titles_for_campaign(PDO $pdo, string $campaignId): void
+{
+    if ($campaignId === '' || !ce_table_exists($pdo, 'content_slots')) {
+        return;
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT id, theme_id, theme, campaign_id, campaign_platform, campaign_fase, campaign_slot_index, publish_date
+         FROM content_slots WHERE campaign_id = :cid'
+    );
+    $stmt->execute(['cid' => $campaignId]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $slotRow) {
+        $title = ce_campagne_resolve_slot_title($pdo, $slotRow);
+        if ($title === '') {
+            continue;
+        }
+        $slotId = (string) ($slotRow['id'] ?? '');
+        $pdo->prepare('UPDATE content_slots SET theme = :theme WHERE id = :id')
+            ->execute(['theme' => $title, 'id' => $slotId]);
+        $themeId = trim((string) ($slotRow['theme_id'] ?? ''));
+        if ($themeId !== '' && ce_table_exists($pdo, 'themes')) {
+            $pdo->prepare('UPDATE themes SET title = :title WHERE id = :id')
+                ->execute(['title' => $title, 'id' => $themeId]);
+        }
+    }
+}
+
+/**
  * @param array<string, int> $channels
  * @param list<array{key: string, label: string, share: float, rol: string, merkOnderdeel: string|null, opdracht: string}> $phaseSequence
  * @param array<string, mixed>|null $schedule
@@ -852,6 +945,8 @@ function ce_campagne_preview_generate_slots(
             'faseKey' => $faseKey !== '' ? $faseKey : null,
         ];
     }
+
+    ce_campagne_sync_slot_titles_for_campaign($pdo, $campaignId);
 
     return $created;
 }

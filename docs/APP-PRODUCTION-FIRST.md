@@ -13,6 +13,25 @@
 | 5 | **CE-03/04** article + review | n8n + Anthropic/Gemini credentials groen |
 | 6 | Mail uit | `erik@brandflocks.nl` / tenant mail |
 
+## Golden path (handmatige UI-smoke)
+
+Referentie-flow die op productie moet blijven werken:
+
+| Stap | Wat | URL / check |
+|------|-----|-------------|
+| 1 | Login tenant | `https://app.brandflocks.nl/login` |
+| 2 | Fastlane → onderzoek | Agenda of Snel artikel |
+| 3 | Research + HBA | `/research/{slotId}` — *Past dit onderwerp bij je merk?* |
+| 4 | Indienen | → `/article/{slotId}?writing=1` + feedback onder knop |
+| 5 | Artikel + HBA | **Voorbeeld (nov 2026):** [fastlane-artikel](https://app.brandflocks.nl/article/0aeab9e5-2f58-4561-baf7-197750e6c3da) |
+
+Campagne (week 46 acceptatie): zelfde CE-02/03-keten; titels per platform tonen **n/6** via `ce_campagne_resolve_slot_title`. Bij herindienen met bestaand artikel → direct naar `/article/{slotId}` (geen `?writing=1`).
+
+```bash
+export BF_ACCEPT_EMAIL=… BF_ACCEPT_PASSWORD=…
+# UI: bovenstaande stappen in browser
+```
+
 ```bash
 cd brandflocks
 export BF_ACCEPT_EMAIL=… BF_ACCEPT_PASSWORD=…
