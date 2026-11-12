@@ -130,7 +130,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT id, title, url, category, source_kind, trello_board_id, asana_project_gid, drive_file_url, max_units_per_run, folder_id\nFROM sources\nWHERE client_id = $1 AND COALESCE(active, 1) = 1\n  AND (\n    (category = 'url_rss' AND url IS NOT NULL AND url != '')\n    OR (category = 'youtube' AND url IS NOT NULL AND url != '')\n    OR (category = 'blogs' AND url IS NOT NULL AND url != '')\n    OR (category = 'document' AND document_chunk_count IS NOT NULL AND document_chunk_count > 0)    OR (category = 'asana' AND asana_project_gid IS NOT NULL AND asana_project_gid != '')\n    OR (category = 'drive' AND drive_file_url IS NOT NULL AND drive_file_url != '')\n    OR (category IN ('scraper', 'linkedin') AND scraper_api_token_ref IS NOT NULL AND scraper_api_token_ref != '')\n    OR (category = 'linkedin' AND scraper_linkedin_profile IS NOT NULL AND scraper_linkedin_profile != '')\n  )\nORDER BY\n  CASE WHEN NULLIF($2, '') IS NOT NULL AND folder_id = $2 THEN 0 ELSE 1 END,\n  category ASC, title ASC\nLIMIT 20",
+        "query": "SELECT id, title, url, category, source_kind, drive_file_url, max_units_per_run, folder_id\nFROM sources\nWHERE client_id = $1 AND COALESCE(active, 1) = 1\n  AND (\n    (category = 'url_rss' AND url IS NOT NULL AND url != '')\n    OR (category = 'youtube' AND url IS NOT NULL AND url != '')\n    OR (category = 'blogs' AND url IS NOT NULL AND url != '')\n    OR (category = 'document' AND document_chunk_count IS NOT NULL AND document_chunk_count > 0)\n    OR (category = 'drive' AND drive_file_url IS NOT NULL AND drive_file_url != '')\n    OR (category IN ('scraper', 'linkedin') AND scraper_api_token_ref IS NOT NULL AND scraper_api_token_ref != '')\n    OR (category = 'linkedin' AND scraper_linkedin_profile IS NOT NULL AND scraper_linkedin_profile != '')\n  )\n    ORDER BY\n  CASE WHEN NULLIF($2, '') IS NOT NULL AND folder_id = $2 THEN 0 ELSE 1 END,\n  category ASC, title ASC\nLIMIT 20",
         "options": {
           "queryReplacement": "={{ [ $('Merge Context').item.json.client_id, $('Merge Context').item.json.objective_source_folder_id || '' ] }}"
         }
@@ -455,21 +455,5 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "active": false,
-  "pinData": {
-    "Webhook Trigger": [
-      {
-        "json": {
-          "headers": {
-            "content-type": "application/json"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "slot_id": "3eef1d6b-0a3f-4073-9e7e-bdde7d4740be"
-          }
-        }
-      }
-    ]
-  }
+  "active": false
 }

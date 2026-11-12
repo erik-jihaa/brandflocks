@@ -61,8 +61,9 @@ def build_payload(workflow: dict) -> dict:
         "connections": workflow["connections"],
         "settings": sanitize_settings(workflow.get("settings")),
     }
-    if workflow.get("pinData"):
-        payload["pinData"] = workflow["pinData"]
+    pin_data = workflow.get("pinData")
+    if pin_data and env_target not in ("brandflocks", "brandflocks-target"):
+        payload["pinData"] = pin_data
     return payload
 
 
