@@ -54,7 +54,7 @@ def sanitize_settings(settings: dict | None) -> dict:
     return {"executionOrder": raw.get("executionOrder") or "v1"}
 
 
-def build_payload(workflow: dict) -> dict:
+def build_payload(workflow: dict, env_target: str) -> dict:
     payload = {
         "name": workflow["name"],
         "nodes": workflow["nodes"],
@@ -62,7 +62,10 @@ def build_payload(workflow: dict) -> dict:
         "settings": sanitize_settings(workflow.get("settings")),
     }
     pin_data = workflow.get("pinData")
-    if pin_data and env_target not in ("brandflocks", "brandflocks-target"):
+    if env_target in ("brandflocks", "brandflocks-target"):
+        # n8n keeps old pinData when the field is omitted — wipe ghost CE test slots.
+        payload["pinData"] = {}
+    elif pin_data:
         payload["pinData"] = pin_data
     return payload
 
@@ -142,7 +145,7 @@ def main() -> None:
     if env_target != "production":
         patch_workflow_for_env(workflow)
 
-    payload = build_payload(workflow)
+    payload = build_payload(workflow, env_target)
 
     print(f"Target: {env_target}")
     existing_id = find_workflow_id(api_url, api_key, workflow["name"])
