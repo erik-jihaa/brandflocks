@@ -56,7 +56,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const row = $input.first()?.json ?? {};\nif (!row.client_id) {\n  throw new Error('Theme or slot not found');\n}\nreturn { json: row };"
+        "jsCode": "const row = $input.first()?.json ?? {};\nconst parsed = $('Parse Input').item.json;\nconst themeId = String(parsed.theme_id || '').trim();\nconst slotId = String(parsed.slot_id || '').trim();\nif (!row.client_id) {\n  const emptyMysql = row.success === true && !row.theme_id && !row.slot_id;\n  const hint = emptyMysql\n    ? 'MySQL returned no row (pinned webhook testdata or unknown id?). Unpin Webhook Trigger or use a slot_id from deb2003839n1_brandflocks_app.'\n    : 'Check Brandflocks [app] credential and database.';\n  throw new Error(\n    `Theme or slot not found. theme_id=${themeId || '(empty)'} slot_id=${slotId || '(empty)'}. ${hint}`\n  );\n}\nreturn { json: row };"
       },
       "id": "ce02-validate-context",
       "name": "Validate Context",
