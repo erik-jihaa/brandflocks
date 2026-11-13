@@ -39,4 +39,8 @@ if (strtolower(trim((string) ($enriched['campaign_platform'] ?? ''))) !== 'linke
     $fail('enrich platform');
 }
 
+if (ce_campagne_infer_platform_from_theme('Aankondiging — Acceptatie campagne — Linkedin 1/6') !== 'linkedin') {
+    $fail('infer platform from theme');
+}
+
 echo "campagne-slot-titles OK\n";

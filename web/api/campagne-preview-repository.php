@@ -699,8 +699,81 @@ function ce_campagne_enrich_slot_row(array $slotRow): array
             $slotRow['campaign_fase'] = $fase;
         }
     }
+    if (trim((string) ($slotRow['campaign_platform'] ?? '')) === '') {
+        $fromTheme = ce_campagne_infer_platform_from_theme((string) ($slotRow['theme'] ?? ''));
+        if ($fromTheme !== '') {
+            $slotRow['campaign_platform'] = $fromTheme;
+        }
+    }
 
     return $slotRow;
+}
+
+function ce_campagne_infer_platform_from_theme(string $theme): string
+{
+    $theme = trim($theme);
+    if ($theme === '') {
+        return '';
+    }
+    require_once __DIR__ . '/mappers.php';
+    foreach (['Linkedin', 'Instagram', 'Facebook', 'Blog', 'X'] as $label) {
+        if (preg_match('/\b' . preg_quote($label, '/') . '\b/i', $theme)) {
+            return ce_platform_to_db($label);
+        }
+    }
+
+    return '';
+}
+
+/** Vul ontbrekende campaign_platform op campagne-slots (o.a. na fase-reapply zonder platform in marker). */
+function ce_campagne_repair_campaign_platforms(PDO $pdo, string $campaignId): int
+{
+    if ($campaignId === '' || !ce_table_has_column($pdo, 'content_slots', 'campaign_platform')) {
+        return 0;
+    }
+
+    $defaultPlatform = '';
+    if (ce_table_exists($pdo, 'campaigns') && ce_table_has_column($pdo, 'campaigns', 'channels_json')) {
+        $cStmt = $pdo->prepare('SELECT channels_json FROM campaigns WHERE id = :id LIMIT 1');
+        $cStmt->execute(['id' => $campaignId]);
+        $raw = $cStmt->fetchColumn();
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded) && count($decoded) === 1) {
+                $defaultPlatform = strtolower(trim((string) array_key_first($decoded)));
+            }
+        }
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT id, theme, campaign_platform, input_human FROM content_slots WHERE campaign_id = :cid'
+    );
+    $stmt->execute(['cid' => $campaignId]);
+    $updated = 0;
+    $upd = $pdo->prepare('UPDATE content_slots SET campaign_platform = :platform WHERE id = :id');
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        if (trim((string) ($row['campaign_platform'] ?? '')) !== '') {
+            continue;
+        }
+        $platform = '';
+        $marker = ce_campagne_marker_from_slot_row($row);
+        if ($marker !== null) {
+            $platform = strtolower(trim((string) ($marker['platform'] ?? '')));
+        }
+        if ($platform === '') {
+            $platform = ce_campagne_infer_platform_from_theme((string) ($row['theme'] ?? ''));
+        }
+        if ($platform === '' && $defaultPlatform !== '') {
+            $platform = $defaultPlatform;
+        }
+        if ($platform === '') {
+            continue;
+        }
+        $upd->execute(['platform' => $platform, 'id' => $row['id']]);
+        ++$updated;
+    }
+
+    return $updated;
 }
 
 /**
@@ -799,6 +872,7 @@ function ce_campagne_repair_campaign_slots(PDO $pdo, string $campaignId): void
         }
     }
 
+    ce_campagne_repair_campaign_platforms($pdo, $campaignId);
     ce_campagne_sync_slot_titles_for_campaign($pdo, $campaignId);
 }
 
@@ -892,6 +966,25 @@ function ce_campagne_sync_slot_titles_for_campaign(PDO $pdo, string $campaignId)
         if ($themeId !== '' && ce_table_exists($pdo, 'themes')) {
             $pdo->prepare('UPDATE themes SET title = :title WHERE id = :id')
                 ->execute(['title' => $title, 'id' => $themeId]);
+        }
+        if (ce_table_exists($pdo, 'articles')) {
+            $oldTheme = trim((string) ($slotRow['theme'] ?? ''));
+            $artStmt = $pdo->prepare(
+                'SELECT id, headline, headline_human FROM articles WHERE slot_id = :sid ORDER BY id DESC LIMIT 1'
+            );
+            $artStmt->execute(['sid' => $slotId]);
+            $art = $artStmt->fetch(PDO::FETCH_ASSOC);
+            if (is_array($art)) {
+                $headline = trim((string) ($art['headline'] ?? ''));
+                $headlineHuman = trim((string) ($art['headline_human'] ?? ''));
+                $shouldSyncHeadline = $headlineHuman === ''
+                    && ($headline === '' || $headline === $oldTheme || preg_match('/\b1\/\d+\b/', $headline));
+                if ($shouldSyncHeadline) {
+                    $pdo->prepare(
+                        'UPDATE articles SET headline = :title WHERE id = :id'
+                    )->execute(['title' => $title, 'id' => (string) ($art['id'] ?? '')]);
+                }
+            }
         }
     }
 }
@@ -1387,7 +1480,7 @@ function ce_campagne_preview_reapply_phases(PDO $pdo, string $campaignId, ?strin
     }
 
     $slotStmt = $pdo->prepare(
-        'SELECT id, theme, campaign_slot_index FROM content_slots WHERE campaign_id = :cid ORDER BY campaign_slot_index ASC, publish_date ASC'
+        'SELECT id, theme, campaign_slot_index, campaign_platform, input_human FROM content_slots WHERE campaign_id = :cid ORDER BY campaign_slot_index ASC, publish_date ASC'
     );
     $slotStmt->execute(['cid' => $campaignId]);
     $slots = $slotStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1418,15 +1511,29 @@ function ce_campagne_preview_reapply_phases(PDO $pdo, string $campaignId, ?strin
             $theme = $faseLabel . ' — ' . $theme;
         }
 
-        $marker = json_encode([
+        $existingMarker = ce_campagne_marker_from_slot_row($slot);
+        $platform = strtolower(trim((string) ($slot['campaign_platform'] ?? '')));
+        if ($platform === '' && is_array($existingMarker)) {
+            $platform = strtolower(trim((string) ($existingMarker['platform'] ?? '')));
+        }
+        if ($platform === '') {
+            $platform = ce_campagne_infer_platform_from_theme((string) ($slot['theme'] ?? ''));
+        }
+        $slotIndex = isset($slot['campaign_slot_index']) ? (int) $slot['campaign_slot_index'] : null;
+        if (($slotIndex === null || $slotIndex <= 0) && is_array($existingMarker) && isset($existingMarker['slotIndex'])) {
+            $slotIndex = (int) $existingMarker['slotIndex'];
+        }
+        $marker = json_encode(array_filter([
             'campagnePreview' => true,
             'campaignId' => $campaignId,
             'templateKey' => $templateKey,
-            'faseKey' => $faseKey,
+            'faseKey' => $faseKey !== '' ? $faseKey : null,
             'rol' => $rol !== '' ? $rol : null,
             'opdracht' => $opdracht !== '' ? $opdracht : null,
+            'platform' => $platform !== '' ? $platform : null,
+            'slotIndex' => $slotIndex,
             'reapplied' => true,
-        ], JSON_THROW_ON_ERROR);
+        ], static fn ($v) => $v !== null && $v !== ''), JSON_THROW_ON_ERROR);
 
         $update->execute([
             'id' => $slot['id'],
