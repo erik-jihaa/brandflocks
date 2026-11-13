@@ -65,6 +65,12 @@ export function filterAgendaRows(
   )
 }
 
+/** Op campagne: alleen campagneposts. Losse artikelen horen bij Op datum. */
+export function rowsForAgendaGroupMode(rows: AgendaRowDto[], groupMode: AgendaGroupMode): AgendaRowDto[] {
+  if (groupMode !== 'campaign') return rows
+  return rows.filter((row) => (row.campaignId ?? '').trim() !== '')
+}
+
 export function filterAgendaWeekGroups(
   groups: AgendaGroupDto[],
   channel: string,

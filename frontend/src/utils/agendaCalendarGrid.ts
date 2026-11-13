@@ -106,7 +106,7 @@ export function defaultPublishDate(mondayIso: string, index: number, postsPerWee
   const monday = parseIsoDate(mondayIso)
   if (!monday) return null
   const offsets = defaultDayOffsets(postsPerWeek)
-  const offset = offsets[index] ?? offsets[offsets.length - 1] ?? 1
+  const offset = offsets[index] ?? Math.min(6, index % 7)
   monday.setDate(monday.getDate() + offset)
   return toIsoDate(monday)
 }

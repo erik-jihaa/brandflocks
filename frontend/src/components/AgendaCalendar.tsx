@@ -8,6 +8,7 @@ import {
   campaignColorDotClass,
   filterAgendaRows,
   groupAgendaRowsByCampaign,
+  rowsForAgendaGroupMode,
   weekOverlapsMonth,
   type AgendaGroupMode,
 } from '../utils/agendaFilters'
@@ -250,8 +251,8 @@ export function AgendaCalendar({
   }, [groups, currentMonday, horizonWeeks, extraWeeks, monthKey])
 
   const visibleRows = useMemo(
-    () => filterAgendaRows(allRows, channel, monthKey),
-    [allRows, channel, monthKey],
+    () => rowsForAgendaGroupMode(filterAgendaRows(allRows, channel, monthKey), groupMode),
+    [allRows, channel, monthKey, groupMode],
   )
 
   const legend = useMemo(() => groupAgendaRowsByCampaign(visibleRows), [visibleRows])
@@ -297,7 +298,10 @@ export function AgendaCalendar({
         const themeHref = monday ? `/theme?week=${encodeURIComponent(monday)}` : '/theme'
         const filteredGroup = {
           ...group,
-          rows: filterAgendaRows(group.rows, channel, monthKey, monday),
+          rows: rowsForAgendaGroupMode(
+            filterAgendaRows(group.rows, channel, monthKey, monday),
+            groupMode,
+          ),
         }
         const cells = buildWeekDayCells(filteredGroup, visibleRows, postsPerWeek)
         const weekCampaigns = showCampaignTitle
