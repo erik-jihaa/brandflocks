@@ -90,12 +90,12 @@ export function HomePage() {
   )
 
   if (loading && !data) {
-    return <GridShell pageTitle="Overzicht" activeNav="home" main={<p className="text-[14px] text-ce-black">Laden…</p>} />
+    return <GridShell pageTitle="Te doen" activeNav="home" main={<p className="text-[14px] text-ce-black">Laden…</p>} />
   }
 
   return (
     <GridShell
-      pageTitle="Overzicht"
+      pageTitle="Te doen"
       activeNav="home"
       main={
         <>
