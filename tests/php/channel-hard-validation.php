@@ -41,4 +41,14 @@ if (ce_validate_textvorm_for_platform('linkedin', 'carrousel') !== 'post') {
     fail('ongeldige tekstvorm valt terug op default');
 }
 
+$soft = ce_channel_soft_hints_for_proposal('linkedin', 'post');
+if ($soft === [] || !str_contains($soft[0], 'kerninzicht')) {
+    fail('soft reminders linkedin post');
+}
+$longBody = implode(' ', array_fill(0, 200, 'woord'));
+$wordSoft = ce_channel_soft_word_count_messages('linkedin', 'promotie', $longBody);
+if ($wordSoft === [] || !str_contains($wordSoft[0], 'lang')) {
+    fail('soft word count promotie');
+}
+
 echo "channel-hard-validation OK\n";

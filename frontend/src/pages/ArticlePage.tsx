@@ -1103,6 +1103,11 @@ export function ArticlePage() {
                 {submitNotice}
               </p>
             )}
+            {article.channelSoftHints && article.channelSoftHints.length > 0 ? (
+              <p className="mb-[12px] text-[14px] leading-[18px] text-ce-beige">
+                {article.channelSoftHints.join(' ')}
+              </p>
+            ) : null}
             {article.channelHardIssues && article.channelHardIssues.length > 0 ? (
               <p className="mb-[12px] text-[14px] leading-[18px] text-ce-red">
                 {article.channelHardIssues.join(' ')}

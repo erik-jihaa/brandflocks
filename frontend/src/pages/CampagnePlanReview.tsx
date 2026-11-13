@@ -245,6 +245,13 @@ export function PlanReview({
                   <p className={`${bodyClass} mt-[6px]`}>{currentLabel}</p>
                 ) : null}
                 {ankerTekst ? <p className={`${hintClass} mt-[6px]`}>Anker: {ankerTekst}</p> : null}
+                {slot.channelHints && slot.channelHints.length > 0
+                  ? slot.channelHints.map((hint) => (
+                      <p key={hint} className={`${hintClass} mt-[6px]`}>
+                        {hint}
+                      </p>
+                    ))
+                  : null}
                 {slot.opdracht ? <p className={`${bodyClass} mt-[6px]`}>{slot.opdracht}</p> : null}
                 {slot.instructie ? (
                   <p className={`${bodyClass} mt-[6px]`}>Aanvullende instructie: {slot.instructie}</p>

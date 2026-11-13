@@ -410,14 +410,20 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
          FROM content_slots s WHERE s.campaign_id = :cid ORDER BY s.publish_date ASC, s.campaign_slot_index ASC"
     );
     $slotStmt->execute(['cid' => $campaignId]);
+    require_once __DIR__ . '/channel-copy-constraints.php';
     $slots = [];
     foreach ($slotStmt->fetchAll(PDO::FETCH_ASSOC) as $slot) {
         $platform = trim((string) ($slot['campaign_platform'] ?? ''));
+        $textvormDefault = $platform !== '' ? ce_default_textvorm_for_platform($platform) : 'post';
+        $channelHints = $platform !== ''
+            ? ce_channel_soft_hints_for_proposal($platform, $textvormDefault)
+            : [];
         $slots[] = [
             'slotId' => (string) $slot['id'],
             'title' => (string) ($slot['theme'] ?? ''),
             'platform' => $platform !== '' ? ce_platform_to_ui($platform) : null,
             'platformKey' => $platform !== '' ? $platform : null,
+            'channelHints' => $channelHints,
             'slotIndex' => isset($slot['campaign_slot_index']) ? (int) $slot['campaign_slot_index'] : null,
             'publishDate' => trim((string) ($slot['publish_date'] ?? '')) ?: null,
             'publishTime' => preg_match('/^(\d{2}:\d{2})/', trim((string) ($slot['publish_time'] ?? '')), $timeMatch)

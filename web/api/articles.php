@@ -67,6 +67,22 @@ function ce_build_article_api_payload(PDO $pdo, array $row): array
     }
     $payload['publications'] = $publications;
 
+    require_once __DIR__ . '/channel-copy-constraints.php';
+    $platformDb = strtolower(trim((string) ($row['platform_final'] ?? $row['platform_suggested'] ?? 'linkedin')));
+    $textvorm = trim((string) ($payload['contentTextvorm'] ?? ''));
+    if ($textvorm === '') {
+      $textvorm = ce_default_textvorm_for_platform($platformDb);
+    }
+    $payload['channelSoftHints'] = ce_channel_soft_hints_for_proposal(
+      $platformDb,
+      $textvorm,
+      (string) ($payload['headline'] ?? ''),
+      (string) ($payload['content'] ?? ''),
+      (string) ($payload['hashtags'] ?? ''),
+      $pdo,
+      $slotId !== '' ? $slotId : null,
+    );
+
     return $payload;
 }
 

@@ -278,6 +278,165 @@ function ce_channel_hard_validation_for_article_row(
   return ce_channel_hard_validation_messages($platform, $textvorm, $headline, $body, $hashtags);
 }
 
+/**
+ * Korte klanttaal-reminders (addendum §3 punt 2) — niet blokkerend.
+ *
+ * @return array<string, list<string>>
+ */
+function ce_channel_soft_reminders_catalog(): array
+{
+  return [
+    'blog|artikel' => ['Werk toe naar één duidelijke lezersvraag en kernantwoord vroeg in de tekst.'],
+    'linkedin|post' => ['Eén kerninzicht; maximaal 3 hashtags en 3.000 tekens. Een oproep tot actie is optioneel.'],
+    'linkedin|artikel' => ['Denk aan 500–1.000 woorden met tussenkoppen en een onderbouwde conclusie.'],
+    'linkedin|promotie' => ['Houd de post kort (richting 80–150 woorden) en nodig uit tot het artikel.'],
+    'x|post' => ['Eén gedachte, maximaal 280 tekens en maximaal 2 hashtags.'],
+    'instagram|bijschrift' => ['Richting 50–150 woorden; maximaal 5 hashtags bij het bijschrift.'],
+    'instagram|carrousel' => ['Eerste slide = belofte; één punt per slide, kort per slide.'],
+    'facebook|post' => ['Richting 50–150 woorden; maximaal 2 hashtags.'],
+    'tiktok|videoscript' => ['Bijschrift richting 20–60 woorden; 2–3 hashtags.'],
+    'youtube|videoscript' => ['Titel maximaal 100 tekens; beschrijving maximaal 5.000 tekens.'],
+    'newsletter|editie' => ['Richting 300–700 woorden; geen hashtags.'],
+    'threads|post' => ['Maximaal 500 tekens en maximaal 1 onderwerptag.'],
+    'bluesky|post' => ['Maximaal 300 tekens en maximaal 2 hashtags.'],
+  ];
+}
+
+/**
+ * @return array<string, array{min_words?: int, max_words?: int}>
+ */
+function ce_channel_soft_word_guidance_catalog(): array
+{
+  return [
+    'linkedin|promotie' => ['min_words' => 80, 'max_words' => 150],
+    'instagram|bijschrift' => ['min_words' => 50, 'max_words' => 150],
+    'facebook|post' => ['min_words' => 50, 'max_words' => 150],
+    'tiktok|videoscript' => ['min_words' => 20, 'max_words' => 60],
+    'newsletter|editie' => ['min_words' => 300, 'max_words' => 700],
+    'linkedin|artikel' => ['min_words' => 500, 'max_words' => 1000],
+  ];
+}
+
+function ce_channel_count_words(string $text): int
+{
+  $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+  if ($text === '') {
+    return 0;
+  }
+
+  return count(preg_split('/\s+/u', $text) ?: []);
+}
+
+/** @return list<string> */
+function ce_channel_soft_reminders_for_platform(string $platformDb, ?string $textvorm): array
+{
+  $platform = strtolower(trim($platformDb));
+  if ($platform === '') {
+    return [];
+  }
+  $form = ce_normalize_textvorm($textvorm ?? ce_default_textvorm_for_platform($platform));
+  $key = ce_channel_constraint_key($platform, $form);
+  $catalog = ce_channel_soft_reminders_catalog();
+
+  return $catalog[$key]
+    ?? $catalog[$platform . '|' . ce_default_textvorm_for_platform($platform)]
+    ?? [];
+}
+
+/** @return list<string> */
+function ce_channel_soft_word_count_messages(string $platformDb, ?string $textvorm, string $body): array
+{
+  $body = trim($body);
+  if ($body === '') {
+    return [];
+  }
+  $platform = strtolower(trim($platformDb));
+  $form = ce_normalize_textvorm($textvorm ?? ce_default_textvorm_for_platform($platform));
+  $key = ce_channel_constraint_key($platform, $form);
+  $guide = ce_channel_soft_word_guidance_catalog()[$key] ?? null;
+  if ($guide === null) {
+    return [];
+  }
+  $words = ce_channel_count_words($body);
+  $messages = [];
+  if (isset($guide['min_words']) && $words > 0 && $words < (int) $guide['min_words']) {
+    $messages[] = 'De tekst is nog kort voor dit kanaal (richting '
+      . (int) $guide['min_words'] . ' woorden).';
+  }
+  if (isset($guide['max_words']) && $words > (int) $guide['max_words']) {
+    $messages[] = 'De tekst is lang voor dit kanaal (richting maximaal '
+      . (int) $guide['max_words'] . ' woorden).';
+  }
+
+  return $messages;
+}
+
+function ce_channel_copy_modus_cta_hint(PDO $pdo, string $slotId, string $text): ?string
+{
+  $text = mb_strtolower(trim($text));
+  if ($text === '' || $slotId === '') {
+    return null;
+  }
+  require_once __DIR__ . '/copy-modus.php';
+  $resolved = ce_resolve_copy_modus_for_slot($pdo, $slotId);
+  if (($resolved['modus'] ?? '') !== CE_COPY_MODUS_MERK) {
+    return null;
+  }
+  if (!preg_match(
+    '/\b(koop nu|bestel|registreer|meld je aan|schrijf je in|gratis proef|korting|actie|nu bestellen|plan een demo|boek een)\b/u',
+    $text,
+  )) {
+    return null;
+  }
+
+  return 'Je copy-modus is gericht op merk en bewijs — vermijd een harde verkoop- of actietaal in deze post.';
+}
+
+/**
+ * Lichte kanaalcheck op postvoorstel (addendum §3.2) — nooit blokkerend.
+ *
+ * @return list<string>
+ */
+function ce_channel_soft_hints_for_proposal(
+  string $platformDb,
+  ?string $textvorm,
+  string $headline = '',
+  string $body = '',
+  string $hashtags = '',
+  ?PDO $pdo = null,
+  ?string $slotId = null,
+): array {
+  $hints = ce_channel_soft_reminders_for_platform($platformDb, $textvorm);
+  $bodyForWords = trim($body);
+  if ($bodyForWords === '') {
+    $bodyForWords = trim($headline);
+  }
+  foreach (ce_channel_soft_word_count_messages($platformDb, $textvorm, $bodyForWords) as $line) {
+    $hints[] = $line;
+  }
+  $hasText = ce_channel_post_combined_text($headline, $body, $hashtags) !== '';
+  if ($pdo !== null && $slotId !== null && $hasText) {
+    $cta = ce_channel_copy_modus_cta_hint(
+      $pdo,
+      $slotId,
+      ce_channel_post_combined_text($headline, $body, $hashtags),
+    );
+    if ($cta !== null) {
+      $hints[] = $cta;
+    }
+  }
+
+  $unique = [];
+  foreach ($hints as $line) {
+    $line = trim($line);
+    if ($line !== '' && !in_array($line, $unique, true)) {
+      $unique[] = $line;
+    }
+  }
+
+  return $unique;
+}
+
 function ce_ensure_article_textvorm_column(PDO $pdo): void
 {
   static $checked = false;

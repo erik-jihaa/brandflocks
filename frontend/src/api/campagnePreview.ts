@@ -182,6 +182,8 @@ export type CampagnePreviewSlot = {
   anker: { soort: string; id: string; vraag: string; formulering?: string; tekst?: string } | null
   merkOnderdeel?: string | null
   status: string | null
+  /** Lichte kanaalcheck — addendum §3.2 */
+  channelHints?: string[]
 }
 
 export type CampagnePreviewDetail = {

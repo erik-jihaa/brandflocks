@@ -136,6 +136,8 @@ export type ArticleDto = {
   aiReviewWarning?: string | null
   /** Harde kanaalgrenzen (tekens, hashtags) — addendum §3/§7. */
   channelHardIssues?: string[]
+  /** Lichte kanaalcheck (reminders + zachte signalen) — addendum §3.2 */
+  channelSoftHints?: string[]
   wordpressPostId?: string | null
   publications?: PublicationDto[]
   reviewMode?: ReviewMode | 'hba' | 'none'
