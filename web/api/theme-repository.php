@@ -1932,6 +1932,8 @@ function ce_resolve_slot_research_context(PDO $pdo, string $slotId): array
         require_once __DIR__ . '/mappers.php';
         if (ce_slot_is_campaign_theme($slotRow)) {
             require_once __DIR__ . '/campagne-preview-repository.php';
+            ce_campagne_repair_slot_campaign_columns($pdo, $slotId);
+            $slotRow = ce_fetch_fastlane_slot_row($pdo, $slotId) ?? $slotRow;
             $campaignTitle = ce_campagne_resolve_slot_title($pdo, $slotRow);
             if ($campaignTitle !== '') {
                 $slotTheme = $campaignTitle;

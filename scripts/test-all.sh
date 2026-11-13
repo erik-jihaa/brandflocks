@@ -24,6 +24,7 @@ run "PHP syntax (scripts)" bash -c 'find scripts -name "*.php" -print0 | xargs -
 
 run "v1.13 replay" php tests/php/hba-v113-replay.php
 run "campagne plan generator" php tests/php/campagne-plan-generator.php
+run "campagne slot titles" php tests/php/campagne-slot-titles.php
 run "article schrijfvorm rewrite" php tests/php/article-schrijfvorm-rewrite.php
 run "copy-modus directive" php tests/php/copy-modus-directive.php
 run "channel hard validation" php tests/php/channel-hard-validation.php

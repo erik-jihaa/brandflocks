@@ -25,7 +25,7 @@ Referentie-flow die op productie moet blijven werken:
 | 4 | Indienen | → `/article/{slotId}?writing=1` + feedback onder knop |
 | 5 | Artikel + HBA | **Voorbeeld (nov 2026):** [fastlane-artikel](https://app.brandflocks.nl/article/0aeab9e5-2f58-4561-baf7-197750e6c3da) |
 
-Campagne (week 46 acceptatie): zelfde CE-02/03-keten; titels per platform tonen **n/6** via `ce_campagne_resolve_slot_title`. Bij herindienen met bestaand artikel → direct naar `/article/{slotId}` (geen `?writing=1`).
+Campagne (week 46 acceptatie): zelfde CE-02/03-keten; titels per platform tonen **n/6** via `ce_campagne_resolve_slot_title`. Bij oude slots zonder `campaign_id`: backfill uit `input_human` (`ce_campagne_repair_campaign_slots`) — eenmalig `php scripts/repair-campagne-slot-titles.php`. Bij herindienen met bestaand artikel → direct naar `/article/{slotId}` (geen `?writing=1`).
 
 ```bash
 export BF_ACCEPT_EMAIL=… BF_ACCEPT_PASSWORD=…

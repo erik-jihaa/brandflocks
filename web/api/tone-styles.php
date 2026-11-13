@@ -446,6 +446,8 @@ function ce_persist_article_write_directive(PDO $pdo, string $slotId): void
 function ce_campagne_context_meta_from_slot_row(PDO $pdo, array $campSlot): array
 {
     $meta = [];
+    require_once __DIR__ . '/campagne-preview-repository.php';
+    $campSlot = ce_campagne_enrich_slot_row($campSlot);
     $campagneId = trim((string) ($campSlot['campaign_id'] ?? ''));
     if ($campagneId === '' || !ce_table_exists($pdo, 'campaigns')) {
         return $meta;

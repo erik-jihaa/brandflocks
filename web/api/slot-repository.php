@@ -246,6 +246,9 @@ function ce_fastlane_slot_select_columns(PDO $pdo): array
     if (ce_table_has_column($pdo, 'content_slots', 'publish_date')) {
         $cols[] = 'publish_date';
     }
+    if (ce_table_has_column($pdo, 'content_slots', 'input_human')) {
+        $cols[] = 'input_human';
+    }
 
     return $cols;
 }

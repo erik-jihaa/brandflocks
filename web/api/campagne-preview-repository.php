@@ -392,6 +392,8 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
         return null;
     }
 
+    ce_campagne_repair_campaign_slots($pdo, $campaignId);
+
     $ankerSelect = ce_table_has_column($pdo, 'content_slots', 'campaign_anker')
         ? 's.campaign_anker'
         : 'NULL AS campaign_anker';
@@ -405,7 +407,7 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
         ? 's.publish_time'
         : 'NULL AS publish_time';
     $slotStmt = $pdo->prepare(
-        "SELECT s.id, s.theme, s.campaign_platform, s.campaign_slot_index, s.publish_date, {$timeSelect}, s.phase_key, s.status,
+        "SELECT s.id, s.theme, s.campaign_id, s.campaign_platform, s.campaign_slot_index, s.publish_date, {$timeSelect}, s.phase_key, s.status,
                 s.campaign_fase, s.campaign_opdracht, s.campaign_rol, {$ankerSelect}, {$onderdeelSelect}, {$instructieSelect}
          FROM content_slots s WHERE s.campaign_id = :cid ORDER BY s.publish_date ASC, s.campaign_slot_index ASC"
     );
@@ -418,9 +420,11 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
         $channelHints = $platform !== ''
             ? ce_channel_soft_hints_for_proposal($platform, $textvormDefault)
             : [];
+        $resolvedTitle = ce_campagne_resolve_slot_title($pdo, $slot);
+        $displayTitle = $resolvedTitle !== '' ? $resolvedTitle : (string) ($slot['theme'] ?? '');
         $slots[] = [
             'slotId' => (string) $slot['id'],
-            'title' => (string) ($slot['theme'] ?? ''),
+            'title' => $displayTitle,
             'platform' => $platform !== '' ? ce_platform_to_ui($platform) : null,
             'platformKey' => $platform !== '' ? $platform : null,
             'channelHints' => $channelHints,
@@ -643,11 +647,167 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
     return $response;
 }
 
+/** @return array<string, mixed>|null */
+function ce_campagne_marker_from_slot_row(array $slotRow): ?array
+{
+    $raw = trim((string) ($slotRow['input_human'] ?? ''));
+    if ($raw === '') {
+        return null;
+    }
+    try {
+        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+    } catch (Throwable) {
+        return null;
+    }
+    if (!is_array($decoded) || empty($decoded['campagnePreview'])) {
+        return null;
+    }
+
+    return $decoded;
+}
+
+/** Vul ontbrekende campaign_* kolommen uit input_human-marker (alleen in geheugen). */
+function ce_campagne_enrich_slot_row(array $slotRow): array
+{
+    $marker = ce_campagne_marker_from_slot_row($slotRow);
+    if ($marker === null) {
+        return $slotRow;
+    }
+    if (trim((string) ($slotRow['campaign_id'] ?? '')) === '') {
+        $fromMarker = trim((string) ($marker['campaignId'] ?? ''));
+        if ($fromMarker !== '') {
+            $slotRow['campaign_id'] = $fromMarker;
+        }
+    }
+    if (trim((string) ($slotRow['campaign_platform'] ?? '')) === '') {
+        $platform = strtolower(trim((string) ($marker['platform'] ?? '')));
+        if ($platform !== '') {
+            $slotRow['campaign_platform'] = $platform;
+        }
+    }
+    if (
+        !isset($slotRow['campaign_slot_index'])
+        || trim((string) $slotRow['campaign_slot_index']) === ''
+    ) {
+        if (isset($marker['slotIndex']) && is_numeric($marker['slotIndex'])) {
+            $slotRow['campaign_slot_index'] = (int) $marker['slotIndex'];
+        }
+    }
+    if (trim((string) ($slotRow['campaign_fase'] ?? '')) === '') {
+        $fase = trim((string) ($marker['faseKey'] ?? ''));
+        if ($fase !== '') {
+            $slotRow['campaign_fase'] = $fase;
+        }
+    }
+
+    return $slotRow;
+}
+
+/**
+ * Repareer campaign_id / platform op één slot vanuit marker; sync daarna titels voor de campagne.
+ */
+function ce_campagne_repair_slot_campaign_columns(PDO $pdo, string $slotId): bool
+{
+    if ($slotId === '' || !ce_table_exists($pdo, 'content_slots')) {
+        return false;
+    }
+    $cols = ['id', 'campaign_id', 'campaign_platform', 'campaign_slot_index', 'campaign_fase', 'input_human', 'origin'];
+    $stmt = $pdo->prepare('SELECT ' . implode(', ', $cols) . ' FROM content_slots WHERE id = :id LIMIT 1');
+    $stmt->execute(['id' => $slotId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!is_array($row)) {
+        return false;
+    }
+    $marker = ce_campagne_marker_from_slot_row($row);
+    if ($marker === null) {
+        return false;
+    }
+
+    $sets = [];
+    $params = ['id' => $slotId];
+    $campaignId = trim((string) ($row['campaign_id'] ?? ''));
+    if ($campaignId === '') {
+        $fromMarker = trim((string) ($marker['campaignId'] ?? ''));
+        if ($fromMarker !== '') {
+            $campaignId = $fromMarker;
+            if (ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
+                $sets[] = 'campaign_id = :campaign_id';
+                $params['campaign_id'] = $campaignId;
+            }
+        }
+    }
+    if (trim((string) ($row['campaign_platform'] ?? '')) === '') {
+        $platform = strtolower(trim((string) ($marker['platform'] ?? '')));
+        if ($platform !== '' && ce_table_has_column($pdo, 'content_slots', 'campaign_platform')) {
+            $sets[] = 'campaign_platform = :campaign_platform';
+            $params['campaign_platform'] = $platform;
+        }
+    }
+    if (
+        ce_table_has_column($pdo, 'content_slots', 'campaign_slot_index')
+        && (trim((string) ($row['campaign_slot_index'] ?? '')) === '')
+        && isset($marker['slotIndex'])
+        && is_numeric($marker['slotIndex'])
+    ) {
+        $sets[] = 'campaign_slot_index = :campaign_slot_index';
+        $params['campaign_slot_index'] = (int) $marker['slotIndex'];
+    }
+    if (
+        ce_table_has_column($pdo, 'content_slots', 'campaign_fase')
+        && trim((string) ($row['campaign_fase'] ?? '')) === ''
+    ) {
+        $fase = trim((string) ($marker['faseKey'] ?? ''));
+        if ($fase !== '') {
+            $sets[] = 'campaign_fase = :campaign_fase';
+            $params['campaign_fase'] = $fase;
+        }
+    }
+
+    $changed = $sets !== [];
+    if ($changed) {
+        $pdo->prepare('UPDATE content_slots SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);
+    }
+    if ($campaignId !== '') {
+        ce_campagne_sync_slot_titles_for_campaign($pdo, $campaignId);
+
+        return true;
+    }
+
+    return $changed;
+}
+
+/** Backfill ontbrekende campaign_id uit markers + herteken n/m-titels voor één campagne. */
+function ce_campagne_repair_campaign_slots(PDO $pdo, string $campaignId): void
+{
+    if ($campaignId === '' || !ce_table_exists($pdo, 'content_slots')) {
+        return;
+    }
+
+    if (ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
+        $orphanStmt = $pdo->prepare(
+            "SELECT id FROM content_slots
+             WHERE (campaign_id IS NULL OR campaign_id = '')
+             AND input_human LIKE '%\"campagnePreview\":true%'
+             AND input_human LIKE :cid"
+        );
+        $orphanStmt->execute(['cid' => '%"campaignId":"' . $campaignId . '"%']);
+        foreach ($orphanStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $orphan) {
+            $oid = trim((string) ($orphan['id'] ?? ''));
+            if ($oid !== '') {
+                ce_campagne_repair_slot_campaign_columns($pdo, $oid);
+            }
+        }
+    }
+
+    ce_campagne_sync_slot_titles_for_campaign($pdo, $campaignId);
+}
+
 /**
  * Berekent weergavetitel voor campagne-slot (o.a. LinkedIn 2/6) op basis van volgorde per platform.
  */
 function ce_campagne_resolve_slot_title(PDO $pdo, array $slotRow): string
 {
+    $slotRow = ce_campagne_enrich_slot_row($slotRow);
     $slotId = trim((string) ($slotRow['id'] ?? ''));
     $campaignId = trim((string) ($slotRow['campaign_id'] ?? ''));
     $platform = strtolower(trim((string) ($slotRow['campaign_platform'] ?? '')));
@@ -1278,6 +1438,7 @@ function ce_campagne_preview_reapply_phases(PDO $pdo, string $campaignId, ?strin
         ]);
     }
 
+    ce_campagne_sync_slot_titles_for_campaign($pdo, $campaignId);
     ce_campagne_preview_reapply_stored_geo_ankers($pdo, $campaignId, $clientId);
 }
 
