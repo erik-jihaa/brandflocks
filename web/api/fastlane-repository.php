@@ -284,6 +284,20 @@ function ce_insert_fastlane_article(
         $params['platform_final'] = ce_platform_to_db($platform);
     }
 
+    require_once __DIR__ . '/channel-copy-constraints.php';
+    ce_ensure_article_textvorm_column($pdo);
+    $platformDb = $platform !== '' ? ce_platform_to_db($platform) : 'linkedin';
+    $textvormRaw = trim((string) ($meta['contentTextvorm'] ?? $meta['content_textvorm'] ?? ''));
+    $textvorm = ce_validate_textvorm_for_platform(
+        $platformDb,
+        $textvormRaw !== '' ? $textvormRaw : ce_default_textvorm_for_platform($platformDb),
+    );
+    if (ce_table_has_column($pdo, 'articles', 'content_textvorm')) {
+        $cols[] = 'content_textvorm';
+        $vals[] = ':content_textvorm';
+        $params['content_textvorm'] = $textvorm;
+    }
+
     $imageRatio = trim((string) ($meta['imageRatio'] ?? ''));
     if ($imageRatio !== '' && ce_table_has_column($pdo, 'articles', 'image_ratio_final')) {
         $cols[] = 'image_ratio_final';

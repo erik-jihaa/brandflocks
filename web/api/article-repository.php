@@ -524,6 +524,8 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
     ce_ensure_headline_human_column($pdo);
     ce_ensure_content_human_column($pdo);
     ce_ensure_article_editor_columns($pdo);
+    require_once __DIR__ . '/channel-copy-constraints.php';
+    ce_ensure_article_textvorm_column($pdo);
     require_once __DIR__ . '/hba-repository.php';
     ce_ensure_hba_schema($pdo);
 
@@ -554,6 +556,7 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
         'editor' => ['column' => 'editor_final', 'cast' => 'string'],
         'imageRatio' => ['column' => 'image_ratio_final', 'cast' => 'image_ratio'],
         'platform' => ['column' => 'platform_final', 'cast' => 'platform'],
+        'contentTextvorm' => ['column' => 'content_textvorm', 'cast' => 'textvorm'],
         'hbaContentrolOverride' => ['column' => 'hba_contentrol_override', 'cast' => 'contentrol'],
     ];
 
@@ -571,6 +574,17 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
             $value = ce_tone_to_db($value);
         } elseif ($spec['cast'] === 'platform') {
             $value = ce_platform_to_db($value);
+        } elseif ($spec['cast'] === 'textvorm') {
+            $platformUi = (string) ($body['platform'] ?? '');
+            if ($platformUi === '') {
+                $stmt = $pdo->prepare(
+                    'SELECT platform_final, platform_suggested FROM articles WHERE id = :id LIMIT 1',
+                );
+                $stmt->execute(['id' => $articleId]);
+                $platformRow = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+                $platformUi = ce_platform_to_ui($platformRow['platform_final'] ?? $platformRow['platform_suggested'] ?? null);
+            }
+            $value = ce_validate_textvorm_for_platform(ce_platform_to_db($platformUi), $value);
         } elseif ($spec['cast'] === 'angle') {
             $value = ce_angle_to_ui($value);
         } elseif ($spec['cast'] === 'image_ratio') {

@@ -2,6 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { AgendaGroupDto, AgendaRowDto, CalendarPhase } from '../types/api'
 import { agendaCampaignCellTitle, agendaCampaignTitles } from '../utils/agendaActions'
+import {
+  AGENDA_CHANNEL_ALL,
+  AGENDA_MONTH_ALL,
+  campaignColorDotClass,
+  filterAgendaRows,
+  groupAgendaRowsByCampaign,
+  weekOverlapsMonth,
+  type AgendaGroupMode,
+} from '../utils/agendaFilters'
 import { DeleteConfirmAction } from './ui/DeleteConfirmAction'
 import { ActionLink, statusRowActionClass } from './ui/ActionLink'
 import { agendaSlotPath } from '../utils/agendaActions'
@@ -26,6 +35,9 @@ type AgendaCalendarProps = {
   horizonWeeks?: number
   today?: string
   busySlotId?: string | null
+  groupMode?: AgendaGroupMode
+  channel?: string
+  monthKey?: string
   onSchedule?: (slotId: string, publishDate: string, publishTime?: string | null, platform?: string | null) => void
   onArchive?: (row: AgendaRowDto) => void
   onDelete?: (row: AgendaRowDto) => void
@@ -76,11 +88,19 @@ function PhaseFooter({ phase, isCampaign }: { phase: CalendarPhase; isCampaign?:
   )
 }
 
-function CalendarSlotTitle({ row, titleClass }: { row: AgendaRowDto; titleClass: string }) {
+function CalendarSlotTitle({
+  row,
+  titleClass,
+  showCampaignTitle,
+}: {
+  row: AgendaRowDto
+  titleClass: string
+  showCampaignTitle: boolean
+}) {
   const campaignTitle = (row.campaignTitle ?? '').trim()
   return (
     <>
-      {campaignTitle !== '' ? (
+      {showCampaignTitle && campaignTitle !== '' ? (
         <p className="m-0 line-clamp-2 text-[14px] font-normal leading-[18px] text-ce-beige">{campaignTitle}</p>
       ) : null}
       <p className={`m-0 line-clamp-3 text-[14px] font-semibold leading-[18px] ${titleClass}`}>
@@ -141,12 +161,14 @@ function CalendarItemBody({
   onDelete,
   onSchedule,
   busy,
+  showCampaignTitle,
 }: {
   row: AgendaRowDto
   onArchive?: (row: AgendaRowDto) => void
   onDelete?: (row: AgendaRowDto) => void
   onSchedule?: (slotId: string, publishDate: string, publishTime?: string | null, platform?: string | null) => void
   busy?: boolean
+  showCampaignTitle: boolean
 }) {
   const phase = resolveCalendarPhase(row)
   const isCampaign = Boolean((row.campaignId ?? '').trim())
@@ -158,7 +180,7 @@ function CalendarItemBody({
     return (
       <>
         <Link to={slotPath} className="block min-w-0 no-underline">
-          <CalendarSlotTitle row={row} titleClass={titleClass} />
+          <CalendarSlotTitle row={row} titleClass={titleClass} showCampaignTitle={showCampaignTitle} />
         </Link>
         <div className="mt-auto pt-[18px]">
           <div className="flex flex-col items-start">
@@ -180,7 +202,7 @@ function CalendarItemBody({
 
   return (
     <Link to={slotPath} className="flex min-h-0 flex-1 flex-col no-underline">
-      <CalendarSlotTitle row={row} titleClass={titleClass} />
+      <CalendarSlotTitle row={row} titleClass={titleClass} showCampaignTitle={showCampaignTitle} />
       {isCampaign ? <CampaignPlacement row={row} onSchedule={onSchedule} /> : null}
       <div className="mt-auto pt-[18px]">
         <PhaseFooter phase={phase} isCampaign={isCampaign} />
@@ -206,6 +228,9 @@ export function AgendaCalendar({
   horizonWeeks = 4,
   today = todayIso(),
   busySlotId = null,
+  groupMode = 'campaign',
+  channel = AGENDA_CHANNEL_ALL,
+  monthKey = AGENDA_MONTH_ALL,
   onSchedule,
   onArchive,
   onDelete,
@@ -214,11 +239,22 @@ export function AgendaCalendar({
   const currentMonday = mondayOfIso(today) ?? today
   const [extraWeeks, setExtraWeeks] = useState(0)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const showCampaignTitle = groupMode === 'campaign'
 
-  const calendarGroups = useMemo(
-    () => calendarAgendaGroups(groups, currentMonday, horizonWeeks, extraWeeks),
-    [groups, currentMonday, horizonWeeks, extraWeeks],
+  const calendarGroups = useMemo(() => {
+    const built = calendarAgendaGroups(groups, currentMonday, horizonWeeks, extraWeeks)
+    return built.filter((group) => {
+      const monday = weekMondayIso(group)
+      return !monday || weekOverlapsMonth(monday, monthKey)
+    })
+  }, [groups, currentMonday, horizonWeeks, extraWeeks, monthKey])
+
+  const visibleRows = useMemo(
+    () => filterAgendaRows(allRows, channel, monthKey),
+    [allRows, channel, monthKey],
   )
+
+  const legend = useMemo(() => groupAgendaRowsByCampaign(visibleRows), [visibleRows])
 
   useEffect(() => {
     const node = sentinelRef.current
@@ -240,11 +276,33 @@ export function AgendaCalendar({
 
   return (
     <div className="flex flex-col">
+      {showCampaignTitle && legend.length > 0 ? (
+        <div className="mb-[12px] flex flex-wrap gap-x-[14px] gap-y-[8px]">
+          {legend.map((item) => (
+            <span
+              key={item.key}
+              className="inline-flex items-center gap-[5px] text-[14px] leading-[18px] text-ce-beige"
+            >
+              <span
+                className={`inline-block h-[10px] w-[10px] rounded-full ${campaignColorDotClass(item.colorIndex)}`}
+                aria-hidden
+              />
+              {item.title}
+            </span>
+          ))}
+        </div>
+      ) : null}
       {calendarGroups.map((group) => {
         const monday = weekMondayIso(group)
         const themeHref = monday ? `/theme?week=${encodeURIComponent(monday)}` : '/theme'
-        const cells = buildWeekDayCells(group, allRows, postsPerWeek)
-        const weekCampaigns = agendaCampaignTitles(cells.flatMap((cell) => cell.rows))
+        const filteredGroup = {
+          ...group,
+          rows: filterAgendaRows(group.rows, channel, monthKey, monday),
+        }
+        const cells = buildWeekDayCells(filteredGroup, visibleRows, postsPerWeek)
+        const weekCampaigns = showCampaignTitle
+          ? agendaCampaignTitles(cells.flatMap((cell) => cell.rows))
+          : []
 
         return (
           <div
@@ -297,6 +355,7 @@ export function AgendaCalendar({
                             onDelete={onDelete}
                             onSchedule={onSchedule}
                             busy={busySlotId === row.slotId}
+                            showCampaignTitle={showCampaignTitle}
                           />
                         </div>
                       ))

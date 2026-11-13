@@ -90,6 +90,7 @@ export function ArticlePage() {
   const [editor, setEditor] = useState<string | null>(null)
   const [imageRatio, setImageRatio] = useState('square')
   const [platform, setPlatform] = useState('Linkedin')
+  const [contentTextvorm, setContentTextvorm] = useState('post')
   const [objective, setObjective] = useState<string | null>(null)
   const [hbaHint, setHbaHint] = useState<HbaArticleHint | null>(null)
   const [hbaHintLoading, setHbaHintLoading] = useState(false)
@@ -167,6 +168,7 @@ export function ArticlePage() {
       ),
     )
     setPlatform(article.platform)
+    setContentTextvorm(article.contentTextvorm ?? 'post')
     setObjective(article.objective ?? null)
     setHbaHint((prev) => {
       if (hbaHintSuppressedForArticle.current === article.id) return null
@@ -914,6 +916,7 @@ export function ArticlePage() {
       editor,
       imageRatio,
       platform,
+      contentTextvorm,
       objective,
       hbaContentrolOverride,
     }
@@ -1100,6 +1103,11 @@ export function ArticlePage() {
                 {submitNotice}
               </p>
             )}
+            {article.channelHardIssues && article.channelHardIssues.length > 0 ? (
+              <p className="mb-[12px] text-[14px] leading-[18px] text-ce-red">
+                {article.channelHardIssues.join(' ')}
+              </p>
+            ) : null}
             <ArticleReviewPanel
               status={article.status}
               headline={headline}
@@ -1152,6 +1160,7 @@ export function ArticlePage() {
           editor={editor}
           imageRatio={imageRatio}
           platform={platform}
+          contentTextvorm={contentTextvorm}
           toneSuggested={article.toneSuggested}
           editorSuggested={article.editorSuggested}
           imageRatioSuggested={article.imageRatioSuggested}
@@ -1160,6 +1169,7 @@ export function ArticlePage() {
           onEditorChange={setEditor}
           onImageRatioChange={setImageRatio}
           onPlatformChange={setPlatform}
+          onContentTextvormChange={setContentTextvorm}
           objective={objective}
           objectiveSuggested={article.objectiveSuggested}
           objectiveOptions={article.objectiveOptions}

@@ -5,6 +5,11 @@ import { MetaSection, RadioOption } from './MetaSection'
 import { RadioSelected } from './ui/RadioOption'
 import { FieldHint } from './ui/FieldHint'
 import { IMAGE_RATIO_OPTIONS, PLATFORM_OPTIONS, imageRatioDisplayLabel } from '../constants/metaOptions'
+import {
+  coerceTextvormForPlatform,
+  textvormDisplayLabel,
+  textvormOptionsForPlatform,
+} from '../constants/contentTextvorm'
 import { toneDisplayLabel } from '../utils/toneStyles'
 import { ArticleSelfReviewSection, type ArticleSelfReviewDto } from './ArticleSelfReviewSection'
 import { ArticleHbaHintSection } from './ArticleHbaHintSection'
@@ -53,6 +58,7 @@ type ArticleMetaSidebarProps = {
   editor?: string | null
   imageRatio: string
   platform: string
+  contentTextvorm?: string
   toneSuggested?: string
   editorSuggested?: string | null
   imageRatioSuggested?: string
@@ -61,6 +67,7 @@ type ArticleMetaSidebarProps = {
   onEditorChange?: (v: string) => void
   onImageRatioChange: (v: string) => void
   onPlatformChange: (v: string) => void
+  onContentTextvormChange?: (v: string) => void
   /** Objective-id; leeg = geen selectie */
   objective?: string | null
   objectiveSuggested?: string | null
@@ -117,6 +124,7 @@ export function ArticleMetaSidebar({
   editor = null,
   imageRatio,
   platform,
+  contentTextvorm = '',
   toneSuggested,
   editorSuggested,
   imageRatioSuggested,
@@ -125,6 +133,7 @@ export function ArticleMetaSidebar({
   onEditorChange,
   onImageRatioChange,
   onPlatformChange,
+  onContentTextvormChange,
   objective = null,
   objectiveSuggested = null,
   objectiveOptions = [],
@@ -307,12 +316,40 @@ export function ArticleMetaSidebar({
                 label={opt}
                 checked={platform === opt}
                 suggested={showSuggested && platformSuggested === opt}
-                onChange={onPlatformChange}
+                onChange={(next) => {
+                  onPlatformChange(next)
+                  if (onContentTextvormChange) {
+                    onContentTextvormChange(coerceTextvormForPlatform(next, contentTextvorm))
+                  }
+                }}
               />
             ))}
           </fieldset>
         )}
       </MetaSection>
+
+      {textvormOptionsForPlatform(platform).length > 0 ? (
+        <MetaSection label="Tekstvorm" collapsible={false}>
+          {readonly ? (
+            contentTextvorm ? <RadioSelected label={textvormDisplayLabel(contentTextvorm)} /> : null
+          ) : onContentTextvormChange ? (
+            <fieldset className="m-0 border-0 p-0">
+              {textvormOptionsForPlatform(platform).map((opt) => (
+                <RadioOption
+                  key={opt.value}
+                  name="content_textvorm"
+                  value={opt.value}
+                  label={opt.label}
+                  checked={coerceTextvormForPlatform(platform, contentTextvorm) === opt.value}
+                  onChange={onContentTextvormChange}
+                />
+              ))}
+            </fieldset>
+          ) : (
+            <RadioSelected label={textvormDisplayLabel(coerceTextvormForPlatform(platform, contentTextvorm))} />
+          )}
+        </MetaSection>
+      ) : null}
 
       {hasObjectives && (
         <MetaSection label="Doel" collapsible={false}>

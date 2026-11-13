@@ -105,6 +105,7 @@ export function ArticleFeedbackPage() {
   const [editor, setEditor] = useState<string | null>(null)
   const [imageRatio, setImageRatio] = useState('square')
   const [platform, setPlatform] = useState('Linkedin')
+  const [contentTextvorm, setContentTextvorm] = useState('post')
   const [objective, setObjective] = useState<string | null>(null)
 
   /** Word-model: wijzigingen 1x berekend uit de review-edit, daarna alleen statusflips. */
@@ -144,6 +145,7 @@ export function ArticleFeedbackPage() {
       ),
     )
     setPlatform(article.platform)
+    setContentTextvorm(article.contentTextvorm ?? 'post')
     setObjective(article.objective ?? null)
     setImageUrlSquare((prev) => {
       const next = article.imageUrlSquare?.trim()
@@ -464,6 +466,7 @@ export function ArticleFeedbackPage() {
       editor,
       imageRatio,
       platform,
+      contentTextvorm,
       objective,
     }
   }
@@ -889,6 +892,7 @@ export function ArticleFeedbackPage() {
           editor={editor}
           imageRatio={imageRatio}
           platform={platform}
+          contentTextvorm={contentTextvorm}
           toneSuggested={article.toneSuggested}
           editorSuggested={article.editorSuggested}
           imageRatioSuggested={article.imageRatioSuggested}
@@ -897,6 +901,7 @@ export function ArticleFeedbackPage() {
           onEditorChange={setEditor}
           onImageRatioChange={setImageRatio}
           onPlatformChange={setPlatform}
+          onContentTextvormChange={setContentTextvorm}
           objective={objective}
           objectiveSuggested={article.objectiveSuggested}
           objectiveOptions={article.objectiveOptions}

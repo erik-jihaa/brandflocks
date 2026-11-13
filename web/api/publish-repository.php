@@ -1034,6 +1034,12 @@ function ce_publish_article_destinations(PDO $pdo, string $slotId): array
         return ['ok' => false, 'error' => ce_hba_self_review_unsupported_assumption_message()];
     }
 
+    require_once __DIR__ . '/channel-copy-constraints.php';
+    $channelHard = ce_channel_hard_validation_for_article_row($row);
+    if ($channelHard !== []) {
+        return ['ok' => false, 'error' => ce_channel_hard_validation_error_message($channelHard)];
+    }
+
     $existingPostId = trim((string) ($row['social_post_id'] ?? ''));
     $destinations = [];
     $cmsKind = ce_client_website_cms_kind($pdo, $clientId);

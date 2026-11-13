@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AgendaCalendar } from '../components/AgendaCalendar'
+import { AgendaCampaignList } from '../components/AgendaCampaignList'
 import { AgendaPortfolioSignals } from '../components/AgendaPortfolioSignals'
+import { AgendaViewFilters } from '../components/AgendaViewFilters'
 import { ActionNotice } from '../components/ui/ActionNotice'
 import { useActionNotice } from '../hooks/useActionNotice'
 import { GridShell } from '../layout/GridShell'
@@ -26,7 +28,15 @@ import {
   parseWeekNumber,
   todayIso,
 } from '../utils/agendaDates'
-import { listAgendaGroups, mondayOfIso, upcomingMondaysFrom } from '../utils/agendaCalendarGrid'
+import { flattenAgendaRows, listAgendaGroups, mondayOfIso, upcomingMondaysFrom } from '../utils/agendaCalendarGrid'
+import {
+  AGENDA_CHANNEL_ALL,
+  AGENDA_MONTH_ALL,
+  agendaChannelOptions,
+  agendaMonthOptions,
+  filterAgendaWeekGroups,
+  type AgendaGroupMode,
+} from '../utils/agendaFilters'
 import type { AgendaRowDto } from '../types/api'
 
 type AgendaWeekHeaderProps = {
@@ -81,6 +91,9 @@ export function AgendaPage() {
   const [busySlotId, setBusySlotId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  const [groupMode, setGroupMode] = useState<AgendaGroupMode>('campaign')
+  const [channel, setChannel] = useState(AGENDA_CHANNEL_ALL)
+  const [monthKey, setMonthKey] = useState(AGENDA_MONTH_ALL)
 
   useEffect(() => {
     const state = location.state as {
@@ -110,6 +123,22 @@ export function AgendaPage() {
     () => (agenda ? listAgendaGroups(agenda.groups, horizonMondays) : []),
     [agenda, horizonMondays],
   )
+  const filteredListGroups = useMemo(
+    () =>
+      filterAgendaWeekGroups(listGroups, channel, monthKey, {
+        keepEmptyWeeks: channel === AGENDA_CHANNEL_ALL,
+      }),
+    [listGroups, channel, monthKey],
+  )
+  const filteredListRows = useMemo(
+    () => flattenAgendaRows(filteredListGroups),
+    [filteredListGroups],
+  )
+  const channelOptions = useMemo(
+    () => agendaChannelOptions(flattenAgendaRows(listGroups)),
+    [listGroups],
+  )
+  const monthOptions = useMemo(() => agendaMonthOptions(listGroups), [listGroups])
 
   async function handleAction(
     slotId: string,
@@ -236,6 +265,17 @@ export function AgendaPage() {
             </button>
           </div>
 
+          <AgendaViewFilters
+            groupMode={groupMode}
+            onGroupMode={setGroupMode}
+            channel={channel}
+            onChannel={setChannel}
+            channels={channelOptions}
+            month={monthKey}
+            onMonth={setMonthKey}
+            months={monthOptions}
+          />
+
           {view === 'calendar' ? (
             <>
               <AgendaPortfolioSignals signals={agenda.portfolioSignals ?? []} />
@@ -245,6 +285,9 @@ export function AgendaPage() {
                 horizonWeeks={planningHorizonWeeks}
                 today={todayIso()}
                 busySlotId={busySlotId}
+                groupMode={groupMode}
+                channel={channel}
+                monthKey={monthKey}
                 onSchedule={handleSchedule}
                 onArchive={(row) => handleCalendarAction(row, 'archive')}
                 onDelete={(row) => handleCalendarAction(row, 'delete')}
@@ -252,7 +295,21 @@ export function AgendaPage() {
             </>
           ) : null}
 
-          {view === 'list' && listGroups.map((group) => {
+          {view === 'list' && groupMode === 'campaign' ? (
+            <AgendaCampaignList
+              rows={filteredListRows}
+              busySlotId={busySlotId}
+              onAction={(row, action) => {
+                void handleAction(row.slotId, row.title, action, row.articleId)
+              }}
+            />
+          ) : null}
+
+          {view === 'list' && groupMode === 'date' && filteredListGroups.length === 0 ? (
+            <p className="m-0 text-[14px] leading-[18px] text-ce-beige">Geen posts voor deze filters.</p>
+          ) : null}
+
+          {view === 'list' && groupMode === 'date' && filteredListGroups.map((group) => {
             const weekNumber = group.weekNumber ?? parseWeekNumber(group.week)
             const dimmed = isPastAgendaWeek(weekNumber, currentWeek)
             const weekCampaigns = agendaCampaignTitles(group.rows)

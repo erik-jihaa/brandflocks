@@ -1042,6 +1042,9 @@ function ce_format_article_row(array $row, int $openFeedbackCount = 0): array
     $editor = trim((string) ($row['editor_final'] ?? $row['editor_suggested'] ?? ''));
     $editorSuggested = trim((string) ($row['editor_suggested'] ?? ''));
 
+    require_once __DIR__ . '/channel-copy-constraints.php';
+    $channelHardIssues = ce_channel_hard_validation_for_article_row($row);
+
     return [
         'id' => $row['id'],
         'slotId' => $row['slot_id'],
@@ -1063,6 +1066,14 @@ function ce_format_article_row(array $row, int $openFeedbackCount = 0): array
         'imageRatioSuggested' => ce_image_ratio_to_ui($row['image_ratio_suggested'] ?? null),
         'platform' => ce_platform_to_ui($row['platform_final'] ?? $row['platform_suggested'] ?? null),
         'platformSuggested' => ce_platform_to_ui($row['platform_suggested'] ?? null),
+        'contentTextvorm' => (function () use ($row, $platformKey) {
+            require_once __DIR__ . '/channel-copy-constraints.php';
+            $stored = trim((string) ($row['content_textvorm'] ?? ''));
+
+            return $stored !== ''
+                ? ce_normalize_textvorm($stored)
+                : ce_default_textvorm_for_platform($platformKey);
+        })(),
         'hashtagsSuggested' => trim((string) ($row['hashtags_suggested'] ?? '')),
         'selfReview' => ce_parse_self_review($row['self_review'] ?? null),
         'imageUrlSquare' => ce_optional_url($row['image_url_square'] ?? null),
@@ -1077,6 +1088,7 @@ function ce_format_article_row(array $row, int $openFeedbackCount = 0): array
         'slotStatus' => ce_status_to_ui($row['slot_status'] ?? null),
         'articleStatus' => ce_status_to_ui($row['status'] ?? null),
         'wordpressPostId' => ce_wordpress_post_id_from_row($row),
+        'channelHardIssues' => $channelHardIssues,
     ];
 }
 

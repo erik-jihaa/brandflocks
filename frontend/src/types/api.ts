@@ -105,6 +105,8 @@ export type ArticleDto = {
   editor?: string | null
   imageRatio: string
   platform: string
+  /** Kanaaltekstvorm (DB-sleutel: post, artikel, promotie, …) */
+  contentTextvorm?: string
   toneSuggested?: string
   toneOptions?: string[]
   editorSuggested?: string | null
@@ -132,6 +134,8 @@ export type ArticleDto = {
   mailSent?: boolean
   mailWarning?: string | null
   aiReviewWarning?: string | null
+  /** Harde kanaalgrenzen (tekens, hashtags) — addendum §3/§7. */
+  channelHardIssues?: string[]
   wordpressPostId?: string | null
   publications?: PublicationDto[]
   reviewMode?: ReviewMode | 'hba' | 'none'
@@ -174,6 +178,7 @@ export type ArticleSavePayload = {
   editor?: string | null
   imageRatio: string
   platform: string
+  contentTextvorm?: string
   objective?: string | null
   hbaContentrolOverride?: string | null
 }

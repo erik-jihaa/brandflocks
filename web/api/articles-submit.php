@@ -64,6 +64,17 @@ if (ce_hba_article_self_review_blocks_flow($row['self_review'] ?? null)) {
     ce_json_error(ce_hba_self_review_unsupported_assumption_message(), 400);
 }
 
+require_once __DIR__ . '/channel-copy-constraints.php';
+$channelHard = ce_channel_hard_validation_for_article_row(
+    $row,
+    isset($body['headline']) ? (string) $body['headline'] : null,
+    isset($body['content']) ? (string) $body['content'] : null,
+    isset($body['hashtags']) ? (string) $body['hashtags'] : null,
+);
+if ($channelHard !== []) {
+    ce_json_error(ce_channel_hard_validation_error_message($channelHard), 400);
+}
+
 $clientId = isset($row['client_id']) ? (string) $row['client_id'] : ce_client_id_for_slot($pdo, $slotId);
 $publishMode = ce_client_publish_mode($pdo, $clientId);
 

@@ -31,7 +31,7 @@ if (!str_contains($merkLines[0], 'geen verkooptaal')) {
 }
 
 $li = ce_channel_copy_constraint_line('linkedin', 'post');
-if ($li === '' || !str_contains($li, 'LinkedIn-post')) {
+if ($li === '' || !str_contains($li, 'professioneel relevante observatie')) {
     fail('linkedin post constraint');
 }
 $ig = ce_channel_copy_constraint_line('instagram', null);
