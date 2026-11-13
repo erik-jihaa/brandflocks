@@ -72,7 +72,7 @@ if ($slotId !== '' && preg_match('/^[0-9a-f-]{36}$/i', $slotId)) {
 }
 
 if ($campaignId === '' && $titleLike !== '' && ce_table_exists($pdo, 'campaigns')) {
-    $stmt = $pdo->prepare('SELECT id, title FROM campaigns WHERE title LIKE :q ORDER BY created_at DESC LIMIT 5');
+    $stmt = $pdo->prepare('SELECT id, title, preview_status FROM campaigns WHERE title LIKE :q ORDER BY created_at DESC LIMIT 20');
     $stmt->execute(['q' => '%' . $titleLike . '%']);
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     if ($matches === []) {
@@ -89,7 +89,8 @@ if ($campaignId === '' || !preg_match('/^[0-9a-f-]{36}$/i', $campaignId)) {
 }
 
 $slotsStmt = $pdo->prepare(
-    'SELECT id, theme, campaign_id, campaign_platform FROM content_slots WHERE campaign_id = :cid ORDER BY publish_date ASC, campaign_slot_index ASC'
+    'SELECT id, theme, campaign_id, campaign_platform, campaign_fase, campaign_slot_index, publish_date
+     FROM content_slots WHERE campaign_id = :cid ORDER BY publish_date ASC, campaign_slot_index ASC'
 );
 $slotsStmt->execute(['cid' => $campaignId]);
 $slotsBefore = $slotsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

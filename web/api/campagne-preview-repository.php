@@ -1035,8 +1035,11 @@ function ce_campagne_sync_slot_titles_for_campaign(PDO $pdo, string $campaignId)
             if (is_array($art)) {
                 $headline = trim((string) ($art['headline'] ?? ''));
                 $headlineHuman = trim((string) ($art['headline_human'] ?? ''));
-                $shouldSyncHeadline = $headlineHuman === ''
-                    && ($headline === '' || $headline === $oldTheme || preg_match('/\b1\/\d+\b/', $headline));
+                $looksLikeSlotLabel = $headline === ''
+                    || $headline === $oldTheme
+                    || preg_match('/\b\d+\/\d+\b/', $headline) === 1
+                    || str_contains(mb_strtolower($headline), 'acceptatie campagne');
+                $shouldSyncHeadline = $headlineHuman === '' && $looksLikeSlotLabel;
                 if ($shouldSyncHeadline) {
                     $pdo->prepare(
                         'UPDATE articles SET headline = :title WHERE id = :id'
