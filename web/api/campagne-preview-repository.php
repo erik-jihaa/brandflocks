@@ -889,8 +889,13 @@ function ce_campagne_soft_delete(PDO $pdo, string $campaignId, ?string $clientId
     }
 
     $scope = ce_client_scope_sql($pdo, 'campaigns', 'c', $clientId);
-    $stmt = $pdo->prepare('SELECT id FROM campaigns c WHERE c.id = :id' . $scope['sql'] . ' LIMIT 1');
-    $stmt->execute(array_merge(['id' => $campaignId], $scope['params']));
+    if ($clientId === null || $clientId === '') {
+        $stmt = $pdo->prepare('SELECT id FROM campaigns WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $campaignId]);
+    } else {
+        $stmt = $pdo->prepare('SELECT id FROM campaigns c WHERE c.id = :id' . $scope['sql'] . ' LIMIT 1');
+        $stmt->execute(array_merge(['id' => $campaignId], $scope['params']));
+    }
     if (!$stmt->fetchColumn()) {
         throw new RuntimeException('Campagne niet gevonden');
     }
