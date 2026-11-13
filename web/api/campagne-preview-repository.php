@@ -877,6 +877,59 @@ function ce_campagne_repair_campaign_slots(PDO $pdo, string $campaignId): void
 }
 
 /**
+ * Markeer campagne als verwijderd en archiveer gekoppelde slots + artikelen (niet hard delete).
+ *
+ * @return array{ok: true, campaignId: string, archivedSlotCount: int, previewStatus: string}
+ */
+function ce_campagne_soft_delete(PDO $pdo, string $campaignId, ?string $clientId = null): array
+{
+    ce_ensure_campagne_preview_schema($pdo);
+    if ($campaignId === '') {
+        throw new InvalidArgumentException('campaignId ontbreekt');
+    }
+
+    $scope = ce_client_scope_sql($pdo, 'campaigns', 'c', $clientId);
+    $stmt = $pdo->prepare('SELECT id FROM campaigns c WHERE c.id = :id' . $scope['sql'] . ' LIMIT 1');
+    $stmt->execute(array_merge(['id' => $campaignId], $scope['params']));
+    if (!$stmt->fetchColumn()) {
+        throw new RuntimeException('Campagne niet gevonden');
+    }
+
+    if (ce_table_has_column($pdo, 'campaigns', 'preview_status')) {
+        $pdo->prepare('UPDATE campaigns SET preview_status = :status WHERE id = :id')
+            ->execute(['status' => 'verwijderd', 'id' => $campaignId]);
+    }
+
+    require_once __DIR__ . '/slot-repository.php';
+    $slotArchived = ce_archive_status($pdo, 'content_slots');
+    $articleArchived = ce_archive_status($pdo, 'articles');
+
+    $slotStmt = $pdo->prepare('SELECT id FROM content_slots WHERE campaign_id = :cid');
+    $slotStmt->execute(['cid' => $campaignId]);
+    $slotIds = [];
+    foreach ($slotStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $sid = trim((string) ($row['id'] ?? ''));
+        if ($sid !== '') {
+            $slotIds[] = $sid;
+        }
+    }
+
+    foreach ($slotIds as $slotId) {
+        $pdo->prepare('UPDATE content_slots SET status = :status WHERE id = :id')
+            ->execute(['status' => $slotArchived, 'id' => $slotId]);
+        $pdo->prepare('UPDATE articles SET status = :status WHERE slot_id = :slot_id')
+            ->execute(['status' => $articleArchived, 'slot_id' => $slotId]);
+    }
+
+    return [
+        'ok' => true,
+        'campaignId' => $campaignId,
+        'archivedSlotCount' => count($slotIds),
+        'previewStatus' => 'verwijderd',
+    ];
+}
+
+/**
  * Berekent weergavetitel voor campagne-slot (o.a. LinkedIn 2/6) op basis van volgorde per platform.
  */
 function ce_campagne_resolve_slot_title(PDO $pdo, array $slotRow): string
