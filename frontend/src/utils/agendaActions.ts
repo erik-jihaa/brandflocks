@@ -29,16 +29,34 @@ export function agendaCampaignTitles(rows: AgendaRowDto[]): string[] {
 }
 
 export function agendaRowDisplayTitle(row: AgendaRowDto): string {
+  const slotTitle = (row.title ?? '').trim()
+  if (row.campaignId && slotTitle !== '' && slotTitle !== 'Untitled') {
+    return slotTitle
+  }
   if (row.campaignId) {
     const parts = nonemptyParts([row.campaignTitle, row.campaignFaseLabel, row.platform])
     if (parts.length > 0) return parts.join(' — ')
   }
-  return row.title
+  return slotTitle || 'Untitled'
 }
 
-/** Kalendercel: fase en kanaal; campagnenaam staat erboven. */
+/** Kalendercel: fase en kanaal (of volledige slot-titel); campagnenaam staat erboven. */
 export function agendaCampaignCellTitle(row: AgendaRowDto): string {
   if (!row.campaignId) return agendaRowDisplayTitle(row)
+  const slotTitle = (row.title ?? '').trim()
+  if (slotTitle !== '' && slotTitle !== 'Untitled') {
+    const campaign = (row.campaignTitle ?? '').trim()
+    if (campaign !== '' && slotTitle.startsWith(campaign)) {
+      const rest = slotTitle.slice(campaign.length).replace(/^\s*[—–-]\s*/, '').trim()
+      if (rest !== '') return rest
+    }
+    const platformIndex = slotTitle.match(/\b(Linkedin|Instagram|Facebook|X|Blog)\s+\d+\/\d+\b/i)
+    if (platformIndex) {
+      const fase = (row.campaignFaseLabel ?? '').trim()
+      return fase ? `${fase} · ${platformIndex[0]}` : platformIndex[0]
+    }
+    return slotTitle
+  }
   const parts = nonemptyParts([row.campaignFaseLabel, row.platform])
   return parts.length > 0 ? parts.join(' · ') : agendaRowDisplayTitle(row)
 }

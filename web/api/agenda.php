@@ -177,7 +177,28 @@ foreach ($rows as $row) {
         ];
     }
 
-    $title = ce_article_headline($row) ?: ($row['theme'] ?: 'Untitled');
+    $theme = trim((string) ($row['theme'] ?? ''));
+    $campaignId = trim((string) ($row['slot_campaign_id'] ?? ''));
+    if ($campaignId !== '') {
+        require_once __DIR__ . '/campagne-preview-repository.php';
+        $resolved = ce_campagne_resolve_slot_title($pdo, [
+            'id' => (string) ($row['slot_id'] ?? ''),
+            'theme' => $theme,
+            'campaign_id' => $campaignId,
+            'campaign_platform' => trim((string) ($row['slot_campaign_platform'] ?? '')),
+            'campaign_fase' => trim((string) ($row['slot_campaign_fase'] ?? '')),
+            'publish_date' => trim((string) ($row['slot_publish_date'] ?? '')),
+        ]);
+        if ($theme !== '') {
+            $title = $theme;
+        } elseif ($resolved !== '') {
+            $title = $resolved;
+        } else {
+            $title = ce_article_headline($row) ?: 'Untitled';
+        }
+    } else {
+        $title = ce_article_headline($row) ?: ($theme !== '' ? $theme : 'Untitled');
+    }
     $openFeedbackCount = (int) ($row['open_feedback_count'] ?? 0);
     $articleStatus = ce_status_to_ui($row['article_status'] ?? null);
     $slotStatus = ce_status_to_ui($row['slot_status'] ?? null);
