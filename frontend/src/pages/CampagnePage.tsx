@@ -20,6 +20,7 @@ import {
 } from '../design/identity.constants'
 import { scheduleAgendaSlot } from '../api/agenda'
 import { PlanReview, type PlanReviewSectionKey } from './CampagnePlanReview'
+import { PeriodAgendaOverview } from '../components/PeriodAgendaOverview'
 import { ApiError, isApiConfigured } from '../api/client'
 import {
   CAMPAGNE_TEMPLATE_FALLBACKS,
@@ -1089,6 +1090,11 @@ export function CampagnePage() {
                 />
               </div>
             )}
+            <PeriodAgendaOverview
+              startDate={form.startDate}
+              endDate={form.endDate}
+              className="mt-[18px]"
+            />
           </>
         )}
 

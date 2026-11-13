@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FieldSingle } from '../components/ui/Field'
 import { Pulldown } from '../components/ui/Pulldown'
 import { PillButton } from '../components/PillButton'
 import { ActionLink } from '../components/ui/ActionLink'
 import { LIST_SECTION } from '../layout/grid.constants'
+import { ChannelFilterBar } from '../components/ChannelFilterBar'
+import { AGENDA_CHANNEL_ALL, matchesChannelKey, periodChannelOptions } from '../utils/agendaFilters'
 import { designStackClass, pillActionsRowInnerClass } from '../design/identity.constants'
 import {
   CAMPAGNE_MERK_ONDERDELEN,
@@ -122,6 +124,15 @@ export function PlanReview({
   onMerkOnderdeel: (slotId: string, merkOnderdeel: string | null) => void
   onChoice: (body: PlanChoiceBody, recheck: boolean) => void
 }) {
+  const [planChannel, setPlanChannel] = useState(AGENDA_CHANNEL_ALL)
+  const visibleSlots = useMemo(
+    () =>
+      slots.filter((slot) =>
+        matchesChannelKey(planChannel, slot.platform, slot.platformKey),
+      ),
+    [slots, planChannel],
+  )
+
   if (!planReady) {
     return null
   }
@@ -202,8 +213,21 @@ export function PlanReview({
         onEdit={onEditSection ? () => onEditSection('campaign') : undefined}
       />
       {slots.length === 0 ? null : (
+        <>
+          <ChannelFilterBar
+            channel={planChannel}
+            onChannel={setPlanChannel}
+            channels={periodChannelOptions()}
+            className="mb-[8px]"
+          />
+          <p className={`${hintClass} mb-[8px]`}>
+            Alleen overzicht — filtert wat je ziet; datum en kanaal per thema pas je hieronder nog aan.
+          </p>
+          {visibleSlots.length === 0 ? (
+            <p className={hintClass}>Geen thema&apos;s op dit kanaal in het plan.</p>
+          ) : null}
         <ul className={`m-0 list-none p-0 ${LIST_SECTION.bodyStackClass}`}>
-          {slots.map((slot) => {
+          {visibleSlots.map((slot) => {
             const ankerTekst = slot.anker?.tekst || slot.anker?.vraag || slot.anker?.formulering
             const currentLabel = merkOnderdeelLabel(slot.merkOnderdeel ?? null) ?? '(fase)'
             const oordeel = (planCheck?.postOordelen ?? []).find((item) => item.slotId === slot.slotId)
@@ -266,6 +290,7 @@ export function PlanReview({
             )
           })}
         </ul>
+        </>
       )}
 
       <SectionHeader

@@ -34,6 +34,8 @@ import {
 } from '../utils/hbaHintApply'
 import { ARTICLE_COLUMN_WIDTH } from '../layout/grid.constants'
 import { ThemeStartPanel, isThemeStartArticle } from '../components/ThemeStartPanel'
+import { PeriodAgendaOverview } from '../components/PeriodAgendaOverview'
+import { addDaysIso, mondayOfIso } from '../utils/agendaCalendarGrid'
 
 export function ArticlePage() {
   const navigate = useNavigate()
@@ -109,6 +111,13 @@ export function ArticlePage() {
   const hbaAutoScoreAttemptedFor = useRef<string | null>(null)
   const articleSyncFingerprint = useRef('')
   const articleSyncArticleId = useRef<string | null>(null)
+
+  const articlePeriodRange = useMemo(() => {
+    const raw = (article?.publishDate ?? '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null
+    const start = mondayOfIso(raw) ?? raw
+    return { start, end: addDaysIso(start, 13) }
+  }, [article?.publishDate])
 
   useEffect(() => {
     if (!article || article.themeOnly || writing) return
@@ -1159,6 +1168,16 @@ export function ArticlePage() {
         </>
       }
       meta={
+        <>
+          {articlePeriodRange ? (
+            <PeriodAgendaOverview
+              startDate={articlePeriodRange.start}
+              endDate={articlePeriodRange.end}
+              highlightSlotId={slotId ?? null}
+              title="Planning in deze periode"
+              className="mb-[18px]"
+            />
+          ) : null}
         <ArticleMetaSidebar
           rationale={article.rationale}
           tone={tone}
@@ -1212,6 +1231,7 @@ export function ArticlePage() {
           positioningBrandGoal={article.positioningBrandGoal ?? null}
           hideHbaContentrol={article.hideHbaContentrol ?? false}
         />
+        </>
       }
     />
   )

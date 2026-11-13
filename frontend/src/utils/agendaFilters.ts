@@ -91,6 +91,47 @@ export function filterAgendaWeekGroups(
 
 export type AgendaChannelOption = { key: string; label: string }
 
+/** §9 — vaste set in periode-stappen (geen dynamische kanalen). */
+export function periodChannelOptions(): AgendaChannelOption[] {
+  return [
+    { key: AGENDA_CHANNEL_ALL, label: 'Alle kanalen' },
+    { key: 'linkedin', label: 'LinkedIn' },
+    { key: 'instagram', label: 'Instagram' },
+  ]
+}
+
+export function matchesChannelKey(
+  channel: string,
+  platform: string | null | undefined,
+  platformKey?: string | null,
+): boolean {
+  if (channel === AGENDA_CHANNEL_ALL || channel === '') return true
+  const key = agendaPlatformKey(platformKey ?? platform)
+  return key === channel
+}
+
+function rowPublishSortKey(row: AgendaRowDto): string {
+  return `${row.publishDate ?? '9999-12-31'} ${row.publishTime ?? ''} ${row.slotId}`
+}
+
+export function agendaRowsInIsoRange(
+  rows: AgendaRowDto[],
+  startIso: string,
+  endIso: string,
+): AgendaRowDto[] {
+  const start = startIso.trim()
+  const end = endIso.trim()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) return []
+  const lo = start <= end ? start : end
+  const hi = start <= end ? end : start
+  return rows
+    .filter((row) => {
+      const d = (row.publishDate ?? '').trim()
+      return /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= lo && d <= hi
+    })
+    .sort((a, b) => rowPublishSortKey(a).localeCompare(rowPublishSortKey(b)))
+}
+
 export function agendaChannelOptions(rows: AgendaRowDto[]): AgendaChannelOption[] {
   const seen = new Set<string>()
   const extras: AgendaChannelOption[] = []
