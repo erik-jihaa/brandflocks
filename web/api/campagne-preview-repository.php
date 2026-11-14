@@ -130,6 +130,9 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
         ['content_slots', 'campaign_merk_onderdeel', 'ALTER TABLE content_slots ADD COLUMN campaign_merk_onderdeel VARCHAR(64) NULL'],
         ['campaigns', 'plan_decisions_json', 'ALTER TABLE campaigns ADD COLUMN plan_decisions_json JSON NULL'],
         ['content_slots', 'campaign_instructie', 'ALTER TABLE content_slots ADD COLUMN campaign_instructie TEXT NULL'],
+        ['campaigns', 'calendar_color', 'ALTER TABLE campaigns ADD COLUMN calendar_color TINYINT NULL'],
+        ['campaigns', 'extra_thoughts', 'ALTER TABLE campaigns ADD COLUMN extra_thoughts TEXT NULL'],
+        ['campaigns', 'source_folder_id', 'ALTER TABLE campaigns ADD COLUMN source_folder_id CHAR(36) NULL'],
     ];
     foreach ($alters as [$table, $column, $sql]) {
         if (ce_table_exists($pdo, $table) && !ce_table_has_column($pdo, $table, $column)) {
@@ -143,6 +146,206 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
 
     ce_ensure_agenda_scheduling_schema($pdo);
     ce_ensure_headline_human_column($pdo);
+    ce_campagne_backfill_calendar_colors($pdo);
+}
+
+/** Bestaande campagnes krijgen de kleur die de agenda nu al toont (colorIndex % 3). */
+function ce_campagne_backfill_calendar_colors(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+
+    if (!ce_table_exists($pdo, 'campaigns') || !ce_table_has_column($pdo, 'campaigns', 'calendar_color')) {
+        return;
+    }
+    if (!ce_table_exists($pdo, 'content_slots') || !ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
+        return;
+    }
+
+    require_once __DIR__ . '/campagne-calendar-color.php';
+
+    try {
+        $clients = $pdo->query('SELECT DISTINCT client_id FROM campaigns')->fetchAll(PDO::FETCH_COLUMN);
+    } catch (Throwable) {
+        return;
+    }
+
+    $slotClient = ce_table_has_column($pdo, 'content_slots', 'client_id')
+        ? ' AND s.client_id = :client'
+        : '';
+
+    foreach ($clients as $clientId) {
+        $clientId = trim((string) $clientId);
+        if ($clientId === '') {
+            continue;
+        }
+        $stmt = $pdo->prepare(
+            'SELECT s.campaign_id
+             FROM content_slots s
+             INNER JOIN campaigns c ON c.id = s.campaign_id AND c.client_id = :client
+             WHERE COALESCE(s.status, \'\') NOT IN (\'archived\', \'archive\')
+               AND s.campaign_id IS NOT NULL'
+            . $slotClient
+            . ' ORDER BY s.phase_key ASC, s.theme ASC, s.id ASC'
+        );
+        $stmt->execute(['client' => $clientId]);
+        $ids = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $id) {
+            $ids[] = (string) $id;
+        }
+        $colors = ce_campagne_calendar_colors_for_row_order($ids);
+        $update = $pdo->prepare(
+            'UPDATE campaigns
+             SET calendar_color = :color
+             WHERE id = :id AND client_id = :client AND calendar_color IS NULL'
+        );
+        foreach ($colors as $id => $color) {
+            $update->execute(['color' => $color, 'id' => $id, 'client' => $clientId]);
+        }
+    }
+}
+
+function ce_campagne_normalize_source_url(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    if (!preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+
+    return $url;
+}
+
+/**
+ * @param list<mixed> $raw
+ * @return list<array{url: string, title: string}>
+ */
+function ce_campagne_normalize_link_sources(mixed $raw): array
+{
+    if (!is_array($raw)) {
+        return [];
+    }
+    $out = [];
+    $seen = [];
+    foreach ($raw as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        if (($item['kind'] ?? 'link') === 'file') {
+            continue;
+        }
+        $url = ce_campagne_normalize_source_url((string) ($item['url'] ?? ''));
+        if ($url === '' || isset($seen[$url])) {
+            continue;
+        }
+        $seen[$url] = true;
+        $title = trim((string) ($item['title'] ?? $item['label'] ?? ''));
+        if ($title === '') {
+            $title = $url;
+        }
+        $out[] = ['url' => $url, 'title' => $title];
+    }
+
+    return $out;
+}
+
+/** @return list<array{id: string, kind: string, label: string, url: string|null}> */
+function ce_campagne_sources_for_folder(PDO $pdo, ?string $folderId): array
+{
+    $folderId = trim((string) $folderId);
+    if ($folderId === '' || !ce_table_exists($pdo, 'sources') || !ce_table_has_column($pdo, 'sources', 'folder_id')) {
+        return [];
+    }
+    $stmt = $pdo->prepare(
+        'SELECT id, category, title, url FROM sources WHERE folder_id = :folder ORDER BY title ASC'
+    );
+    $stmt->execute(['folder' => $folderId]);
+    $items = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $category = (string) ($row['category'] ?? '');
+        $items[] = [
+            'id' => (string) ($row['id'] ?? ''),
+            'kind' => $category === 'document' ? 'file' : 'link',
+            'label' => trim((string) ($row['title'] ?? '')) ?: trim((string) ($row['url'] ?? '')),
+            'url' => trim((string) ($row['url'] ?? '')) ?: null,
+        ];
+    }
+
+    return $items;
+}
+
+/**
+ * @param list<array{url: string, title: string}> $links
+ */
+function ce_campagne_sync_link_sources(
+    PDO $pdo,
+    string $campaignId,
+    string $clientId,
+    string $title,
+    array $links,
+    bool $ensureFolder = false,
+): ?string {
+    if (!ce_table_has_column($pdo, 'campaigns', 'source_folder_id')) {
+        return null;
+    }
+    require_once __DIR__ . '/source-folders-repository.php';
+    require_once __DIR__ . '/sources-repository.php';
+
+    $stmt = $pdo->prepare('SELECT source_folder_id FROM campaigns WHERE id = :id AND client_id = :client LIMIT 1');
+    $stmt->execute(['id' => $campaignId, 'client' => $clientId]);
+    $folderId = trim((string) ($stmt->fetchColumn() ?: ''));
+    if ($folderId === '' && ($links !== [] || $ensureFolder)) {
+        $folder = ce_create_source_folder($pdo, $title !== '' ? $title : 'Campagne', $clientId);
+        $folderId = trim((string) ($folder['id'] ?? ''));
+        if ($folderId !== '') {
+            $pdo->prepare('UPDATE campaigns SET source_folder_id = :folder WHERE id = :id AND client_id = :client')
+                ->execute(['folder' => $folderId, 'id' => $campaignId, 'client' => $clientId]);
+        }
+    }
+    if ($folderId === '') {
+        return null;
+    }
+
+    $existing = $pdo->prepare(
+        'SELECT id, url FROM sources WHERE folder_id = :folder AND category = :category'
+    );
+    $existing->execute(['folder' => $folderId, 'category' => 'url_rss']);
+    $byUrl = [];
+    foreach ($existing->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $url = ce_campagne_normalize_source_url((string) ($row['url'] ?? ''));
+        if ($url !== '') {
+            $byUrl[$url] = (string) ($row['id'] ?? '');
+        }
+    }
+    $keep = [];
+    foreach ($links as $link) {
+        $keep[$link['url']] = true;
+        if (isset($byUrl[$link['url']])) {
+            continue;
+        }
+        try {
+            ce_create_source($pdo, 'url_rss', [
+                'title' => $link['title'],
+                'url' => $link['url'],
+                'folderId' => $folderId,
+            ]);
+        } catch (Throwable) {
+            // Bron niet aangemaakt — de campagne zelf blijft staan.
+        }
+    }
+    foreach ($byUrl as $url => $sourceId) {
+        if (!isset($keep[$url]) && $sourceId !== '') {
+            $pdo->prepare('DELETE FROM sources WHERE id = :id AND folder_id = :folder AND category = :category')
+                ->execute(['id' => $sourceId, 'folder' => $folderId, 'category' => 'url_rss']);
+        }
+    }
+
+    return $folderId;
 }
 
 /** @return array<string, int> */
@@ -183,7 +386,7 @@ function ce_campagne_preview_normalize_channels(mixed $raw): array
 }
 
 /** @param array<string, mixed> $row */
-function ce_campagne_preview_map_campaign(array $row, int $slotCount = 0): array
+function ce_campagne_preview_map_campaign(array $row, int $slotCount = 0, ?PDO $pdo = null): array
 {
     $channels = [];
     $raw = $row['channels_json'] ?? null;
@@ -235,6 +438,14 @@ function ce_campagne_preview_map_campaign(array $row, int $slotCount = 0): array
             ce_campagne_preview_json_ids_from_row($row, 'merk_onderdelen_json'),
         ),
         'planDecisions' => ce_campagne_preview_plan_decisions_from_row($row),
+        'calendarColor' => array_key_exists('calendar_color', $row) && $row['calendar_color'] !== null && $row['calendar_color'] !== ''
+            ? (int) $row['calendar_color']
+            : null,
+        'extraThoughts' => trim((string) ($row['extra_thoughts'] ?? '')),
+        'sourceFolderId' => trim((string) ($row['source_folder_id'] ?? '')) ?: null,
+        'sources' => $pdo instanceof PDO
+            ? ce_campagne_sources_for_folder($pdo, isset($row['source_folder_id']) ? (string) $row['source_folder_id'] : null)
+            : [],
     ];
 }
 
@@ -373,7 +584,7 @@ SQL;
     $stmt->execute($scope['params']);
     $items = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $items[] = ce_campagne_preview_map_campaign($row, (int) ($row['slot_count'] ?? 0));
+        $items[] = ce_campagne_preview_map_campaign($row, (int) ($row['slot_count'] ?? 0), $pdo);
     }
 
     return $items;
@@ -449,7 +660,7 @@ function ce_campagne_preview_fetch(PDO $pdo, string $campaignId, ?string $client
     }
 
     return [
-        'campaign' => ce_campagne_preview_map_campaign($row, count($slots)),
+        'campaign' => ce_campagne_preview_map_campaign($row, count($slots), $pdo),
         'slots' => $slots,
         'availableGeoQuestions' => ce_fetch_llm_questions($pdo, $clientId, 'geo'),
     ];
@@ -497,6 +708,13 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
     $feitIds = $body['feitIds'] ?? $body['feit_ids'] ?? null;
     $merkOnderdelen = ce_campagne_normalize_merk_onderdelen($body['merkOnderdelen'] ?? $body['merk_onderdelen'] ?? []);
     $forceAllAnkers = filter_var($body['forceAllAnkers'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    require_once __DIR__ . '/campagne-calendar-color.php';
+    $calendarColor = null;
+    if (array_key_exists('calendarColor', $body) || array_key_exists('calendar_color', $body)) {
+        $calendarColor = ce_campagne_normalize_calendar_color($body['calendarColor'] ?? $body['calendar_color']);
+    }
+    $extraThoughts = trim((string) ($body['extraThoughts'] ?? $body['extra_thoughts'] ?? ''));
+    $linkSources = ce_campagne_normalize_link_sources($body['sources'] ?? []);
 
     $explicitClient = trim((string) ($body['clientId'] ?? $body['client_id'] ?? ''));
     $clientId = ce_resolve_client_id($pdo, $explicitClient !== '' ? $explicitClient : ce_default_client_id($pdo));
@@ -573,6 +791,16 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
             $vals[] = ':merk_onderdelen_json';
             $params['merk_onderdelen_json'] = json_encode($merkOnderdelen, JSON_THROW_ON_ERROR);
         }
+        if ($calendarColor !== null && ce_table_has_column($pdo, 'campaigns', 'calendar_color')) {
+            $cols[] = 'calendar_color';
+            $vals[] = ':calendar_color';
+            $params['calendar_color'] = $calendarColor;
+        }
+        if (ce_table_has_column($pdo, 'campaigns', 'extra_thoughts')) {
+            $cols[] = 'extra_thoughts';
+            $vals[] = ':extra_thoughts';
+            $params['extra_thoughts'] = $extraThoughts !== '' ? $extraThoughts : null;
+        }
 
         $pdo->prepare(
             'INSERT INTO campaigns (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $vals) . ')'
@@ -596,6 +824,16 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
     } catch (Throwable $e) {
         $pdo->rollBack();
         throw $e;
+    }
+
+    $ensureFolder = $linkSources !== []
+        || filter_var($body['ensureSourceFolder'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    if ($ensureFolder) {
+        try {
+            ce_campagne_sync_link_sources($pdo, $campaignId, $clientId, $title, $linkSources, true);
+        } catch (Throwable) {
+            // Bronnenmap mag de campagne niet tegenhouden.
+        }
     }
 
     $productExtractResult = null;
@@ -1321,6 +1559,19 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
     $setDecision = is_array($body['planDecision'] ?? null);
     $setInstructie = is_array($body['slotInstructie'] ?? null);
     $recalculate = filter_var($body['recalculate'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $setColor = array_key_exists('calendarColor', $body) || array_key_exists('calendar_color', $body);
+    $setThoughts = array_key_exists('extraThoughts', $body) || array_key_exists('extra_thoughts', $body);
+    $setSources = array_key_exists('sources', $body);
+    if ($setColor && ce_table_has_column($pdo, 'campaigns', 'calendar_color')) {
+        require_once __DIR__ . '/campagne-calendar-color.php';
+        $updates[] = 'calendar_color = :calendar_color';
+        $params['calendar_color'] = ce_campagne_normalize_calendar_color($body['calendarColor'] ?? $body['calendar_color']);
+    }
+    if ($setThoughts && ce_table_has_column($pdo, 'campaigns', 'extra_thoughts')) {
+        $thoughts = trim((string) ($body['extraThoughts'] ?? $body['extra_thoughts'] ?? ''));
+        $updates[] = 'extra_thoughts = :extra_thoughts';
+        $params['extra_thoughts'] = $thoughts !== '' ? $thoughts : null;
+    }
     if (array_key_exists('merkOnderdelen', $body) || array_key_exists('merk_onderdelen', $body)) {
         $onderdelen = ce_campagne_normalize_merk_onderdelen($body['merkOnderdelen'] ?? $body['merk_onderdelen'] ?? []);
         if (ce_table_has_column($pdo, 'campaigns', 'merk_onderdelen_json')) {
@@ -1328,7 +1579,7 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
             $params['merk_onderdelen_json'] = json_encode($onderdelen, JSON_THROW_ON_ERROR);
         }
     }
-    if ($updates === [] && !$reapplyPhases && !$setGeo && !$setBank && !$setSlotOnderdeel && !$setDecision && !$setInstructie && !$recalculate) {
+    if ($updates === [] && !$reapplyPhases && !$setGeo && !$setBank && !$setSlotOnderdeel && !$setDecision && !$setInstructie && !$recalculate && !$setSources) {
         return $existing;
     }
 
@@ -1338,7 +1589,11 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array_merge($params, $scope['params']));
         if ($stmt->rowCount() === 0) {
-            throw new RuntimeException('Campagne niet gevonden');
+            $check = $pdo->prepare('SELECT 1 FROM campaigns c WHERE c.id = :id' . $scope['sql'] . ' LIMIT 1');
+            $check->execute(array_merge(['id' => $campaignId], $scope['params']));
+            if (!$check->fetchColumn()) {
+                throw new RuntimeException('Campagne niet gevonden');
+            }
         }
     }
 
@@ -1398,6 +1653,15 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
 
     if ($setDecision) {
         ce_campagne_preview_store_plan_decision($pdo, $campaignId, $clientId, $body['planDecision']);
+    }
+
+    if ($setSources && $clientId !== null && $clientId !== '') {
+        $links = ce_campagne_normalize_link_sources($body['sources'] ?? []);
+        $title = trim((string) ($existing['campaign']['title'] ?? ''));
+        try {
+            ce_campagne_sync_link_sources($pdo, $campaignId, $clientId, $title, $links);
+        } catch (Throwable) {
+        }
     }
 
     $refreshed = ce_campagne_preview_fetch($pdo, $campaignId, $clientId);

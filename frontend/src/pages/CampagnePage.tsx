@@ -26,6 +26,7 @@ import {
   CAMPAGNE_TEMPLATE_FALLBACKS,
   CAMPAGNE_MERK_ONDERDELEN,
   archiveCampagnePreview,
+  checkCampagneSourceUrl,
   createCampagnePreview,
   deleteCampagnePreview,
   fetchCampagneBank,
@@ -47,19 +48,22 @@ import {
   type CampagnePhase,
   type CampagnePhasePlan,
   type CampagneTemplate,
+  type CampagneSourceDto,
   type CampagneTemplateKey,
 } from '../api/campagnePreview'
+import { createSource, createSourceFolder, uploadSourceDocument } from '../api/sources'
+import { CAMPAIGN_CALENDAR_COLOR_CLASSES } from '../utils/agendaFilters'
 
 const STEP_COPY: { title: string; question: string; hint: string }[] = [
   {
-    title: 'Soort',
-    question: 'Wat voor campagne wil je maken?',
-    hint: 'Kies Touch, Tell of Sell. De keuze gaat meteen verder.',
+    title: 'Touch, Tell of Sell',
+    question: 'Wat is het doel van deze campagne?',
+    hint: 'Je keuze bepaalt meteen de opbouw.',
   },
   {
-    title: 'Onderwerp',
-    question: 'Waar gaat het over?',
-    hint: 'Sell leest de productpagina. Tell heeft een vaste dag. Touch blijft licht.',
+    title: 'Titel',
+    question: 'Waar gaat de campagne over?',
+    hint: '',
   },
   {
     title: 'Vragen en feiten',
@@ -106,6 +110,12 @@ const TEMPLATE_PILL_LABELS: Record<CampagneTemplateKey, string> = {
 
 const MODE_ORDER: CampagneTemplateKey[] = ['touch', 'serie', 'lancering']
 
+const MODE_HINT: Record<CampagneTemplateKey, string> = {
+  touch: 'merk laten zien',
+  serie: 'uitleggen hoe het werkt',
+  lancering: 'activeren, verkopen',
+}
+
 function modeFromTemplate(key: string | null | undefined): CampagneTemplateKey {
   if (key === 'serie' || key === 'tell') return 'serie'
   if (key === 'touch') return 'touch'
@@ -129,6 +139,9 @@ type FormState = {
   merkOnderdelen: string[]
   /** Alleen afwijkingen t.o.v. het sjabloon per fase-key */
   phaseMerkOnderdeel: Record<string, string | null>
+  calendarColor: number | null
+  extraThoughts: string
+  sources: CampagneSourceDto[]
 }
 
 function isoDate(d: Date): string {
@@ -162,7 +175,32 @@ function emptyForm(geoQuestionIds: string[] = [], vraagIds: string[] = [], feitI
     feitIds,
     merkOnderdelen: [],
     phaseMerkOnderdeel: {},
+    calendarColor: null,
+    extraThoughts: '',
+    sources: [],
   }
+}
+
+const LIVE_CAMPAIGN_STATUSES = new Set(['concept', 'bevestigd', 'loopt'])
+
+function takenCalendarColors(
+  campaigns: { id: string; previewStatus: string; calendarColor?: number | null }[],
+  exceptId: string | null,
+): Set<number> {
+  const taken = new Set<number>()
+  for (const campaign of campaigns) {
+    if (exceptId && campaign.id === exceptId) continue
+    if (!LIVE_CAMPAIGN_STATUSES.has(campaign.previewStatus)) continue
+    if (typeof campaign.calendarColor === 'number') taken.add(campaign.calendarColor)
+  }
+  return taken
+}
+
+function firstFreeCalendarColor(taken: Set<number>): number {
+  for (let color = 0; color < CAMPAIGN_CALENDAR_COLOR_CLASSES.length; color += 1) {
+    if (!taken.has(color)) return color
+  }
+  return 0
 }
 
 function parseCount(raw: string): number {
@@ -343,6 +381,12 @@ export function CampagnePage() {
   const [editingPhaseKey, setEditingPhaseKey] = useState<string | null>(null)
   const [busyCampaignId, setBusyCampaignId] = useState<string | null>(null)
   const [missingWordsInput, setMissingWordsInput] = useState('')
+  const [sourceMode, setSourceMode] = useState<'link' | 'bestand'>('link')
+  const [sourceDraft, setSourceDraft] = useState('')
+  const [sourceDraftOk, setSourceDraftOk] = useState(false)
+  const [sourceNotice, setSourceNotice] = useState<string | null>(null)
+  const [pendingFiles, setPendingFiles] = useState<{ id: string; name: string; file: File }[]>([])
+  const colorTouched = useRef(false)
 
   const loadCatalog = useCallback(async () => {
     setLoading(true)
@@ -449,7 +493,11 @@ export function CampagnePage() {
             ? campaign.merkOnderdelen
             : [...CAMPAGNE_MERK_ONDERDELEN],
         phaseMerkOnderdeel: { ...(campaign.phasePlan?.merkOnderdeelByKey ?? {}) },
+        calendarColor: typeof campaign.calendarColor === 'number' ? campaign.calendarColor : null,
+        extraThoughts: campaign.extraThoughts ?? '',
+        sources: campaign.sources ?? [],
       })
+      colorTouched.current = typeof campaign.calendarColor === 'number'
     } catch (err) {
       if (seq !== hydrateSeq.current) return
       setError(errorMessage(err))
@@ -495,6 +543,15 @@ export function CampagnePage() {
   /** Actieve campagne uit URL (bestaand) of state na Maak plan op /nieuw → redirect. */
   const activeCampaignId = routeId ?? (isNewWizardRoute ? null : campaignId)
   const canEditWizard = previewStatus === 'concept'
+
+  useEffect(() => {
+    if (colorTouched.current || isOverview) return
+    const taken = takenCalendarColors(campaigns, activeCampaignId)
+    if (form.calendarColor !== null && !taken.has(form.calendarColor)) return
+    const next = firstFreeCalendarColor(taken)
+    if (form.calendarColor === next) return
+    setForm((prev) => ({ ...prev, calendarColor: next }))
+  }, [campaigns, form.calendarColor, isOverview, activeCampaignId])
   const planReady = activeCampaignId != null && slots.length > 0
 
   function trackRemovedBankId(kind: 'vraag' | 'feit', id: string) {
@@ -603,7 +660,33 @@ export function CampagnePage() {
     }
   }
 
+  async function persistWizardMeta(): Promise<boolean> {
+    if (!activeCampaignId || !canEditWizard || (step !== 1 && step !== 2)) return true
+    try {
+      const detail = await patchCampagnePreview(activeCampaignId, {
+        ...(form.calendarColor !== null ? { calendarColor: form.calendarColor } : {}),
+        extraThoughts: form.extraThoughts,
+        sources: form.sources
+          .filter((item) => item.kind === 'link' && item.url)
+          .map((item) => ({ url: item.url ?? '', title: item.label, kind: 'link' })),
+      })
+      if (detail.campaign?.sources) {
+        setForm((prev) => ({ ...prev, sources: detail.campaign?.sources ?? prev.sources }))
+      }
+      return true
+    } catch (err) {
+      setError(errorMessage(err))
+      return false
+    }
+  }
+
   async function goNextStep() {
+    if (step === 1 || step === 2) {
+      setBusy(true)
+      const metaOk = await persistWizardMeta()
+      setBusy(false)
+      if (!metaOk) return
+    }
     if (step === 3) {
       const mergedFeiten = feitRowsWithCommaWords(missingWordsInput, draftFeitRows)
       if (missingWordsInput.trim() !== '') {
@@ -713,6 +796,7 @@ export function CampagnePage() {
   }
 
   function canContinue(current: number): boolean {
+    if (current === 1) return form.calendarColor !== null
     if (current === 2) return form.title.trim() !== ''
     if (current === 3) {
       const filledVragen = draftVraagRows.filter((r) => r.text.trim() !== '')
@@ -808,6 +892,40 @@ export function CampagnePage() {
     }
   }
 
+  async function addOrCheckSource() {
+    const raw = sourceDraft.trim()
+    if (raw === '') return
+    if (!sourceDraftOk) {
+      setBusy(true)
+      setSourceNotice(null)
+      try {
+        const checked = await checkCampagneSourceUrl(raw)
+        if (!checked.ok) {
+          setSourceNotice('Deze pagina is niet leesbaar.')
+          setSourceDraftOk(false)
+          return
+        }
+        setSourceDraft(checked.url)
+        setSourceDraftOk(true)
+        setSourceNotice(null)
+      } catch (err) {
+        setSourceNotice(errorMessage(err))
+      } finally {
+        setBusy(false)
+      }
+      return
+    }
+    const url = sourceDraft.trim()
+    setForm((prev) => ({
+      ...prev,
+      sources: prev.sources.some((item) => item.url === url)
+        ? prev.sources
+        : [...prev.sources, { id: `link-${Date.now()}`, kind: 'link', label: url, url }],
+    }))
+    setSourceDraft('')
+    setSourceDraftOk(false)
+  }
+
   async function makePlan() {
     if (!canContinue(7)) {
       setError(
@@ -837,7 +955,28 @@ export function CampagnePage() {
         vraagIds: form.vraagIds,
         feitIds: form.feitIds,
         merkOnderdelen: form.merkOnderdelen,
+        calendarColor: form.calendarColor ?? 0,
+        extraThoughts: form.extraThoughts,
+        sources: form.sources
+          .filter((item) => item.kind === 'link' && item.url)
+          .map((item) => ({ url: item.url ?? '', title: item.label, kind: 'link' })),
+        ensureSourceFolder: pendingFiles.length > 0,
       })
+      let folderId = created.campaign?.sourceFolderId ?? null
+      if (!folderId && pendingFiles.length > 0) {
+        const folder = await createSourceFolder(form.title.trim() || 'Campagne')
+        folderId = folder.id
+      }
+      for (const item of pendingFiles) {
+        if (!folderId) break
+        const source = await createSource({
+          category: 'Document',
+          title: item.name,
+          folderId,
+        })
+        await uploadSourceDocument(source.id, item.file)
+      }
+      setPendingFiles([])
       setCampaignId(created.campaignId)
       setSlots(created.slots ?? [])
       setPreviewStatus(created.campaign?.previewStatus ?? 'concept')
@@ -945,9 +1084,8 @@ export function CampagnePage() {
           <p className={stepLeadClass}>
             Stap {step} van 7 · {copy?.title}
           </p>
-          <h2 className={stepQuestionClass}>
-            {step === 2 ? `Waar gaat de ${modeLabel}-campagne over?` : copy?.question}
-          </h2>
+          <h2 className={stepQuestionClass}>{copy?.question}</h2>
+          {copy?.hint ? <p className={stepLeadClass}>{copy.hint}</p> : null}
           {step === 3 ? (
             <p className={stepLeadClass}>
               Merkonderdelen — de fases stellen voor, click cirkels aan om te selecteren.
@@ -956,30 +1094,73 @@ export function CampagnePage() {
         </div>
 
         {step === 1 && (
-          <Pulldown
-            options={MODE_ORDER.map((key) => TEMPLATE_PILL_LABELS[key])}
-            value={modeLabel}
-            onChange={(label) => {
-              const key = MODE_ORDER.find((item) => TEMPLATE_PILL_LABELS[item] === label)
-              if (!key) return
-              setForm((prev) => applyTemplateDefaults(prev, key))
-              setError(null)
-              navigate('/campagnes/nieuw/stap/2')
-            }}
-          />
+          <>
+            <div>
+              <p className={`${sectionTitleClass} mb-[8px]`}>Touch, Tell of Sell</p>
+              <Pulldown
+                options={MODE_ORDER.map((key) => `${TEMPLATE_PILL_LABELS[key]} — ${MODE_HINT[key]}`)}
+                value={`${modeLabel} — ${MODE_HINT[form.templateKey]}`}
+                onChange={(label) => {
+                  const key = MODE_ORDER.find((item) => label.startsWith(TEMPLATE_PILL_LABELS[item]))
+                  if (!key) return
+                  setForm((prev) => applyTemplateDefaults(prev, key))
+                  setError(null)
+                }}
+              />
+              <p className={`${hintClass} mt-[10px]`}>
+                Sell rekent als activatie en gebruikt de opbouw van een lancering. Tell en Touch rekenen als merkbouw
+                en gebruiken de opbouw van een reeks. De balanscheck op stap 7 gebruikt deze indeling.
+              </p>
+            </div>
+            <div>
+              <p className={`${sectionTitleClass} mb-[8px]`}>Kleur in de kalender</p>
+              <p className={hintClass}>Zo herken je deze campagne meteen tussen je losse artikelen.</p>
+              <div className="mt-[10px] flex gap-[10px]">
+                {CAMPAIGN_CALENDAR_COLOR_CLASSES.map((className, index) => {
+                  const taken = takenCalendarColors(campaigns, activeCampaignId).has(index)
+                  const selected = form.calendarColor === index
+                  return (
+                    <button
+                      key={className}
+                      type="button"
+                      aria-label={taken ? `Kleur ${index + 1}, al in gebruik` : `Kleur ${index + 1}`}
+                      aria-pressed={selected}
+                      className={`h-[28px] w-[28px] cursor-pointer rounded-full border-0 p-0 ${className} ${taken && !selected ? 'opacity-40' : ''} ${selected ? 'ring-2 ring-ce-black ring-offset-2' : ''}`}
+                      onClick={() => {
+                        colorTouched.current = true
+                        setForm((prev) => ({ ...prev, calendarColor: index }))
+                      }}
+                    />
+                  )
+                })}
+              </div>
+              <p className={`${hintClass} mt-[6px]`}>Vervaagde kleuren zijn al in gebruik bij een lopende campagne.</p>
+            </div>
+          </>
         )}
 
         {step === 2 && (
           <>
-            <FieldSingle
-              id="campagne-title"
-              variant="title"
-              showPencil
-              placeholderTone="blue"
-              value={form.title}
-              onChange={(title) => setForm((prev) => ({ ...prev, title }))}
-              placeholder={form.templateKey === 'serie' ? 'Naam van de serie' : 'Onderwerp van de campagne'}
-            />
+            <div>
+              <p className={`${sectionTitleClass} mb-[8px]`}>Onderwerp</p>
+              <FieldSingle
+                id="campagne-title"
+                variant="title"
+                showPencil
+                placeholderTone="blue"
+                value={form.title}
+                onChange={(title) => setForm((prev) => ({ ...prev, title }))}
+                placeholder="Thema"
+              />
+              <textarea
+                value={form.extraThoughts}
+                onChange={(event) => setForm((prev) => ({ ...prev, extraThoughts: event.target.value }))}
+                placeholder="Wat moet er in elk geval in staan, of juist niet?"
+                rows={3}
+                aria-label="Extra gedachten"
+                className="mt-[10px] w-full resize-y rounded-[8px] border border-ce-beige bg-transparent px-[10px] py-[8px] text-[14px] leading-[18px] text-ce-black outline-none"
+              />
+            </div>
             {form.templateKey === 'lancering' && sellFitHint ? (
               <p className={bodyClass}>{sellFitHint}</p>
             ) : null}
@@ -992,6 +1173,100 @@ export function CampagnePage() {
                 placeholderTone="black"
               />
             )}
+            <div>
+              <p className={`${sectionTitleClass} mb-[8px]`}>Bronnen voor deze campagne</p>
+              <p className={hintClass}>
+                Naast je vaste bronnen kun je hier bronnen toevoegen die alleen voor deze campagne gelden — meerdere
+                links, en documenten om te uploaden. Komt terecht in de automatische campagnemap bij Bronnen, samen met
+                de merkonderdelen en vragen hierboven. Bij een link checken we eerst of de pagina leesbaar is; de knop
+                wordt dan Toevoegen om &apos;m te bevestigen.
+              </p>
+              <ul className="m-0 mt-[10px] list-none p-0">
+                {form.sources.map((source) => (
+                  <li key={source.id} className="flex items-baseline justify-between gap-[12px] py-[6px]">
+                    <span className="min-w-0 text-[14px] leading-[18px] text-ce-black">{source.label}</span>
+                    <button
+                      type="button"
+                      className="shrink-0 cursor-pointer border-0 bg-transparent p-0 text-[14px] text-ce-blue"
+                      onClick={() => {
+                        setForm((prev) => ({
+                          ...prev,
+                          sources: prev.sources.filter((item) => item.id !== source.id),
+                        }))
+                        setPendingFiles((prev) => prev.filter((item) => item.id !== source.id))
+                      }}
+                    >
+                      Verwijder
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-[10px]">
+                <Pulldown
+                  options={['Link toevoegen', 'Bestand toevoegen']}
+                  value={sourceMode === 'link' ? 'Link toevoegen' : 'Bestand toevoegen'}
+                  onChange={(label) => {
+                    setSourceMode(label.startsWith('Bestand') ? 'bestand' : 'link')
+                    setSourceDraftOk(false)
+                    setSourceNotice(null)
+                  }}
+                />
+              </div>
+              {sourceMode === 'link' ? (
+                <div className="mt-[8px]">
+                  <input
+                    type="text"
+                    value={sourceDraft}
+                    placeholder="Plak een link..."
+                    aria-label="Link"
+                    onChange={(event) => {
+                      setSourceDraft(event.target.value)
+                      setSourceDraftOk(false)
+                      setSourceNotice(null)
+                    }}
+                    className="w-full border-0 border-b border-ce-beige bg-transparent px-0 py-[6px] text-[14px] leading-[18px] text-ce-black outline-none"
+                  />
+                  <div className="mt-[8px] flex flex-wrap items-center gap-[8px]">
+                    <PillButton
+                      type="button"
+                      variant="second"
+                      disabled={busy || sourceDraft.trim() === ''}
+                      onClick={() => void addOrCheckSource()}
+                    >
+                      {sourceDraftOk ? 'Toevoegen' : 'Controleren'}
+                    </PillButton>
+                    {sourceNotice ? <span className={hintClass}>{sourceNotice}</span> : null}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-[8px]">
+                  <label className="inline-flex cursor-pointer">
+                    <span className="rounded-full border border-ce-black px-[14px] py-[6px] text-[14px] text-ce-black">
+                      Bestand kiezen
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      className="sr-only"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0]
+                        event.target.value = ''
+                        if (!file) return
+                        const id = `file-${Date.now()}`
+                        setPendingFiles((prev) => [...prev, { id, name: file.name, file }])
+                        setForm((prev) => ({
+                          ...prev,
+                          sources: [...prev.sources, { id, kind: 'file', label: file.name, url: null }],
+                        }))
+                      }}
+                    />
+                  </label>
+                  <p className={`${hintClass} mt-[8px]`}>
+                    Opent de bestandskiezer van je computer. Accepteert PDF- en Worddocumenten.
+                  </p>
+                </div>
+              )}
+            </div>
           </>
         )}
 
@@ -1253,9 +1528,25 @@ export function CampagnePage() {
               Voer uit
             </PillButton>
           )}
-          {step > 1 && step < 7 && (
+          {step < 7 && (
             <PillButton variant="main" disabled={busy || !canContinue(step)} onClick={() => void goNextStep()}>
               Verder
+            </PillButton>
+          )}
+          {step === 1 && (
+            <PillButton
+              variant="second"
+              disabled={busy}
+              onClick={() => {
+                colorTouched.current = false
+                setForm((prev) => ({
+                  ...applyTemplateDefaults(prev, 'lancering'),
+                  calendarColor: null,
+                }))
+                setError(null)
+              }}
+            >
+              Ongedaan maken
             </PillButton>
           )}
           {step > 1 && (

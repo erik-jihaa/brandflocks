@@ -164,6 +164,17 @@ export type CampagnePreviewCampaign = {
   vraagIds?: string[]
   feitIds?: string[]
   merkOnderdelen?: string[]
+  calendarColor?: number | null
+  extraThoughts?: string
+  sourceFolderId?: string | null
+  sources?: CampagneSourceDto[]
+}
+
+export type CampagneSourceDto = {
+  id: string
+  kind: 'link' | 'file'
+  label: string
+  url: string | null
 }
 
 export type CampagnePreviewSlot = {
@@ -206,6 +217,10 @@ export type CampagnePreviewCreatePayload = {
   vraagIds?: string[]
   feitIds?: string[]
   merkOnderdelen?: string[]
+  calendarColor?: number
+  extraThoughts?: string
+  sources?: Array<{ url: string; title?: string; label?: string; kind?: string }>
+  ensureSourceFolder?: boolean
 }
 
 export type CampagnePreviewCreateResponse = CampagnePreviewDetail & {
@@ -249,6 +264,13 @@ export function saveCampagneBank(body: {
   return apiFetch('/campagne-preview/bank', {
     method: 'PATCH',
     body: JSON.stringify(body),
+  })
+}
+
+export function checkCampagneSourceUrl(url: string): Promise<{ ok: boolean; url: string }> {
+  return apiFetch('/campagne-preview/check-url', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
   })
 }
 
@@ -296,6 +318,9 @@ export function patchCampagnePreview(
       text?: string
       slotIds?: string[]
     }
+    calendarColor?: number
+    extraThoughts?: string
+    sources?: Array<{ url: string; title?: string; label?: string; kind?: string }>
   },
 ): Promise<CampagnePreviewDetail> {
   return apiFetch(`/campagne-preview/${id}`, {

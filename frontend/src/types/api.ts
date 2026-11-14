@@ -217,6 +217,8 @@ export type AgendaRowDto = {
   publishTime?: string | null
   campaignId?: string | null
   campaignTitle?: string | null
+  /** 0–3, opgeslagen kalenderkleur. */
+  campaignColor?: number | null
   campaignFaseKey?: string | null
   campaignFaseLabel?: string | null
   campaignOpdracht?: string | null

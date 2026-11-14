@@ -249,6 +249,9 @@ export function groupAgendaRowsByCampaign(rows: AgendaRowDto[]): AgendaCampaignL
       continue
     }
     const title = (grouped[0]?.campaignTitle ?? '').trim() || 'Campagne'
+    const stored = grouped.find((row) => typeof row.campaignColor === 'number')?.campaignColor
+    const resolved = typeof stored === 'number' ? stored : colorIndex
+    if (typeof stored !== 'number') colorIndex += 1
     campaigns.push({
       key,
       campaignId: grouped[0]?.campaignId ?? null,
@@ -256,7 +259,7 @@ export function groupAgendaRowsByCampaign(rows: AgendaRowDto[]): AgendaCampaignL
       kind: 'campaign',
       rows: grouped,
       rangeLabel: campaignRangeLabel(grouped),
-      colorIndex: colorIndex++,
+      colorIndex: resolved,
     })
   }
 
@@ -269,10 +272,17 @@ export function groupAgendaRowsByCampaign(rows: AgendaRowDto[]): AgendaCampaignL
   return theme ? [...campaigns, theme] : campaigns
 }
 
+/** Zelfde volgorde als de oude rotatie, plus de vierde swatch uit het klikmodel. */
+export const CAMPAIGN_CALENDAR_COLOR_CLASSES = [
+  'bg-ce-green',
+  'bg-ce-orange',
+  'bg-ce-blue',
+  'bg-ce-red',
+] as const
+
 export function campaignColorDotClass(colorIndex: number): string {
   if (colorIndex < 0) return 'bg-ce-beige'
-  const palette = ['bg-ce-green', 'bg-ce-orange', 'bg-ce-blue'] as const
-  return palette[colorIndex % palette.length] ?? 'bg-ce-green'
+  return CAMPAIGN_CALENDAR_COLOR_CLASSES[colorIndex % CAMPAIGN_CALENDAR_COLOR_CLASSES.length] ?? 'bg-ce-green'
 }
 
 export type AgendaDateListGroup = {
