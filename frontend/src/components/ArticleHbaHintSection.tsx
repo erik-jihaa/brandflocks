@@ -61,7 +61,7 @@ export function ArticleHbaHintSection({
   if (error && !hint?.aanwijzing) {
     return (
       <section className={HINT_FRAME_CLASS}>
-        <p className={HINT_TITLE_CLASS}>Positionering scherper maken</p>
+        <p className={HINT_TITLE_CLASS}>AI-advies — positionering</p>
         <p className="m-0 text-[14px] font-normal leading-[18px] text-ce-black">{error}</p>
         {error.includes('merkarchitectuur') ? (
           <p className="m-0 pt-[8px] text-[14px] leading-[18px]">
@@ -93,7 +93,7 @@ export function ArticleHbaHintSection({
 
   return (
     <section className={HINT_FRAME_CLASS}>
-      <p className={HINT_TITLE_CLASS}>Positionering scherper maken</p>
+      <p className={HINT_TITLE_CLASS}>AI-advies — positionering</p>
       {hint.regelOvertreden ? (
         <p className="m-0 mb-[10px] text-[14px] font-normal leading-[18px] text-ce-black">
           {hint.regelOvertreden}

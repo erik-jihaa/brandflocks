@@ -20,6 +20,7 @@ import type { ReviewEditDto, ReviewMode } from '../types/api'
 import { renderContentDiff } from '../utils/contentDiff'
 import { isManualPublishMode, isTestPost, pickArticleImageUrl, resolveEffectiveImageRatio } from '../utils/mediaUrl'
 import { BODY_HASHTAG_SEPARATOR } from '../utils/articleContent'
+import { articleCtaFromDto } from '../utils/articleCta'
 import { toneOptionsFromStyles } from '../utils/toneStyles'
 import { editorOptionsFromStyles } from '../utils/editorStyles'
 import { normalizeEditorQuestionsContent, stripEditorQuestionsBlock } from '../utils/editorQuestions'
@@ -94,6 +95,8 @@ export function ArticlePage() {
   const [platform, setPlatform] = useState('Linkedin')
   const [contentTextvorm, setContentTextvorm] = useState('post')
   const [objective, setObjective] = useState<string | null>(null)
+  const [hasCta, setHasCta] = useState<boolean | null>(null)
+  const [ctaText, setCtaText] = useState('')
   const [hbaHint, setHbaHint] = useState<HbaArticleHint | null>(null)
   const [hbaHintLoading, setHbaHintLoading] = useState(false)
   const [hbaHintApplying, setHbaHintApplying] = useState(false)
@@ -111,6 +114,7 @@ export function ArticlePage() {
   const hbaAutoScoreAttemptedFor = useRef<string | null>(null)
   const articleSyncFingerprint = useRef('')
   const articleSyncArticleId = useRef<string | null>(null)
+  const ctaSaveTimer = useRef<number | null>(null)
 
   const articlePeriodRange = useMemo(() => {
     const raw = (article?.publishDate ?? '').trim()
@@ -149,6 +153,8 @@ export function ArticlePage() {
       normalizedContent,
       article.headline,
       article.hashtags,
+      article.hasCta === true ? '1' : article.hasCta === false ? '0' : '',
+      article.ctaText ?? '',
       article.hbaHint?.id ?? '',
       article.hbaScore?.id ?? '',
       article.hbaScore?.status ?? '',
@@ -179,6 +185,9 @@ export function ArticlePage() {
     setPlatform(article.platform)
     setContentTextvorm(article.contentTextvorm ?? 'post')
     setObjective(article.objective ?? null)
+    const cta = articleCtaFromDto(article.hasCta, article.ctaText)
+    setHasCta(cta.hasCta)
+    setCtaText(cta.ctaText)
     setHbaHint((prev) => {
       if (hbaHintSuppressedForArticle.current === article.id) return null
       if (article.hbaHint?.aanwijzing) return article.hbaHint
@@ -217,6 +226,12 @@ export function ArticlePage() {
     hbaAutoScoreAttemptedFor.current = null
     articleSyncArticleId.current = null
   }, [article?.id])
+
+  useEffect(() => {
+    return () => {
+      if (ctaSaveTimer.current) window.clearTimeout(ctaSaveTimer.current)
+    }
+  }, [])
 
   const hbaKlantPreview = searchParams.get('hbaKlant') === '1'
 
@@ -928,7 +943,22 @@ export function ArticlePage() {
       contentTextvorm,
       objective,
       hbaContentrolOverride,
+      hasCta,
+      ctaText,
     }
+  }
+
+  function handleCtaChange(next: { hasCta: boolean; ctaText: string }) {
+    const text = next.hasCta ? next.ctaText : ''
+    setHasCta(next.hasCta)
+    setCtaText(text)
+    if (!slotId || usingMock || isApprovedOrPublished || rewriting || writing) return
+    if (ctaSaveTimer.current) window.clearTimeout(ctaSaveTimer.current)
+    const payload = { ...formPayload(), hasCta: next.hasCta, ctaText: text }
+    const typing = next.hasCta === true && hasCta === true
+    ctaSaveTimer.current = window.setTimeout(() => {
+      void save(payload).catch(() => undefined)
+    }, typing ? 500 : 0)
   }
 
   async function handleHbaRescore() {
@@ -1230,6 +1260,9 @@ export function ArticlePage() {
           positioningArchetype={article.positioningArchetype ?? null}
           positioningBrandGoal={article.positioningBrandGoal ?? null}
           hideHbaContentrol={article.hideHbaContentrol ?? false}
+          hasCta={hasCta}
+          ctaText={ctaText}
+          onCtaChange={isApprovedOrPublished ? undefined : handleCtaChange}
         />
         </>
       }

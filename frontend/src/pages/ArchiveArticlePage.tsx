@@ -238,6 +238,8 @@ export function ArchiveArticlePage() {
           hideHbaContentrol={hideHbaContentrol}
           onContentrolOverrideChange={hbaKlantPreview ? () => {} : undefined}
           onHbaRescore={hbaKlantPreview ? async () => {} : undefined}
+          hasCta={detail.hasCta ?? null}
+          ctaText={detail.ctaText ?? ''}
         />
       }
     />

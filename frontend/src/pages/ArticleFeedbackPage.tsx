@@ -47,6 +47,7 @@ import {
 import { isManualPublishMode, isTestPost, pickArticleImageUrl, resolveEffectiveImageRatio } from '../utils/mediaUrl'
 import { toneOptionsFromStyles } from '../utils/toneStyles'
 import { editorOptionsFromStyles } from '../utils/editorStyles'
+import { articleCtaFromDto } from '../utils/articleCta'
 
 export function ArticleFeedbackPage() {
   const navigate = useNavigate()
@@ -107,6 +108,9 @@ export function ArticleFeedbackPage() {
   const [platform, setPlatform] = useState('Linkedin')
   const [contentTextvorm, setContentTextvorm] = useState('post')
   const [objective, setObjective] = useState<string | null>(null)
+  const [hasCta, setHasCta] = useState<boolean | null>(null)
+  const [ctaText, setCtaText] = useState('')
+  const ctaSaveTimer = useRef<number | null>(null)
 
   /** Word-model: wijzigingen 1x berekend uit de review-edit, daarna alleen statusflips. */
   const [trackedDoc, setTrackedDoc] = useState<TrackedDoc | null>(null)
@@ -147,6 +151,9 @@ export function ArticleFeedbackPage() {
     setPlatform(article.platform)
     setContentTextvorm(article.contentTextvorm ?? 'post')
     setObjective(article.objective ?? null)
+    const cta = articleCtaFromDto(article.hasCta, article.ctaText)
+    setHasCta(cta.hasCta)
+    setCtaText(cta.ctaText)
     setImageUrlSquare((prev) => {
       const next = article.imageUrlSquare?.trim()
       return next ? next : prev
@@ -156,6 +163,12 @@ export function ArticleFeedbackPage() {
       return next ? next : prev
     })
   }, [article])
+
+  useEffect(() => {
+    return () => {
+      if (ctaSaveTimer.current) window.clearTimeout(ctaSaveTimer.current)
+    }
+  }, [])
 
   // Tracked doc opbouwen zodra er een (nieuwe) pending review-edit is.
   useEffect(() => {
@@ -468,7 +481,22 @@ export function ArticleFeedbackPage() {
       platform,
       contentTextvorm,
       objective,
+      hasCta,
+      ctaText,
     }
+  }
+
+  function handleCtaChange(next: { hasCta: boolean; ctaText: string }) {
+    const text = next.hasCta ? next.ctaText : ''
+    setHasCta(next.hasCta)
+    setCtaText(text)
+    if (!slotId || usingMock || rewriting) return
+    if (ctaSaveTimer.current) window.clearTimeout(ctaSaveTimer.current)
+    const payload = { ...formPayload(), hasCta: next.hasCta, ctaText: text }
+    const typing = next.hasCta === true && hasCta === true
+    ctaSaveTimer.current = window.setTimeout(() => {
+      void save(payload).catch(() => undefined)
+    }, typing ? 500 : 0)
   }
 
   function rewriteStarted(saved?: { writing?: boolean; writingPending?: boolean } | null): boolean {
@@ -921,6 +949,9 @@ export function ArticleFeedbackPage() {
           rewriteNotice={rewriteNotice}
           toneOptions={toneOptions}
           editorOptions={editorOptions}
+          hasCta={hasCta}
+          ctaText={ctaText}
+          onCtaChange={handleCtaChange}
         />
       }
     />

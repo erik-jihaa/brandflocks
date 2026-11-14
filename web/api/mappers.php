@@ -1005,6 +1005,52 @@ function ce_parse_self_review(mixed $value): ?array
     return $items;
 }
 
+/**
+ * CTA-keuze uit de artikelrij — null = nog niet gekozen (telt later als merkbouw).
+ *
+ * @return array{hasCta: bool|null, ctaText: string}
+ */
+function ce_article_cta_from_row(array $row): array
+{
+    $raw = $row['has_cta'] ?? null;
+    $hasCta = null;
+    if ($raw !== null && $raw !== '') {
+        $hasCta = ((int) $raw) === 1;
+    }
+
+    return [
+        'hasCta' => $hasCta,
+        'ctaText' => trim((string) ($row['cta_text'] ?? '')),
+    ];
+}
+
+/**
+ * PATCH-body → kolommen. Nee wist de CTA-tekst.
+ *
+ * @param array<string, mixed> $body
+ * @return array{has_cta?: int|null, cta_text?: string}
+ */
+function ce_article_cta_patch_from_body(array $body): array
+{
+    $out = [];
+    if (array_key_exists('hasCta', $body)) {
+        $raw = $body['hasCta'];
+        if ($raw === null || $raw === '') {
+            $out['has_cta'] = null;
+        } else {
+            $out['has_cta'] = filter_var($raw, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        }
+    }
+    if (array_key_exists('ctaText', $body)) {
+        $out['cta_text'] = trim((string) $body['ctaText']);
+    }
+    if (array_key_exists('has_cta', $out) && $out['has_cta'] === 0) {
+        $out['cta_text'] = '';
+    }
+
+    return $out;
+}
+
 function ce_wordpress_post_id_from_row(array $row): ?string
 {
     $id = trim((string) ($row['social_post_id'] ?? ''));
@@ -1044,6 +1090,7 @@ function ce_format_article_row(array $row, int $openFeedbackCount = 0): array
 
     require_once __DIR__ . '/channel-copy-constraints.php';
     $channelHardIssues = ce_channel_hard_validation_for_article_row($row);
+    $cta = ce_article_cta_from_row($row);
 
     return [
         'id' => $row['id'],
@@ -1089,6 +1136,8 @@ function ce_format_article_row(array $row, int $openFeedbackCount = 0): array
         'articleStatus' => ce_status_to_ui($row['status'] ?? null),
         'wordpressPostId' => ce_wordpress_post_id_from_row($row),
         'channelHardIssues' => $channelHardIssues,
+        'hasCta' => $cta['hasCta'],
+        'ctaText' => $cta['ctaText'],
     ];
 }
 
