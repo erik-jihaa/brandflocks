@@ -80,7 +80,7 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 - `docs/help-faq-klikmodel-extract-2026-11-14.json` —zelfde data
 - `docs/help-faq-mismatches-extract-2026-11-14.md` — antwoorden die de app (nog) niet doet / verouderde producten; **tekst niet aangepast**
 
-UI (`SupportPage` accordion + “Stel hier jouw vraag”) volgt nog.
+**Help UI (14 nov):** `SupportPage` — onderwerp-pills + accordion (`HelpFaqSection`, data uit `HELP_FAQ`), los blok **Stel hier jouw vraag** (`HelpOwnQuestionForm`, escalate/mailto); oude Engelstalige bullet-FAQ verwijderd; kostenregel dichter bij klikmodel.
 
 ## Eerdere opdrachten
 
