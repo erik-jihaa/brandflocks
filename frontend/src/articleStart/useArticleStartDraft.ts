@@ -5,8 +5,9 @@ import {
   defaultArticleStartChannels,
   type ArticleStartChannelKey,
 } from './articleStartMerk'
+import type { ArticleStartPlanItem } from './articleStartPlan'
 
-const STORAGE_KEY = 'bf-article-start-draft-v2'
+const STORAGE_KEY = 'bf-article-start-draft-v3'
 
 export type ArticleStartLinkedInType = 'post' | 'artikel'
 
@@ -21,6 +22,7 @@ export type ArticleStartDraft = {
   hashtags: string[]
   channels: Record<ArticleStartChannelKey, boolean>
   linkedinType: ArticleStartLinkedInType
+  planItems: ArticleStartPlanItem[]
 }
 
 const emptyDraft = (): ArticleStartDraft => ({
@@ -34,15 +36,26 @@ const emptyDraft = (): ArticleStartDraft => ({
   hashtags: [],
   channels: defaultArticleStartChannels(),
   linkedinType: 'post',
+  planItems: [],
 })
 
 function readDraft(): ArticleStartDraft {
   if (typeof sessionStorage === 'undefined') return emptyDraft()
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (!raw) return emptyDraft()
+    if (!raw) {
+      // Migreer v2-draft indien aanwezig
+      const legacy = sessionStorage.getItem('bf-article-start-draft-v2')
+      if (!legacy) return emptyDraft()
+      const parsed = JSON.parse(legacy) as Partial<ArticleStartDraft>
+      return { ...emptyDraft(), ...parsed, planItems: [] }
+    }
     const parsed = JSON.parse(raw) as Partial<ArticleStartDraft>
-    return { ...emptyDraft(), ...parsed }
+    return {
+      ...emptyDraft(),
+      ...parsed,
+      planItems: Array.isArray(parsed.planItems) ? parsed.planItems : [],
+    }
   } catch {
     return emptyDraft()
   }
