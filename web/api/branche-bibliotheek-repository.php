@@ -243,6 +243,20 @@ function ce_branche_bibliotheek_upsert_catalog_row(PDO $pdo, array $row): void
     ]);
 }
 
+/** @return list<string> */
+function ce_branche_bibliotheek_data_dirs(): array
+{
+    $webRoot = dirname(__DIR__);
+    $repoRoot = dirname(__DIR__, 2);
+
+    return [
+        $webRoot . '/data',
+        $repoRoot . '/web/data',
+        $repoRoot . '/docs/Branchebibliotheek-voor-Erik-2nov',
+        $repoRoot . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov',
+    ];
+}
+
 function ce_branche_bibliotheek_resolve_dir(?string $override = null): string
 {
     if ($override !== null && $override !== '') {
@@ -254,13 +268,7 @@ function ce_branche_bibliotheek_resolve_dir(?string $override = null): string
         return $dir;
     }
 
-    $root = dirname(__DIR__, 2);
-    $candidates = [
-        $root . '/web/data',
-        $root . '/docs/Branchebibliotheek-voor-Erik-2nov',
-        $root . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov',
-    ];
-    foreach ($candidates as $dir) {
+    foreach (ce_branche_bibliotheek_data_dirs() as $dir) {
         if (is_file($dir . '/branchelijst.csv')) {
             return $dir;
         }
@@ -321,13 +329,8 @@ function ce_branche_bibliotheek_import(?PDO $pdo, string $dir, bool $dryRun = fa
 
 function ce_branche_bibliotheek_catalog_csv_path(): ?string
 {
-    $root = dirname(__DIR__, 2);
-    $candidates = [
-        $root . '/web/data/branchelijst.csv',
-        $root . '/docs/Branchebibliotheek-voor-Erik-2nov/branchelijst.csv',
-        $root . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov/branchelijst.csv',
-    ];
-    foreach ($candidates as $path) {
+    foreach (ce_branche_bibliotheek_data_dirs() as $dir) {
+        $path = $dir . '/branchelijst.csv';
         if (is_readable($path)) {
             return $path;
         }
