@@ -232,6 +232,48 @@ SQL
             // Geen CREATE-rechten.
         }
     }
+
+    if (!ce_table_exists($pdo, 'hba_derived_branche_log')) {
+        try {
+            $pdo->exec(
+                <<<'SQL'
+CREATE TABLE IF NOT EXISTS hba_derived_branche_log (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    typed_label VARCHAR(255) NOT NULL,
+    typed_normalized VARCHAR(255) NOT NULL,
+    hit_count INT NOT NULL DEFAULT 0,
+    last_seen_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_client_id CHAR(36) NULL,
+    branche_code VARCHAR(64) NULL,
+    UNIQUE KEY uq_hba_derived_branche_norm (typed_normalized),
+    KEY idx_hba_derived_branche_hits (hit_count)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL
+            );
+        } catch (Throwable) {
+            // Geen CREATE-rechten.
+        }
+    }
+
+    if (!ce_table_exists($pdo, 'hba_branche_tenant_cache')) {
+        try {
+            $pdo->exec(
+                <<<'SQL'
+CREATE TABLE IF NOT EXISTS hba_branche_tenant_cache (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    client_id CHAR(36) NOT NULL,
+    typed_normalized VARCHAR(255) NOT NULL,
+    branche_code VARCHAR(64) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_hba_branche_tenant_cache (client_id, typed_normalized),
+    KEY idx_hba_branche_tenant_code (branche_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL
+            );
+        } catch (Throwable) {
+            // Geen CREATE-rechten.
+        }
+    }
 }
 
 /** @return array{usable: bool, indicative: bool, blocked: bool, reason: string|null} */

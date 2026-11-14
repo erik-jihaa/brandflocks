@@ -1,0 +1,103 @@
+nr;branche;afbakening;markt;ronde1_volgorde;status;bestand;versie_instructie
+1;Accountancy voor het mkb;Accountantskantoren die vooral Nederlandse mkb-ondernemingen bedienen met samenstelwerk, assurance en advies.;B2B;3;gecontroleerd;branche-01-accountancy-mkb.json;1.2
+2;Administratiekantoren voor zzp en mkb;Kantoren die boekhouding, aangiften en financiële administratie verzorgen voor zelfstandigen en kleine bedrijven.;B2B;;open;;
+3;Belastingadvieskantoren;Zelfstandige belastingadvieskantoren voor particulieren en ondernemers, exclusief kantoren waar accountancy de hoofdactiviteit is.;Beide;;open;;
+4;Advocatenkantoren;Advocatenkantoren voor particulieren en mkb, met rechtsgebied als aanvullend vergelijkingskenmerk.;Beide;;open;;
+5;Notariskantoren;Kantoren voor familierecht, vastgoedtransacties en ondernemingsrecht.;Beide;;open;;
+6;Hypotheekadvieskantoren;Advieskantoren die consumenten begeleiden bij het kiezen en afsluiten van een hypotheek.;B2C;;gecontroleerd;branche-6-hypotheekadvieskantoren.json;1.2
+7;Verzekeringsadvieskantoren;Intermediairs die particuliere en zakelijke verzekeringen adviseren en bemiddelen, exclusief verzekeraars zelf.;Beide;;open;;
+8;Makelaardij woningverkoop;Makelaars die particuliere eigenaren begeleiden bij de verkoop van hun woning.;B2C;;gecontroleerd;branche-8-makelaardij-woningverkoop.json;1.2
+9;Makelaardij bedrijfsvastgoed;Makelaars voor verkoop, aankoop en verhuur van commercieel vastgoed.;B2B;;open;;
+10;Vastgoed- en VvE-beheer;Beheerders van vastgoed en verenigingen van eigenaars, met beide activiteiten afzonderlijk gelabeld.;Beide;;open;;
+11;Organisatie- en managementadvies;Bureaus die het mkb adviseren over strategie, organisatie en bedrijfsvoering.;B2B;;open;;
+12;HR-adviesbureaus;Bureaus die werkgevers ondersteunen bij personeelsbeleid en organisatieontwikkeling.;B2B;;open;;
+13;Werving- en selectiebureaus;Bureaus die medewerkers voor vaste functies zoeken, met opdrachtgevers en kandidaten als aparte publieken.;B2B;;gecontroleerd;branche-13-werving-en-selectiebureaus.json;1.2
+14;Uitzendbureaus;Bureaus die uitzendkrachten ter beschikking stellen, met werkgevers en werkzoekenden als aparte publieken.;B2B;;open;;
+15;Zakelijke training en opleiding;Commerciële bureaus voor trainingen en opleidingen van medewerkers en leidinggevenden.;B2B;;open;;
+16;Reclame- en creatieve bureaus;Bureaus die creatieve concepten en campagnes voor organisaties ontwikkelen.;B2B;;gecontroleerd;branche-16-reclame-en-creatieve-bureaus.json;1.2
+17;Branding- en merkstrategiebureaus;Bureaus die merkidentiteit, positionering en merkstrategie ontwikkelen.;B2B;;open;;
+18;Online marketingbureaus;Bureaus die bedrijven helpen met online vindbaarheid, advertenties en conversie.;B2B;;open;;
+19;Content- en tekstbureaus;Bureaus die zakelijke teksten en doorlopende content voor klanten maken.;B2B;;open;;
+20;Webdesignstudio’s;Studio’s die websites voor het mkb ontwerpen en bouwen, exclusief complexe softwareontwikkeling.;B2B;;open;;
+21;Grafische ontwerpbureaus;Bureaus voor visuele communicatie en grafisch ontwerp, exclusief bureaus met vooral merkstrategie.;B2B;;open;;
+22;Video- en filmproductiebedrijven;Productiebedrijven voor bedrijfsfilms, campagnes en andere zakelijke videocontent.;B2B;;open;;
+23;Fotografen en fotostudio’s;Zelfstandige fotografen en studio’s, met zakelijke en particuliere fotografie afzonderlijk gelabeld.;Beide;;open;;
+24;IT managed services voor het mkb;Dienstverleners die het dagelijkse IT-beheer en de ondersteuning van mkb-klanten structureel verzorgen.;B2B;;gecontroleerd;branche-24-it-managed-services-mkb.json;1.2
+25;Softwareontwikkelbureaus;Bureaus die maatwerksoftware voor opdrachtgevers ontwerpen, bouwen en onderhouden.;B2B;;open;;
+26;Cybersecuritydienstverleners;Specialisten die organisaties adviseren en ondersteunen bij digitale beveiliging.;B2B;;open;;
+27;Hosting- en clouddienstverleners;Aanbieders van hosting en cloudinfrastructuur, exclusief algemeen werkplekbeheer.;B2B;;open;;
+28;Aannemers voor woningbouw en verbouwing;Aannemers die woningen bouwen, renoveren of verbouwen voor particuliere en zakelijke opdrachtgevers.;Beide;;open;;
+29;Afbouwbedrijven (timmer, stuc, metsel, tegel);Uitvoerende vakbedrijven voor timmer-, stuc-, metsel- en tegelwerk, met specialisatie als apart label.;Beide;;open;;
+30;Schildersbedrijven;Bedrijven voor binnen- en buitenschilderwerk aan woningen en bedrijfspanden.;Beide;;open;;
+31;Dakdekkersbedrijven;Bedrijven voor aanleg, onderhoud en herstel van daken, met daktype als aanvullend label.;Beide;;open;;
+32;Loodgietersbedrijven;Bedrijven voor sanitair, waterleidingen, afvoer en loodgietersreparaties.;Beide;;open;;
+33;Elektrotechnische installatiebedrijven;Installateurs van elektrische installaties in woningen en bedrijfspanden.;Beide;;open;;
+34;Warmtepomp- en verwarmingsinstallateurs voor particulieren;Installateurs die particuliere woningeigenaren adviseren over verwarming en warmtepompen en deze installeren en onderhouden.;B2C;2;gecontroleerd;branche-34-warmtepompinstallateurs.json;1.2
+35;Airconditioning- en ventilatiebedrijven;Bedrijven die airconditioning en ventilatiesystemen adviseren, installeren en onderhouden.;Beide;;open;;
+36;Zonnepaneleninstallateurs;Bedrijven die zonnepanelen aan particuliere en zakelijke klanten leveren en installeren.;Beide;;open;;
+37;Isolatiebedrijven;Bedrijven voor woning- en gebouwisolatie, met isolatiemethode als aanvullend label.;Beide;;open;;
+38;Kozijn- en glasbedrijven;Leveranciers en installateurs van kozijnen en beglazing voor woningen en bedrijfspanden.;Beide;;open;;
+39;Vloerleveranciers en vloerlegbedrijven;Bedrijven die vloeren adviseren, verkopen en leggen, met materiaal en klanttype als labels.;Beide;;open;;
+40;Hoveniersbedrijven;Bedrijven die tuinen en groenvoorzieningen ontwerpen, aanleggen en onderhouden.;Beide;;open;;
+41;Architectenbureaus;Bureaus die gebouwen ontwerpen en opdrachtgevers bij bouwprojecten begeleiden.;Beide;;open;;
+42;Interieurontwerp en interieuradvies;Bureaus die interieurs voor woningen en zakelijke ruimten ontwerpen en adviseren.;Beide;;open;;
+43;Ambachtelijke bakkerijen;Zelfstandige brood- en banketbakkerijen met eigen productie, exclusief industriële bakkerijen en supermarktformules.;Vooral B2C;;gecontroleerd;branche-43-bakkerijen.json;1.2
+44;Versspeciaalzaken (slager, groente en fruit, vis, kaas);Zelfstandige verswinkels, met productgroep als verplicht specialisatielabel.;Vooral B2C;;open;;
+45;Wijnwinkels en slijterijen;Speciaalzaken die wijn en andere alcoholhoudende dranken aan consumenten en bedrijven verkopen.;Beide;;open;;
+46;Bloemisten;Bloemenwinkels en bloemisten voor particuliere en zakelijke bestellingen.;Beide;;open;;
+47;Kledingboetieks en modewinkels;Zelfstandige multimerkwinkels voor kleding, exclusief kledingmerken als producent of merkeigenaar.;B2C;;open;;
+48;Schoenenwinkels;Zelfstandige schoenenwinkels en gespecialiseerde schoenenwebshops.;B2C;;open;;
+49;Juweliers;Winkels voor sieraden en horloges, met eigen ontwerp en reparatie als aanvullende labels.;B2C;;open;;
+50;Opticiens;Optiekzaken voor oogmetingen, brillen en contactlenzen.;B2C;;open;;
+51;Meubelwinkels;Zelfstandige winkels en webshops voor meubels, exclusief uitsluitend maatwerkproductie.;Beide;;open;;
+52;Keukenspeciaalzaken;Bedrijven die keukens adviseren, ontwerpen en verkopen, eventueel inclusief montage.;B2C;;open;;
+53;Badkamerspeciaalzaken;Bedrijven die badkamers en sanitair adviseren en verkopen, eventueel inclusief realisatie.;B2C;;open;;
+54;Fietsenwinkels;Fietsspeciaalzaken voor verkoop, onderhoud en reparatie van fietsen en e-bikes.;Beide;;open;;
+55;Dierenspeciaalzaken;Winkels en webshops voor diervoeding en dierbenodigdheden, exclusief dierenartspraktijken.;B2C;;open;;
+56;Tuincentra;Retailbedrijven met planten, tuinartikelen en aanverwante producten als hoofdaanbod.;B2C;;open;;
+57;Elektronica- en witgoedspeciaalzaken;Zelfstandige winkels voor consumentenelektronica en huishoudelijke apparaten.;Beide;;open;;
+58;Restaurants;Zelfstandige restaurants met bediening en maaltijden ter plaatse, met keuken en segment als labels.;Vooral B2C;;open;;
+59;Koffiezaken en lunchrooms;Zaken waar koffie, lichte maaltijden en verblijf overdag centraal staan.;Vooral B2C;;open;;
+60;Cateringbedrijven;Bedrijven die eten en drinken verzorgen op locaties van particuliere en zakelijke opdrachtgevers.;Beide;;open;;
+61;Stads- en zakenhotels;Hotels in steden en op zakelijke locaties waar overnachten samengaat met vergaderen, congres of evenement, zelfstandig of als hotelmerk, exclusief B&B’s en vakantieparken.;Beide;;gecontroleerd;branche-61-stads-en-zakenhotels.json;1.2
+62;Bed & breakfasts en kleinschalige verblijfsrecreatie;B&B’s, gastenverblijven en kleinschalige vakantieverblijven, exclusief reguliere hotels en grotere parken.;B2C;;open;;
+63;Campings en vakantieparken;Campings en parken met recreatieve verblijfseenheden of kampeerplaatsen.;B2C;;open;;
+64;Reisbureaus en gespecialiseerde reisorganisaties;Aanbieders die reizen adviseren, samenstellen of organiseren, met reissegment als label.;Beide;;open;;
+65;Evenementenorganisatiebureaus;Bureaus die evenementen voor bedrijven en particulieren bedenken en organiseren.;Beide;;open;;
+66;Kappers en barbershops;Salons voor haarverzorging en barbierdiensten, met specialisatie als label.;B2C;;open;;
+67;Schoonheids-, nagel- en pedicuresalons;Salons voor schoonheidsverzorging, nagelbehandelingen en pedicure, met behandelingstype apart vastgelegd.;B2C;;open;;
+68;Sportscholen en fitnesscentra;Fitnessaanbieders met een locatie en lidmaatschapsmodel, exclusief zelfstandige personal trainers.;B2C;;open;;
+69;Personaltrainingbedrijven;Zelfstandige trainers en studio’s met individuele of kleinschalige trainingsbegeleiding.;B2C;;open;;
+70;Yoga- en pilatesstudio’s;Studio’s voor yoga- en pilateslessen, met discipline en lesvorm als labels.;B2C;;open;;
+71;Rijscholen;Rijscholen voor particuliere rijopleidingen, met rijbewijscategorie als label.;B2C;;open;;
+72;Coaching voor leven en loopbaan;Coachingspraktijken voor persoonlijke ontwikkeling en loopbaanvragen, exclusief psychologische behandeling.;Beide;;open;;
+73;Sportfysiotherapiepraktijken;Praktijken met een expliciet aanbod voor sportblessures, sportrevalidatie en terugkeer naar sport.;B2C;;open;;
+74;Tandartspraktijken;Algemene tandartspraktijken, exclusief uitsluitend specialistische of cosmetische klinieken.;B2C;;open;;
+75;Psychologenpraktijken;Zelfstandige praktijken voor psychologische behandeling, met behandelgebied en financiering als labels.;B2C;;open;;
+76;Thuiszorgorganisaties;Organisaties voor verpleging, verzorging en ondersteuning thuis, met zorgvorm en financiering apart vastgelegd.;"B2C; zakelijke publieken";4;gecontroleerd;branche-76-thuiszorgorganisaties.json;1.2
+77;Kinderopvangorganisaties;Aanbieders van kinderdagopvang en buitenschoolse opvang, met opvangvorm als label.;B2C;;open;;
+78;Dierenartspraktijken;Eerstelijnspraktijken voor gezelschapsdieren, exclusief uitsluitend veterinaire verwijsklinieken.;B2C;;open;;
+79;Uitvaartzorg;Uitvaartondernemingen die nabestaanden begeleiden en uitvaarten organiseren.;B2C;;open;;
+80;Autodealers en occasionbedrijven;Bedrijven die personenauto’s aan particulieren en zakelijke rijders verkopen.;Beide;;open;;
+81;Onafhankelijke autobedrijven en garages;Niet-merkgebonden bedrijven voor onderhoud, reparatie en keuring van personenauto’s.;Beide;;open;;
+82;Verhuisbedrijven;Bedrijven voor particuliere en zakelijke verhuizingen, eventueel met opslag.;Beide;;open;;
+83;Koeriers- en pakketdiensten;Zelfstandige aanbieders van koeriersritten en pakketbezorging voor zakelijke opdrachtgevers.;B2B;;open;;
+84;Wegtransportbedrijven;Transporteurs voor zakelijk goederenvervoer over de weg, met goederentype als label.;B2B;;open;;
+85;Schoonmaakbedrijven;Bedrijven voor reguliere particuliere en zakelijke schoonmaak, met opdrachtsegment als label.;Beide;;open;;
+86;Beveiligingsbedrijven;Aanbieders van particuliere beveiligingsdiensten voor organisaties en locaties.;B2B;;open;;
+87;Drukkerijen en printbedrijven;Bedrijven voor commercieel druk- en printwerk voor zakelijke klanten.;B2B;;open;;
+88;Koffiebranderijen met eigen merk (specialty coffee);Branderijen die specialty coffee onder eigen merk aan consumenten verkopen, exclusief koffieketens en supermarktmerken.;B2C;1;gecontroleerd;branche-88-koffiebranderijen.json;1.2
+89;ERP-advies voor de maakindustrie;Bureaus die maakbedrijven adviseren over ERP-selectie, implementatie en optimalisatie.;B2B;;open;;
+90;Loyaliteitsmarketingbureaus;Bureaus die organisaties adviseren en ondersteunen bij klantloyaliteit en loyaliteitsprogramma’s.;B2B;5;gecontroleerd;branche-90-loyaliteitsmarketingbureaus.json;1.2
+91;Duurzame modemerken;Kledingmerken die duurzaamheid als expliciet onderdeel van hun marktpropositie voeren, exclusief multimerkwinkels.;B2C;;open;;
+92;Energieleveranciers;Leveranciers van elektriciteit en gas aan Nederlandse huishoudens.;B2C;;gecontroleerd;branche-92-energieleveranciers.json;1.2
+93;Banken voor particulieren en mkb;Banken met betaal-, spaar- of financieringsdiensten voor particulieren en mkb, per productmarkt gelabeld.;Beide;;gecontroleerd;branche-93-banken-particulieren-mkb.json;1.2
+94;Particuliere verzekeraars;Verzekeraars die consumentenverzekeringen onder eigen merk aanbieden, per verzekeringstype gelabeld.;B2C;;gecontroleerd;branche-94-particuliere-verzekeraars.json;1.2
+95;Telecomaanbieders;Merken die mobiele telefonie of vast internet aan consumenten aanbieden, per productmarkt gelabeld.;B2C;;gecontroleerd;branche-95-telecomaanbieders.json;1.2
+96;SaaS voor het mkb;Aanbieders van abonnementssoftware voor mkb-bedrijfsprocessen, met softwarefunctie als verplicht vergelijkingslabel.;B2B;;gecontroleerd;branche-96-saas-voor-het-mkb.json;1.2
+97;Toeleveranciers in de maakindustrie;Leveranciers van onderdelen, materialen en technische productiediensten aan maakbedrijven, per specialisatie gelabeld.;B2B;;open;;
+98;Ambachtelijke brouwerijen;Brouwerijen die bier onder eigen merk aan consumenten en zakelijke afnemers verkopen.;Beide;;open;;
+99;Foodmerken;Producenten en merkeigenaren van levensmiddelen voor consumenten, met productcategorie als verplicht vergelijkingslabel.;B2C;;gecontroleerd;branche-99-foodmerken.json;1.2
+100;Circulaire en duurzame productmerken;Merken van fysieke gebruiksproducten met circulariteit of duurzaamheid als kernpropositie, exclusief voeding en kleding.;Beide;;open;;
+101;Voedingssupplementen;Merken die voedingssupplementen (vitamines, mineralen, kruiden- en andere supplementen) onder eigen merk aan consumenten verkopen, via webshop, drogist of apotheek. Exclusief geneesmiddelen, sportvoeding als hoofdzaak en huismerken van supermarkten en drogisterijketens.;B2C;;gecontroleerd;branche-101-voedingssupplementen.json;1.2
+102;Vakantie- en landhotels;Hotels voor vrijetijdsverblijf op het platteland, aan de kust en op de eilanden, zelfstandig of als hotelmerk, exclusief B&B’s en vakantieparken.;Beide;;gecontroleerd;branche-102-vakantie-en-landhotels.json;1.2

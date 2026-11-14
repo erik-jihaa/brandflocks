@@ -583,3 +583,34 @@ export function addPlatformHygieneCategoryFactor(listId: string, phrase: string)
 export function activatePlatformHygieneList(listId: string): Promise<{ ok: boolean }> {
   return apiFetch(`/platform/hygiene/lists/${encodeURIComponent(listId)}/activate`, { method: 'POST' })
 }
+
+export type PlatformDerivedBrancheRow = {
+  typedLabel: string
+  hitCount: number
+  lastSeenAt: string
+  brancheCode: string | null
+}
+
+export function fetchPlatformDerivedBranches(): Promise<{ ok: boolean; items: PlatformDerivedBrancheRow[] }> {
+  return apiFetch('/platform/derived-branches')
+}
+
+export async function downloadPlatformDerivedBranchesCsv(): Promise<void> {
+  const apiBase = import.meta.env.VITE_API_BASE ?? '/api'
+  const response = await fetch(`${apiBase}/platform/derived-branches?format=csv`, {
+    credentials: 'include',
+    headers: { Accept: 'text/csv' },
+  })
+  if (!response.ok) {
+    throw new Error('CSV-export mislukt')
+  }
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'branchelijst-afgeleid.csv'
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}

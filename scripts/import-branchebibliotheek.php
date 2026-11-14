@@ -36,7 +36,12 @@ if ($dryRun) {
 
 $pdo = null;
 if (!$dryRun) {
-    $pdo = ce_db();
+    try {
+        $pdo = ce_db();
+    } catch (Throwable $e) {
+        fwrite(STDERR, "Geen databaseverbinding (draai dit op de server, niet lokaal): " . $e->getMessage() . "\n");
+        exit(1);
+    }
     if (!($pdo instanceof PDO)) {
         fwrite(STDERR, "Geen databaseverbinding; controleer .env\n");
         exit(1);

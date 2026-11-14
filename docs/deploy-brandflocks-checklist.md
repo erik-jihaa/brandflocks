@@ -71,11 +71,12 @@ Deploy synct `web/migrations/` naar de server (actieve migraties, niet `archive/
 ## 5. Branchebibliotheek
 
 ```bash
-# vanaf weekplan — eenmalig per omgeving
+# vanaf weekplan — eenmalig per omgeving, op de server (lokaal is DB_HOST=localhost niet bereikbaar)
 php scripts/import-branchebibliotheek.php
+php scripts/import-branchebibliotheek.php --dry-run   # controle zonder writes
 ```
 
-(Draai tegen de Brandflocks-DB; gebruik de ZIP uit `briefing/spec/hba-input/`.)
+Bronmap: `docs/Branchebibliotheek-voor-Erik-2nov/` of `--dir=...`. Catalogus-CSV staat ook in `web/data/branchelijst.csv` (102 labels, fallback als de tabel nog leeg is). JSON-hygiëne voor de 20 gecureerde branches komt pas ná deze import in `branche_library`.
 
 ## 6. Rooktest (handmatig)
 

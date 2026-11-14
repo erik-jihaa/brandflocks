@@ -258,6 +258,7 @@ function ce_branche_bibliotheek_resolve_dir(?string $override = null): string
     $candidates = [
         $root . '/docs/Branchebibliotheek-voor-Erik-2nov',
         $root . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov',
+        $root . '/web/data',
     ];
     foreach ($candidates as $dir) {
         if (is_file($dir . '/branchelijst.csv')) {
@@ -318,36 +319,96 @@ function ce_branche_bibliotheek_import(?PDO $pdo, string $dir, bool $dryRun = fa
     return $stats;
 }
 
+function ce_branche_bibliotheek_catalog_csv_path(): ?string
+{
+    $root = dirname(__DIR__, 2);
+    $candidates = [
+        $root . '/web/data/branchelijst.csv',
+        $root . '/docs/Branchebibliotheek-voor-Erik-2nov/branchelijst.csv',
+        $root . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov/branchelijst.csv',
+    ];
+    foreach ($candidates as $path) {
+        if (is_readable($path)) {
+            return $path;
+        }
+    }
+
+    return null;
+}
+
+/** @return list<array<string, mixed>> */
+function ce_branche_bibliotheek_catalog_from_csv(?string $query = null, int $limit = 120): array
+{
+    $path = ce_branche_bibliotheek_catalog_csv_path();
+    if ($path === null) {
+        return [];
+    }
+    $limit = max(1, min(120, $limit));
+    $q = mb_strtolower(trim((string) ($query ?? '')));
+    $out = [];
+    foreach (ce_branche_bibliotheek_parse_csv($path) as $row) {
+        if ($q !== '') {
+            $hay = mb_strtolower($row['branche_label'] . ' ' . $row['afbakening']);
+            if (!str_contains($hay, $q)) {
+                continue;
+            }
+        }
+        $out[] = $row;
+        if (count($out) >= $limit) {
+            break;
+        }
+    }
+
+    return $out;
+}
+
+function ce_branche_bibliotheek_find_catalog_row(PDO $pdo, string $label): ?array
+{
+    $label = trim($label);
+    if ($label === '') {
+        return null;
+    }
+    foreach (ce_branche_bibliotheek_fetch_catalog($pdo, null, 120) as $row) {
+        if (strcasecmp((string) ($row['branche_label'] ?? ''), $label) === 0) {
+            return $row;
+        }
+    }
+
+    return null;
+}
+
 /** @return list<array<string, mixed>> */
 function ce_branche_bibliotheek_fetch_catalog(PDO $pdo, ?string $query = null, int $limit = 120): array
 {
     ce_branche_bibliotheek_ensure_catalog_schema($pdo);
-    if (!ce_table_exists($pdo, 'branche_catalog')) {
-        return [];
-    }
-
     $limit = max(1, min(120, $limit));
     $q = trim((string) ($query ?? ''));
-    if ($q === '') {
-        $stmt = $pdo->query(
-            'SELECT list_nr, branche_label, afbakening, markt, csv_status, json_filename, is_gecureerd, branche_code
-             FROM branche_catalog ORDER BY list_nr ASC LIMIT ' . $limit
-        );
 
-        return $stmt ? ($stmt->fetchAll() ?: []) : [];
+    if (ce_table_exists($pdo, 'branche_catalog')) {
+        if ($q === '') {
+            $stmt = $pdo->query(
+                'SELECT list_nr, branche_label, afbakening, markt, csv_status, json_filename, is_gecureerd, branche_code
+                 FROM branche_catalog ORDER BY list_nr ASC LIMIT ' . $limit
+            );
+            $rows = $stmt ? ($stmt->fetchAll() ?: []) : [];
+        } else {
+            $stmt = $pdo->prepare(
+                'SELECT list_nr, branche_label, afbakening, markt, csv_status, json_filename, is_gecureerd, branche_code
+                 FROM branche_catalog
+                 WHERE branche_label LIKE :q OR afbakening LIKE :q2
+                 ORDER BY list_nr ASC
+                 LIMIT ' . $limit
+            );
+            $like = '%' . $q . '%';
+            $stmt->execute(['q' => $like, 'q2' => $like]);
+            $rows = $stmt->fetchAll() ?: [];
+        }
+        if ($rows !== []) {
+            return $rows;
+        }
     }
 
-    $stmt = $pdo->prepare(
-        'SELECT list_nr, branche_label, afbakening, markt, csv_status, json_filename, is_gecureerd, branche_code
-         FROM branche_catalog
-         WHERE branche_label LIKE :q OR afbakening LIKE :q2
-         ORDER BY list_nr ASC
-         LIMIT ' . $limit
-    );
-    $like = '%' . $q . '%';
-    $stmt->execute(['q' => $like, 'q2' => $like]);
-
-    return $stmt->fetchAll() ?: [];
+    return ce_branche_bibliotheek_catalog_from_csv($q === '' ? null : $q, $limit);
 }
 
 /** @param array<string, mixed> $row */

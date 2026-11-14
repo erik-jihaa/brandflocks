@@ -9,6 +9,7 @@ import { fetchStrategy, patchStrategy } from '../api/onboarding'
 import { clearHomeDashboardCache } from '../api/home'
 import { deriveHbaArchitecture, fetchHbaBrancheCatalog, fetchHbaBranches, fetchHbaWizardDocumentStatus, uploadHbaWizardDocument, resolveHbaBranche, runHbaArchitectureCheck, type BrancheCatalogEntry, type BrancheOption, type HbaWizardDocumentSuggestions, type HbaArchitectureCheckResult } from '../api/hbaV2'
 import { BranchePickerFields } from './BranchePickerFields'
+import { findCatalogEntry } from '../utils/branchePicker'
 import { apiFetch } from '../api/client'
 import {
   brandNarrativeFromDto,
@@ -485,6 +486,14 @@ export function MerkarchitectuurSection() {
     if (input === '') {
       return currentDraft
     }
+    const catalogHit = findCatalogEntry(currentDraft.brancheCode, input, brancheCatalog)
+    if (catalogHit?.isGecureerd && catalogHit.brancheCode) {
+      return {
+        ...currentDraft,
+        brancheCode: catalogHit.brancheCode,
+        brancheInput: catalogHit.brancheLabel,
+      }
+    }
     const exact = branches.find((branch) => branch.label.toLowerCase() === input.toLowerCase())
     if (exact) {
       return { ...currentDraft, brancheCode: exact.code, brancheInput: exact.label }
@@ -515,6 +524,14 @@ export function MerkarchitectuurSection() {
     const input = currentDraft.brancheInput.trim()
     if (input === '') {
       return currentDraft
+    }
+    const catalogHit = findCatalogEntry(currentDraft.brancheCode, input, brancheCatalog)
+    if (catalogHit?.isGecureerd && catalogHit.brancheCode) {
+      return {
+        ...currentDraft,
+        brancheCode: catalogHit.brancheCode,
+        brancheInput: catalogHit.brancheLabel,
+      }
     }
 
     const exact = branches.find((branch) => branch.label.toLowerCase() === input.toLowerCase())
@@ -2020,7 +2037,7 @@ export function MerkarchitectuurSection() {
           ) : null}
           <RichTextDisplay
             className="w-full"
-            text={`**Wie je bent:** ${draft.identityIntro || '—'}\n\n**Wat je wilt bereiken:** ${draft.doel}\n\n**Waar je tegen vecht:** ${draft.foe}`}
+            text={`**Wie je bent:** ${draft.identityIntro || '—'}\n\n**Branche:** ${draft.brancheInput.trim() || '—'}\n\n**Markt-archetype:** ${marktArchetypeLabel || '—'}\n\n**Wat je wilt bereiken:** ${draft.doel}\n\n**Waar je tegen vecht:** ${draft.foe}`}
           />
           <HbaArchitectureCheckPanel
             check={architectureCheck}
