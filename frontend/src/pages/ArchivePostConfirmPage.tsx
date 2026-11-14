@@ -29,7 +29,7 @@ export function ArchivePostConfirmPage() {
         mainLayout="grid2"
         main={
           <p className="text-[14px] leading-[18px] text-ce-beige">
-            Geen archiefconcept gevonden.{' '}
+            Geen concept gevonden.{' '}
             <button
               type="button"
               onClick={() => navigate('/agenda')}

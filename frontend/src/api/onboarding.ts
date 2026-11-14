@@ -20,6 +20,10 @@ export type ThemeListMeta = {
   weekFull?: boolean
   proposedThemeCount?: number
   needsThemeGeneration?: boolean
+  themeProposalCount?: number
+  /** Bruikbare bronfragmenten (proxy: actieve kennisbronnen). */
+  usableBronfragmenten?: number
+  thinSourceWarning?: boolean
   activeCycleWeek?: string
   redirectWeekKey?: string
 }
@@ -67,7 +71,10 @@ export function submitTheme(themeId: string): Promise<{ theme: ThemeDto | null; 
   return apiFetch(`/themes/${themeId}/submit`, { method: 'POST' })
 }
 
-export function generateThemes(week?: string): Promise<{
+export function generateThemes(
+  week?: string,
+  options?: { forceThin?: boolean },
+): Promise<{
   ok: boolean
   async?: boolean
   week: string
@@ -76,8 +83,10 @@ export function generateThemes(week?: string): Promise<{
   meta?: ThemeListMeta
   ce01?: { ok?: boolean; error?: string; response?: unknown }
 }> {
-  const body = week ? JSON.stringify({ week }) : '{}'
-  return apiFetch('/themes/generate', { method: 'POST', body })
+  const payload: Record<string, unknown> = {}
+  if (week) payload.week = week
+  if (options?.forceThin) payload.forceThin = true
+  return apiFetch('/themes/generate', { method: 'POST', body: JSON.stringify(payload) })
 }
 
 export function patchResearchItem(
@@ -123,6 +132,8 @@ export function fetchSlotResearch(slotId: string): Promise<{
   items: ResearchItemDto[]
   themeGroups?: ResearchThemeGroup[]
   note?: string
+  usableResearchCount?: number
+  lichtOnderbouwdLabel?: string | null
 }> {
   return apiFetch(`/research/${slotId}`)
 }

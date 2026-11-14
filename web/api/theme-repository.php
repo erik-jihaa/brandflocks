@@ -9,11 +9,24 @@ require_once __DIR__ . '/mappers.php';
 require_once __DIR__ . '/event-log-repository.php';
 require_once __DIR__ . '/tone-styles.php';
 require_once __DIR__ . '/copy-modus.php';
+require_once __DIR__ . '/theme-onderbouwing.php';
 
-/** Aantal theme-voorstellen per week op Theme (keuze uit meerdere opties). */
+/**
+ * Fallback als fragmenttelling niet beschikbaar is.
+ * Met bronfragmenten: zie ce_theme_proposal_count_from_fragments().
+ */
 function ce_theme_proposal_count(): int
 {
     return 3;
+}
+
+/** Effectief voorstel-aantal voor deze tenant (drempels-thema-onderbouwing.md). */
+function ce_theme_proposal_count_for_client(PDO $pdo, string $clientId): int
+{
+    $fragments = ce_count_usable_bronfragmenten_for_client($pdo, $clientId);
+    $fromFragments = ce_theme_proposal_count_from_fragments($fragments);
+    // Bij 0–1 fragmenten: 0 voorstellen (waarschuwing); anders formule, minstens 1 als er genoeg bron is.
+    return $fromFragments;
 }
 
 function ce_ensure_themes_schema(PDO $pdo): void
@@ -1229,7 +1242,13 @@ function ce_fetch_themes(PDO $pdo, ?string $week = null): array
     $themesStillRequired = ce_themes_still_required_for_week($pdo, $clientId, $activeWeekKey);
     $proposedThemeCount = ce_count_proposed_themes_for_week($pdo, $clientId, $activeWeekKey);
     $weekFull = $themesStillRequired <= 0;
-    $needsThemeGeneration = $proposedThemeCount < ce_theme_proposal_count() && $themesStillRequired > 0;
+    $usableBronfragmenten = ce_count_usable_bronfragmenten_for_client($pdo, $clientId);
+    $themeProposalCount = ce_theme_proposal_count_for_client($pdo, $clientId);
+    $needsThemeGeneration = $proposedThemeCount < max(1, $themeProposalCount) && $themesStillRequired > 0;
+    // Bij 0–1 fragmenten: nog steeds “kan genereren” tonen via waarschuwing + Toch doorgaan.
+    if ($themeProposalCount === 0 && $themesStillRequired > 0 && $proposedThemeCount < 1) {
+        $needsThemeGeneration = true;
+    }
 
     $resolvedWeek = ce_resolve_theme_week_keys($activeWeekKey !== '' ? $activeWeekKey : (string) ($week ?? ''));
     $weeks = ce_theme_weeks_ensure_navigation($pdo, $clientId, $weeks, $activeWeekKey, $proposedThemeCount);
@@ -1276,15 +1295,20 @@ function ce_fetch_themes(PDO $pdo, ?string $week = null): array
             'weekFull' => $weekFull,
             'proposedThemeCount' => $proposedThemeCount,
             'needsThemeGeneration' => $needsThemeGeneration,
-            'themeProposalCount' => ce_theme_proposal_count(),
+            'themeProposalCount' => $themeProposalCount,
+            'usableBronfragmenten' => $usableBronfragmenten,
+            'thinSourceWarning' => $usableBronfragmenten <= 1,
             'activeCycleWeek' => $resolvedWeek['cycleWeek'],
             'redirectWeekKey' => $redirectWeekKey,
         ],
     ];
 }
 
-/** @return array<string, mixed> */
-function ce_generate_themes_for_week(PDO $pdo, ?string $weekParam = null): array
+/**
+ * @return array<string, mixed>
+ * @param bool $forceThin "Toch doorgaan" bij 0–1 bronfragmenten → 1 thema.
+ */
+function ce_generate_themes_for_week(PDO $pdo, ?string $weekParam = null, bool $forceThin = false): array
 {
     $clientId = ce_default_client_id($pdo);
     if ($clientId === null) {
@@ -1308,7 +1332,16 @@ function ce_generate_themes_for_week(PDO $pdo, ?string $weekParam = null): array
         throw new InvalidArgumentException('Agenda voor deze week is al vol — geen theme-voorstellen nodig.');
     }
 
-    $proposalTarget = ce_theme_proposal_count();
+    $usableBronfragmenten = ce_count_usable_bronfragmenten_for_client($pdo, $clientId);
+    $proposalTarget = ce_theme_proposal_count_for_client($pdo, $clientId);
+    if ($proposalTarget === 0) {
+        if (!$forceThin) {
+            throw new InvalidArgumentException(
+                'Te weinig bruikbare bronnen voor thema-voorstellen — voeg eerst bronnen toe, of kies Toch doorgaan.',
+            );
+        }
+        $proposalTarget = 1;
+    }
     $proposedThemeCount = ce_count_proposed_themes_for_week($pdo, $clientId, $weekParam);
     if ($proposedThemeCount >= $proposalTarget) {
         throw new InvalidArgumentException(
@@ -2224,6 +2257,8 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
     }
 
     $items = is_array($anchorGroup['items'] ?? null) ? $anchorGroup['items'] : [];
+    require_once __DIR__ . '/research-quality.php';
+    $usableResearchCount = ce_count_usable_research_for_slot($pdo, $slotId);
     $researchNotice = null;
     if (
         $slotStatus === 'research_done'
@@ -2247,6 +2282,8 @@ function ce_fetch_slot_research(PDO $pdo, string $slotId): array
         'items' => $items,
         'themeGroups' => $themeGroups,
         'researchNotice' => $researchNotice,
+        'usableResearchCount' => $usableResearchCount,
+        'lichtOnderbouwdLabel' => ce_theme_licht_onderbouwd_label($usableResearchCount),
     ];
 }
 

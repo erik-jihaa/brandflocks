@@ -269,7 +269,7 @@ export function ReportPage() {
     fading: saveNoticeFading,
     showSuccess: showSaveSuccess,
     clear: clearSaveNotice,
-  } = useSaveNotice('Report opgeslagen in het archief.')
+  } = useSaveNotice('Rapport opgeslagen bij Alle artikelen.')
   const [hbaProgress, setHbaProgress] = useState<HbaProgress | null>(null)
   const [homeDashboard, setHomeDashboard] = useState<HomeDashboard | null>(null)
   const [hbaLoading, setHbaLoading] = useState(() => isApiConfigured())
@@ -361,7 +361,7 @@ export function ReportPage() {
       void fetchReports().then((list) => setTrend(list.trend ?? []))
       showSaveSuccess(
         scope === 'findability'
-          ? 'Findability-rapport opgeslagen in het archief.'
+          ? 'SEO/GEO-rapport opgeslagen bij Alle artikelen.'
           : undefined,
       )
     } catch (err) {
