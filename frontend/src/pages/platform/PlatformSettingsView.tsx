@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LIST_SECTION } from '../../layout/grid.constants'
 import { PillButton } from '../../components/PillButton'
 import { SaveNotice } from '../../components/ui/SaveNotice'
 import { useSaveNotice } from '../../hooks/useSaveNotice'
 import { ApiError } from '../../api/client'
-import { fetchPlatformSession, importPlatformSupportEmails, platformSupportImportSkipLabel } from '../../api/platform'
+import {
+  downloadPlatformDerivedBranchesCsv,
+  fetchPlatformDerivedBranches,
+  fetchPlatformSession,
+  importPlatformSupportEmails,
+  platformSupportImportSkipLabel,
+  type PlatformDerivedBrancheRow,
+} from '../../api/platform'
 import { usePlatformData } from '../../components/platform/PlatformDataContext'
 
 export function PlatformSettingsView() {
@@ -14,7 +21,16 @@ export function PlatformSettingsView() {
   const { message, kind, fading, showSaving, showSuccess, showError } = useSaveNotice()
   const [importBusy, setImportBusy] = useState(false)
   const [importDetails, setImportDetails] = useState<string[]>([])
+  const [derivedRows, setDerivedRows] = useState<PlatformDerivedBrancheRow[]>([])
+  const [derivedError, setDerivedError] = useState<string | null>(null)
+  const [csvBusy, setCsvBusy] = useState(false)
   const isAdmin = platformUser?.role === 'admin'
+
+  useEffect(() => {
+    void fetchPlatformDerivedBranches()
+      .then((res) => setDerivedRows(res.items ?? []))
+      .catch((err) => setDerivedError(err instanceof Error ? err.message : 'Logboek laden mislukt'))
+  }, [])
 
   async function handleImportEmails() {
     if (!isAdmin) return
@@ -97,6 +113,42 @@ export function PlatformSettingsView() {
           <SaveNotice message={message} kind={kind} fading={fading} />
         </section>
       )}
+
+      <section className={LIST_SECTION.bodyClass}>
+        <h3 className={`m-0 ${LIST_SECTION.headerClass} text-ce-black`}>Afgeleide branches</h3>
+        <p className="m-0 mt-[12px] text-[14px] leading-[18px] text-ce-beige">
+          Namen die klanten invoerden en die niet in de gecureerde bibliotheek stonden. CSV volgt de kolommen van
+          branchelijst.csv, plus aantal keer en laatste datum.
+        </p>
+        {derivedError ? (
+          <p className="m-0 mt-[12px] text-[14px] leading-[18px] text-ce-red">{derivedError}</p>
+        ) : derivedRows.length === 0 ? (
+          <p className="m-0 mt-[12px] text-[14px] leading-[18px] text-ce-beige">Nog geen afgeleide branches.</p>
+        ) : (
+          <ul className="m-0 mt-[12px] list-none space-y-[8px] p-0 text-[14px] leading-[18px] text-ce-black">
+            {derivedRows.slice(0, 12).map((row) => (
+              <li key={row.typedLabel}>
+                {row.typedLabel} — {row.hitCount}×, laatst {row.lastSeenAt || '—'}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-[16px]">
+          <PillButton
+            variant="second"
+            disabled={csvBusy}
+            loading={csvBusy}
+            onClick={() => {
+              setCsvBusy(true)
+              void downloadPlatformDerivedBranchesCsv()
+                .catch((err) => showError(err instanceof Error ? err.message : 'CSV-export mislukt'))
+                .finally(() => setCsvBusy(false))
+            }}
+          >
+            Exporteer CSV
+          </PillButton>
+        </div>
+      </section>
     </div>
   )
 }

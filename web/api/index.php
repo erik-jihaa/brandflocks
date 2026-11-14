@@ -327,6 +327,30 @@ require_once __DIR__ . '/event-log-suggestions.php';
         }
     }
 
+    if ($path === '/platform/derived-branches' && $method === 'GET') {
+        require_once __DIR__ . '/hba-derived-branche-log.php';
+        $rows = ce_hba_derived_branche_log_rows($platformPdo);
+        $format = strtolower(trim((string) ($_GET['format'] ?? '')));
+        if ($format === 'csv') {
+            $csv = ce_hba_derived_branche_csv($platformPdo, $rows);
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="branchelijst-afgeleid.csv"');
+            echo $csv;
+            exit;
+        }
+        $items = array_map(static function (array $row): array {
+            return [
+                'typedLabel' => (string) ($row['typed_label'] ?? ''),
+                'hitCount' => (int) ($row['hit_count'] ?? 0),
+                'lastSeenAt' => (string) ($row['last_seen_at'] ?? ''),
+                'brancheCode' => ($row['branche_code'] ?? null) !== null && $row['branche_code'] !== ''
+                    ? (string) $row['branche_code']
+                    : null,
+            ];
+        }, $rows);
+        ce_json_response(['ok' => true, 'items' => $items]);
+    }
+
     if ($path === '/platform/status' && $method === 'GET') {
         ce_json_response(ce_platform_fetch_status($platformPdo));
     }

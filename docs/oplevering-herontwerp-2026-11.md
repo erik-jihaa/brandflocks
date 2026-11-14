@@ -127,7 +127,19 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 - Multi-kanaal: één slot per artikel op primair kanaal (geen fan-out per kanaal/offsets).
 - Systeemcheck ritme/plan-check nog niet live.
 - Artikel-detail zijbalk-typen + CTA-blok.
-- **Stap 5 branche-koppeling** wacht op branchebibliotheek-ZIP in de fork (geen importscript tot die data er is).
+
+## Opdracht — weekplan stap 5 (Branche-koppeling)
+
+### Gebouwd (PR #8 + deze branch)
+
+- Import: `php scripts/import-branchebibliotheek.php` (CSV 102 + 20 JSON). Catalog-CSV ook in `web/data/branchelijst.csv` als fallback vóór DB-import.
+- Wizard: pulldown 102, labels (gecureerd)/(automatisch afgeleid), markt-archetype op stap 1 en 8.
+- Niet-gecureerd: live afleider, cache per tenant+branche (`hba_branche_tenant_cache`), logboek 1e (`hba_derived_branche_log`).
+- Platform › Settings: logboek + CSV-export in de vorm van `branchelijst.csv` (+ aantal, laatste datum).
+
+### Nog te doen op de server
+
+- `php scripts/import-branchebibliotheek.php` draait niet lokaal (geen MySQL). Eenmalig na deploy op de omgeving.
 
 ### Follow-up Claude-feedback (14 nov) — klanttaal + drempels
 

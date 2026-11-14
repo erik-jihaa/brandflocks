@@ -6,6 +6,7 @@ require_once __DIR__ . '/hba-contentflow-schema.php';
 require_once __DIR__ . '/hba-architectuur-check-repository.php';
 require_once __DIR__ . '/uuid-helper.php';
 require_once __DIR__ . '/llm-repository.php';
+require_once __DIR__ . '/hba-derived-branche-log.php';
 
 /** @return list<array<string, mixed>> */
 function ce_hba_branch_record_seed_enrichment(): array
@@ -440,15 +441,27 @@ function ce_hba_resolve_or_derive_branch(PDO $pdo, string $clientId, array $body
     ];
 
     $codeHint = trim((string) ($body['brancheCode'] ?? $body['branche_code'] ?? ''));
+    $catalogRow = ce_branche_bibliotheek_find_catalog_row($pdo, $label);
+    if ($codeHint === '' && is_array($catalogRow) && !empty($catalogRow['branche_code'])) {
+        $codeHint = (string) $catalogRow['branche_code'];
+    }
+
+    $cachedCode = ce_hba_branche_tenant_cache_get($pdo, $clientId, $label);
     $existing = $codeHint !== '' ? ce_hba_fetch_branche_by_code($pdo, $codeHint) : null;
+    $existing ??= $cachedCode !== null ? ce_hba_fetch_branche_by_code($pdo, $cachedCode) : null;
     $existing ??= ce_hba_match_branch_record($pdo, $label, $frame);
 
     if ($existing !== null) {
+        $code = (string) ($existing['branche_code'] ?? '');
+        if (ce_hba_derived_branche_should_log($catalogRow, $existing)) {
+            ce_hba_derived_branche_log_hit($pdo, $label, $clientId, $code !== '' ? $code : null);
+            ce_hba_branche_tenant_cache_put($pdo, $clientId, $label, $code);
+        }
         $use = ce_hba_branch_confidence_use($existing);
         return [
             'ok' => true,
             'branch' => ce_hba_branch_record_dto($pdo, $existing),
-            'derived' => false,
+            'derived' => ((string) ($existing['bron'] ?? '')) === 'afgeleid',
             'confidence' => $use,
         ];
     }
@@ -484,6 +497,9 @@ function ce_hba_resolve_or_derive_branch(PDO $pdo, string $clientId, array $body
     }
 
     $stored = ce_hba_store_branch_record($pdo, $label, $data, $frame);
+    $storedCode = (string) ($stored['code'] ?? '');
+    ce_hba_derived_branche_log_hit($pdo, $label, $clientId, $storedCode !== '' ? $storedCode : null);
+    ce_hba_branche_tenant_cache_put($pdo, $clientId, $label, $storedCode);
 
     return [
         'ok' => true,
