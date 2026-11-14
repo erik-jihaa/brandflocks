@@ -11,6 +11,8 @@ import {
 } from '../utils/agendaActions'
 import { formatArtboardDayLabel } from '../utils/agendaCalendarGrid'
 import {
+  AGENDA_EMPTY_MONTH_MESSAGE,
+  AGENDA_MONTH_ALL,
   campaignColorDotClass,
   groupAgendaRowsByCampaign,
   type AgendaCampaignListGroup,
@@ -18,6 +20,7 @@ import {
 
 type AgendaCampaignListProps = {
   rows: AgendaRowDto[]
+  monthKey: string
   busySlotId: string | null
   onAction: (row: AgendaRowDto, action: 'delete' | 'archive') => void
 }
@@ -91,7 +94,7 @@ function CampaignGroup({
   )
 }
 
-export function AgendaCampaignList({ rows, busySlotId, onAction }: AgendaCampaignListProps) {
+export function AgendaCampaignList({ rows, monthKey, busySlotId, onAction }: AgendaCampaignListProps) {
   const groups = useMemo(() => groupAgendaRowsByCampaign(rows), [rows])
   const [openKeys, setOpenKeys] = useState<Set<string>>(() => new Set())
 
@@ -105,7 +108,9 @@ export function AgendaCampaignList({ rows, busySlotId, onAction }: AgendaCampaig
   }
 
   if (groups.length === 0) {
-    return <p className="m-0 text-[14px] leading-[18px] text-ce-beige">Geen posts voor deze filters.</p>
+    const emptyMessage =
+      monthKey !== AGENDA_MONTH_ALL ? AGENDA_EMPTY_MONTH_MESSAGE : 'Geen posts voor deze filters.'
+    return <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{emptyMessage}</p>
   }
 
   return (

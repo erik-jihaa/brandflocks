@@ -11,6 +11,9 @@ export type AgendaGroupMode = 'campaign' | 'date'
 export const AGENDA_CHANNEL_ALL = 'all'
 export const AGENDA_MONTH_ALL = 'all'
 
+/** Klikmodel p-agenda — zonder de demo-toevoeging over november. */
+export const AGENDA_EMPTY_MONTH_MESSAGE = 'Geen posts gepland in deze maand.'
+
 const FIXED_CHANNEL_KEYS = ['linkedin', 'instagram'] as const
 
 export function agendaPlatformKey(platform: string | null | undefined): string {
@@ -258,5 +261,56 @@ export function campaignColorDotClass(colorIndex: number): string {
   if (colorIndex < 0) return 'bg-ce-beige'
   const palette = ['bg-ce-green', 'bg-ce-orange', 'bg-ce-blue'] as const
   return palette[colorIndex % palette.length] ?? 'bg-ce-green'
+}
+
+export type AgendaDateListGroup = {
+  key: string
+  dateIso: string
+  dateLabel: string
+  rows: AgendaRowDto[]
+  postCountLabel: string
+}
+
+export function groupAgendaRowsByDate(rows: AgendaRowDto[]): AgendaDateListGroup[] {
+  const buckets = new Map<string, AgendaRowDto[]>()
+  for (const row of rows) {
+    const iso = (row.publishDate ?? '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) continue
+    const bucket = buckets.get(iso) ?? []
+    bucket.push(row)
+    buckets.set(iso, bucket)
+  }
+  return [...buckets.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dateIso, grouped]) => {
+      const sorted = [...grouped].sort((a, b) => rowSortTime(a).localeCompare(rowSortTime(b)))
+      const date = parseIsoDate(dateIso)
+      const dateLabel = date
+        ? date.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })
+        : dateIso
+      const count = sorted.length
+      return {
+        key: dateIso,
+        dateIso,
+        dateLabel,
+        rows: sorted,
+        postCountLabel: `${count} ${count === 1 ? 'post' : 'posts'}`,
+      }
+    })
+}
+
+export function agendaSeriesLabel(row: AgendaRowDto): string {
+  const campaign = (row.campaignTitle ?? '').trim()
+  return campaign !== '' ? campaign : 'Losse artikelen'
+}
+
+export function agendaColorIndexForCampaign(
+  rows: AgendaRowDto[],
+  campaignId: string | null | undefined,
+): number {
+  if (!campaignId || (campaignId ?? '').trim() === '') return -1
+  const campaigns = groupAgendaRowsByCampaign(rows)
+  const match = campaigns.find((g) => g.campaignId === campaignId)
+  return match?.colorIndex ?? 0
 }
 
