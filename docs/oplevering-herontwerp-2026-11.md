@@ -72,9 +72,15 @@ Nav-item verwijderd. **`/targets` en API `/objectives` blijven.** `source-folder
 
 Elk kanaal is een **eigen `content_slots`-rij** met eigen `platform` / `publish_date` (en vaak eigen `article_id` per slot). Er is geen gedeeld slot met meerdere kanalen op één datum in het huidige schema; campagneplanning maakt meerdere slots (zie campagne-repositories).
 
-### Deel B — Help
+### Deel B — Help (Sonnet-extract, 14 nov)
 
-Nog niet in deze commit (aparte sessie).
+Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
+
+- `frontend/src/data/helpFaq.klikmodel.ts` — voor UI-wiring (Composer)
+- `docs/help-faq-klikmodel-extract-2026-11-14.json` —zelfde data
+- `docs/help-faq-mismatches-extract-2026-11-14.md` — antwoorden die de app (nog) niet doet / verouderde producten; **tekst niet aangepast**
+
+UI (`SupportPage` accordion + “Stel hier jouw vraag”) volgt nog.
 
 ## Eerdere opdrachten
 
