@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
+import { BREADCRUMB_PUBLICATION_ARTICLE, NavBreadcrumb } from '../components/NavBreadcrumb'
 import { ThemeReviewRow, normalizeThemeFeedback, type ThemeReviewFeedback } from '../components/ThemeReviewRow'
 import { ThemeCustomCard } from '../components/ThemeCustomCard'
 import { ThemeGenerationTips } from '../components/ThemeGenerationTips'
@@ -610,7 +611,17 @@ export function ThemePage() {
   }
 
   if (loading) {
-    return <GridShell pageTitle="Thema's" activeNav="theme" mainLayout="grid2" main={<p>Laden…</p>} />
+    return (
+      <GridShell
+        pageTitle="Thema's"
+        activeNav="article"
+        breadcrumb={
+          <NavBreadcrumb items={[...BREADCRUMB_PUBLICATION_ARTICLE, { label: "Thema's" }]} />
+        }
+        mainLayout="grid2"
+        main={<p>Laden…</p>}
+      />
+    )
   }
 
   return (
@@ -621,7 +632,10 @@ export function ThemePage() {
         </span>
       }
       pageTitleTone="section"
-      activeNav="theme"
+      activeNav="article"
+      breadcrumb={
+        <NavBreadcrumb items={[...BREADCRUMB_PUBLICATION_ARTICLE, { label: "Thema's" }]} />
+      }
       mainLayout="grid2"
       headerContentGap={20}
       main={
@@ -675,7 +689,7 @@ export function ThemePage() {
               </ActionLink>
               {postsPerWeek <= 1 && (
                 <p className="m-0 text-[14px] leading-[18px] text-ce-beige">
-                  Meer posts per week? Pas het aan onder Agenda.
+                  Meer posts per week? Pas het aan onder Instellingen → Planning.
                 </p>
               )}
             </div>

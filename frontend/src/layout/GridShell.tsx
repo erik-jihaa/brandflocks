@@ -46,6 +46,8 @@ type GridShellProps = {
   sidebarNav?: React.ReactNode
   /** Auth-schermen — altijd licht (niet Account-dark via activeNav) */
   forceLightTheme?: boolean
+  /** Broodkruimel boven de paginatitel (subflows zonder eigen nav-item). */
+  breadcrumb?: React.ReactNode
 }
 
 export function GridShell({
@@ -64,6 +66,7 @@ export function GridShell({
   showNav = true,
   sidebarNav,
   forceLightTheme = false,
+  breadcrumb,
 }: GridShellProps) {
   const isGrid2 = mainLayout === 'grid2'
   const grid2MainMaxWidth = mainContentMaxWidth ?? GRID.colMainInner
@@ -147,6 +150,7 @@ export function GridShell({
           className="box-border flex min-w-0 flex-col"
         >
           <div className="box-border flex min-w-0 shrink-0 flex-col">
+            {breadcrumb}
             <div className={PAGE_HEADER.rowClass}>
               <h1
                 className={

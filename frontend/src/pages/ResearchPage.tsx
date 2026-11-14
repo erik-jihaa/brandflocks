@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
+import { BREADCRUMB_PUBLICATION_ARTICLE, NavBreadcrumb } from '../components/NavBreadcrumb'
 import { LoadingDots } from '../components/LoadingDots'
 import {
   normalizeResearchFeedback,
@@ -903,7 +904,10 @@ export function ResearchPage() {
     return (
       <GridShell
         pageTitle="Onderzoek"
-        activeNav="research"
+        activeNav="article"
+        breadcrumb={
+          <NavBreadcrumb items={[...BREADCRUMB_PUBLICATION_ARTICLE, { label: 'Onderzoek' }]} />
+        }
         mainLayout="grid2"
         main={<LoadingDots label="Onderzoek laden" className="text-ce-black" />}
       />
@@ -917,7 +921,10 @@ export function ResearchPage() {
           Onderzoek
         </span>
       }
-      activeNav="research"
+      activeNav="article"
+      breadcrumb={
+        <NavBreadcrumb items={[...BREADCRUMB_PUBLICATION_ARTICLE, { label: 'Onderzoek' }]} />
+      }
       mainLayout="grid2"
       headerContentGap={20}
       main={

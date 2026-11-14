@@ -62,7 +62,7 @@ export function PeriodAgendaOverview({
         </p>
       </div>
       <ChannelFilterBar channel={channel} onChannel={setChannel} channels={periodChannelOptions()} />
-      {loading ? <p className={hintClass}>Agenda laden…</p> : null}
+      {loading ? <p className={hintClass}>Kalender laden…</p> : null}
       {!loading && rows.length === 0 ? (
         <p className={hintClass}>Geen andere posts in deze periode{channel !== AGENDA_CHANNEL_ALL ? ' op dit kanaal' : ''}.</p>
       ) : null}

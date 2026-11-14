@@ -204,17 +204,22 @@ export function ArchivePostPage() {
 
   if (loading) {
     return (
-      <GridShell pageTitle="Archive this post" activeNav="agenda" mainLayout="grid2" main={<p>Laden…</p>} />
+      <GridShell
+        pageTitle="Deze post archiveren"
+        activeNav="agenda"
+        mainLayout="grid2"
+        main={<p>Laden…</p>}
+      />
     )
   }
 
   if (!detail) {
     return (
       <GridShell
-        pageTitle="Archive this post"
+        pageTitle="Deze post archiveren"
         activeNav="agenda"
         mainLayout="grid2"
-        main={<p className="text-[14px] leading-[18px] text-ce-red">{error ?? 'Article not found.'}</p>}
+        main={<p className="text-[14px] leading-[18px] text-ce-red">{error ?? 'Artikel niet gevonden.'}</p>}
       />
     )
   }
@@ -223,7 +228,7 @@ export function ArchivePostPage() {
 
   return (
     <GridShell
-      pageTitle="Archive this post"
+      pageTitle="Deze post archiveren"
       pageSubtitle={formatPublishedDate(detail.publishedAt)}
       activeNav="agenda"
       mainLayout="grid2"
@@ -251,17 +256,17 @@ export function ArchivePostPage() {
                 type="date"
                 value={publishedAt}
                 onChange={setPublishedAt}
-                placeholder="Date published"
+                placeholder="Publicatiedatum"
                 placeholderTone="black"
-                aria-label="Date published"
+                aria-label="Publicatiedatum"
               />
               <FieldSingle
                 id="archive-promo-budget"
                 value={promoBudget}
                 onChange={setPromoBudget}
-                placeholder="Promo budget €"
+                placeholder="Promobudget €"
                 placeholderTone="black"
-                aria-label="Promo budget"
+                aria-label="Promobudget"
               />
             </div>
 
@@ -273,9 +278,9 @@ export function ArchivePostPage() {
                   setPostUrl(value)
                   setUrlCheck('none')
                 }}
-                placeholder="URL article"
+                placeholder="URL van het artikel"
                 placeholderTone="black"
-                aria-label="URL article"
+                aria-label="URL van het artikel"
               />
               <div className="mt-[8px] flex items-center gap-[8px] text-[14px] leading-[18px] text-ce-black">
                 <button
@@ -283,7 +288,7 @@ export function ArchivePostPage() {
                   onClick={() => void handleCheckUrl()}
                   className={statusRowActionClass}
                 >
-                  Check
+                  Controleren
                 </button>
                 <span
                   className={`inline-block h-[8px] w-[8px] rounded-full ${
@@ -306,16 +311,16 @@ export function ArchivePostPage() {
                 id="archive-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Notes — side effects of this article"
+                placeholder="Notities — neveneffecten van dit artikel"
                 rows={3}
-                aria-label="Notes"
+                aria-label="Notities"
                 className="w-full resize-y border-0 bg-transparent p-0 text-[14px] leading-[18px] text-ce-black outline-none placeholder:text-ce-black"
               />
             </div>
 
             <div className="mt-[18px]">
               <PillButton variant="main" onClick={handleArchiveClick}>
-                Archive
+                Archiveren
               </PillButton>
             </div>
           </div>

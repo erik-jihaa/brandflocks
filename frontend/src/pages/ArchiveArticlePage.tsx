@@ -115,16 +115,18 @@ export function ArchiveArticlePage() {
   const spec = detail ? IMAGE_SPECS[resolveImageRatio(detail.imageRatio)] : IMAGE_SPECS.square
 
   if (loading) {
-    return <GridShell pageTitle="Archive" activeNav="archive" mainLayout="grid2" main={<p>Laden…</p>} />
+    return (
+      <GridShell pageTitle="Alle artikelen" activeNav="archive" mainLayout="grid2" main={<p>Laden…</p>} />
+    )
   }
 
   if (!detail) {
     return (
       <GridShell
-        pageTitle="Archive"
+        pageTitle="Alle artikelen"
         activeNav="archive"
         mainLayout="grid2"
-        main={<p className="text-[14px] leading-[18px] text-ce-red">{error ?? 'Article not found.'}</p>}
+        main={<p className="text-[14px] leading-[18px] text-ce-red">{error ?? 'Artikel niet gevonden.'}</p>}
       />
     )
   }
@@ -133,7 +135,7 @@ export function ArchiveArticlePage() {
 
   return (
     <GridShell
-      pageTitle="Archive"
+      pageTitle="Alle artikelen"
       pageSubtitle={formatPublishedDate(detail.publishedAt)}
       activeNav="archive"
       mainLayout="grid2"

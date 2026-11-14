@@ -24,18 +24,18 @@ export function ArchivePostConfirmPage() {
   if (!state || state.slotId !== slotId) {
     return (
       <GridShell
-        pageTitle="Archive this post"
+        pageTitle="Deze post archiveren"
         activeNav="agenda"
         mainLayout="grid2"
         main={
           <p className="text-[14px] leading-[18px] text-ce-beige">
-            No archive draft found.{' '}
+            Geen archiefconcept gevonden.{' '}
             <button
               type="button"
               onClick={() => navigate('/agenda')}
               className={statusRowActionClass}
             >
-              Back to Agenda
+              Terug naar Kalender
             </button>
           </p>
         }
@@ -59,7 +59,7 @@ export function ArchivePostConfirmPage() {
       }
       navigate('/archive')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Archive failed')
+      setError(err instanceof Error ? err.message : 'Archiveren mislukt')
     } finally {
       setSubmitting(false)
     }
@@ -67,7 +67,7 @@ export function ArchivePostConfirmPage() {
 
   return (
     <GridShell
-      pageTitle="Archive this post"
+      pageTitle="Deze post archiveren"
       pageSubtitle={state.title}
       activeNav="agenda"
       mainLayout="grid2"
@@ -76,23 +76,23 @@ export function ArchivePostConfirmPage() {
           {error && <p className="mb-[12px] text-[14px] leading-[18px] text-ce-red">{error}</p>}
 
           <p className="m-0 text-[14px] leading-[18px] text-ce-black">
-            Are you sure you want to archive this post?{' '}
+            Weet je zeker dat je deze post wilt archiveren?{' '}
             {state!.publishedAt || state!.socialPostUrl || state!.archiveNote
-              ? "You can't edit the article anymore."
-              : 'This slot will move to Archive (no article written yet).'}
+              ? 'Je kunt het artikel daarna niet meer bewerken.'
+              : 'Dit slot gaat naar Alle artikelen (er is nog geen artikel geschreven).'}
           </p>
 
           <div className={pillActionsRowClass}>
             <PillButton variant="second" onClick={() => void handleConfirm()} disabled={submitting} loading={submitting}>
-              Yes Archive
+              Ja, archiveren
             </PillButton>
             <PillButton variant="second" onClick={() => navigate('/agenda')} disabled={submitting}>
-              Keep in agenda
+              In kalender houden
             </PillButton>
           </div>
 
           <p className="mt-[16px] mb-0 text-[14px] leading-[18px] text-ce-beige">
-            You can&apos;t edit the article anymore
+            Je kunt het artikel daarna niet meer bewerken
           </p>
         </>
       }

@@ -733,7 +733,7 @@ export function ArticleFeedbackPage() {
             </p>
             {!slotId && (
               <p className="m-0 text-ce-beige">
-                Geen slot gekozen. Ga naar Agenda en klik op Terugkoppeling bij het artikel.
+                Geen slot gekozen. Ga naar Kalender en klik op Terugkoppeling bij het artikel.
               </p>
             )}
           </div>

@@ -113,7 +113,7 @@ export function useAgenda() {
       if (err instanceof ApiError && err.status === 503) {
         setError('Database niet geconfigureerd — mock agenda actief.')
       } else if (!silent) {
-        setError(err instanceof Error ? err.message : 'Agenda laden mislukt')
+        setError(err instanceof Error ? err.message : 'Kalender laden mislukt')
       }
       if (!agendaRef.current) {
         setAgenda(mockAgenda())

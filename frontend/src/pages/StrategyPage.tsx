@@ -34,7 +34,7 @@ const EMPTY: StrategyDto = {
   editorStyles: {},
 }
 
-const PAGE_TITLE = 'Merkelementen'
+const PAGE_TITLE = 'Merktaal'
 
 /** Schrijfwijzer, tone-styles en auteurs — merkidentiteit staat op Merkarchitectuur. */
 export function StrategyPage() {

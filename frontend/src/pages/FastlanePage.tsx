@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
+import { BREADCRUMB_PUBLICATION_ARTICLE, NavBreadcrumb } from '../components/NavBreadcrumb'
 import { FieldMulti, FieldSingle } from '../components/ui/Field'
 import { PillButton, pillActionsRowClass } from '../components/PillButton'
 import { createFastlaneArticle } from '../api/fastlane'
@@ -168,7 +169,10 @@ export function FastlanePage() {
     <GridShell
       pageTitle="Snel artikel"
       pageSubtitle="Artikel buiten het weekritme"
-      activeNav="fastlane"
+      activeNav="article"
+      breadcrumb={
+        <NavBreadcrumb items={[...BREADCRUMB_PUBLICATION_ARTICLE, { label: 'Snel artikel' }]} />
+      }
       mainLayout="grid2"
       mainContentMaxWidth={GRID2_REVIEW_MAIN_WIDTH}
       metaAlign="flush"
