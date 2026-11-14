@@ -7,6 +7,7 @@ import { SourcesPage } from './pages/SourcesPage'
 import { SourcesFormPage } from './pages/SourcesFormPage'
 import { AgendaPage } from './pages/AgendaPage'
 import { ArticlePage } from './pages/ArticlePage'
+import { ArticleStartPage } from './pages/ArticleStartPage'
 import { ArticleFeedbackPage } from './pages/ArticleFeedbackPage'
 import { StrategyPage } from './pages/StrategyPage'
 import { BrandArchitecturePage } from './pages/BrandArchitecturePage'
@@ -86,8 +87,9 @@ export default function App() {
           <Route path="/research/:slotId" element={<ResearchPage />} />
           <Route path="/article/feedback" element={<ArticleFeedbackPage />} />
           <Route path="/article/:slotId/feedback" element={<ArticleFeedbackPage />} />
+          <Route path="/article/nieuw/stap/:wizardStep" element={<ArticleStartPage />} />
           <Route path="/article/:slotId" element={<ArticlePage />} />
-          <Route path="/article" element={<ArticlePage />} />
+          <Route path="/article" element={<ArticleStartPage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/archive/:slotId/post" element={<ArchivePostPage />} />
           <Route path="/archive/:slotId/confirm" element={<ArchivePostConfirmPage />} />
