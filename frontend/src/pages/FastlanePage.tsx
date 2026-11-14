@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
 import { BREADCRUMB_PUBLICATION_ARTICLE, NavBreadcrumb } from '../components/NavBreadcrumb'
 import { FieldMulti, FieldSingle } from '../components/ui/Field'
@@ -47,6 +47,7 @@ const emptyForm = (): FormState => ({
 /** Fastlane — briefing/fastlaneType+.png; zelfde grid als Article */
 export function FastlanePage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [form, setForm] = useState<FormState>(emptyForm)
   const { toneOptions } = useToneOptions()
   const { editorOptions } = useEditorOptions(form.editor)
@@ -57,6 +58,16 @@ export function FastlanePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const prefill = (location.state as { prefillContent?: string } | null)?.prefillContent?.trim()
+    if (!prefill) return
+    setForm((prev) => ({
+      ...prev,
+      extraThoughts: prefill,
+      title: prev.title.trim() ? prev.title : 'Eigen artikel',
+    }))
+  }, [location.state])
 
   useEffect(() => {
     if (!isApiConfigured()) return

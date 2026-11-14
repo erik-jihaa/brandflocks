@@ -1019,7 +1019,7 @@ export function ArticlePage() {
                 {error ??
                   (slotId
                     ? 'Artikel niet gevonden.'
-                    : 'Nog geen artikel — open een slot via de kalender.')}
+                    : 'Nog geen artikel — start via Artikel in de navigatie.')}
               </p>
             )}
           </div>
