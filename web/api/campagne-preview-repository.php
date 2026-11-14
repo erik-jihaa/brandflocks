@@ -133,6 +133,7 @@ function ce_ensure_campagne_preview_schema(PDO $pdo): void
         ['campaigns', 'calendar_color', 'ALTER TABLE campaigns ADD COLUMN calendar_color TINYINT NULL'],
         ['campaigns', 'extra_thoughts', 'ALTER TABLE campaigns ADD COLUMN extra_thoughts TEXT NULL'],
         ['campaigns', 'source_folder_id', 'ALTER TABLE campaigns ADD COLUMN source_folder_id CHAR(36) NULL'],
+        ['campaigns', 'hashtags_json', 'ALTER TABLE campaigns ADD COLUMN hashtags_json JSON NULL'],
     ];
     foreach ($alters as [$table, $column, $sql]) {
         if (ce_table_exists($pdo, $table) && !ce_table_has_column($pdo, $table, $column)) {
@@ -446,7 +447,38 @@ function ce_campagne_preview_map_campaign(array $row, int $slotCount = 0, ?PDO $
         'sources' => $pdo instanceof PDO
             ? ce_campagne_sources_for_folder($pdo, isset($row['source_folder_id']) ? (string) $row['source_folder_id'] : null)
             : [],
+        'hashtags' => ce_campagne_normalize_hashtags($row['hashtags_json'] ?? []),
     ];
+}
+
+/**
+ * @param mixed $raw
+ * @return list<string>
+ */
+function ce_campagne_normalize_hashtags(mixed $raw): array
+{
+    if (is_string($raw) && $raw !== '') {
+        $decoded = json_decode($raw, true);
+        $raw = is_array($decoded) ? $decoded : (preg_split('/[\s,]+/', $raw) ?: []);
+    }
+    if (!is_array($raw)) {
+        return [];
+    }
+    $out = [];
+    foreach ($raw as $item) {
+        $tag = trim((string) $item);
+        if ($tag === '') {
+            continue;
+        }
+        if ($tag[0] !== '#') {
+            $tag = '#' . ltrim($tag, '#');
+        }
+        if (!in_array($tag, $out, true)) {
+            $out[] = $tag;
+        }
+    }
+
+    return $out;
 }
 
 /** @param array<string, mixed> $row */
@@ -714,6 +746,7 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
         $calendarColor = ce_campagne_normalize_calendar_color($body['calendarColor'] ?? $body['calendar_color']);
     }
     $extraThoughts = trim((string) ($body['extraThoughts'] ?? $body['extra_thoughts'] ?? ''));
+    $hashtags = ce_campagne_normalize_hashtags($body['hashtags'] ?? []);
     $linkSources = ce_campagne_normalize_link_sources($body['sources'] ?? []);
 
     $explicitClient = trim((string) ($body['clientId'] ?? $body['client_id'] ?? ''));
@@ -800,6 +833,11 @@ function ce_campagne_preview_create(PDO $pdo, array $body): array
             $cols[] = 'extra_thoughts';
             $vals[] = ':extra_thoughts';
             $params['extra_thoughts'] = $extraThoughts !== '' ? $extraThoughts : null;
+        }
+        if (ce_table_has_column($pdo, 'campaigns', 'hashtags_json')) {
+            $cols[] = 'hashtags_json';
+            $vals[] = ':hashtags_json';
+            $params['hashtags_json'] = json_encode($hashtags, JSON_THROW_ON_ERROR);
         }
 
         $pdo->prepare(
@@ -1561,6 +1599,7 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
     $recalculate = filter_var($body['recalculate'] ?? false, FILTER_VALIDATE_BOOLEAN);
     $setColor = array_key_exists('calendarColor', $body) || array_key_exists('calendar_color', $body);
     $setThoughts = array_key_exists('extraThoughts', $body) || array_key_exists('extra_thoughts', $body);
+    $setHashtags = array_key_exists('hashtags', $body);
     $setSources = array_key_exists('sources', $body);
     if ($setColor && ce_table_has_column($pdo, 'campaigns', 'calendar_color')) {
         require_once __DIR__ . '/campagne-calendar-color.php';
@@ -1572,6 +1611,13 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
         $updates[] = 'extra_thoughts = :extra_thoughts';
         $params['extra_thoughts'] = $thoughts !== '' ? $thoughts : null;
     }
+    if ($setHashtags && ce_table_has_column($pdo, 'campaigns', 'hashtags_json')) {
+        $updates[] = 'hashtags_json = :hashtags_json';
+        $params['hashtags_json'] = json_encode(
+            ce_campagne_normalize_hashtags($body['hashtags'] ?? []),
+            JSON_THROW_ON_ERROR,
+        );
+    }
     if (array_key_exists('merkOnderdelen', $body) || array_key_exists('merk_onderdelen', $body)) {
         $onderdelen = ce_campagne_normalize_merk_onderdelen($body['merkOnderdelen'] ?? $body['merk_onderdelen'] ?? []);
         if (ce_table_has_column($pdo, 'campaigns', 'merk_onderdelen_json')) {
@@ -1579,7 +1625,7 @@ function ce_campagne_preview_patch(PDO $pdo, string $campaignId, array $body, ?s
             $params['merk_onderdelen_json'] = json_encode($onderdelen, JSON_THROW_ON_ERROR);
         }
     }
-    if ($updates === [] && !$reapplyPhases && !$setGeo && !$setBank && !$setSlotOnderdeel && !$setDecision && !$setInstructie && !$recalculate && !$setSources) {
+    if ($updates === [] && !$reapplyPhases && !$setGeo && !$setBank && !$setSlotOnderdeel && !$setDecision && !$setInstructie && !$recalculate && !$setSources && !$setHashtags) {
         return $existing;
     }
 

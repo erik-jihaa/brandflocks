@@ -168,6 +168,7 @@ export type CampagnePreviewCampaign = {
   extraThoughts?: string
   sourceFolderId?: string | null
   sources?: CampagneSourceDto[]
+  hashtags?: string[]
 }
 
 export type CampagneSourceDto = {
@@ -221,6 +222,7 @@ export type CampagnePreviewCreatePayload = {
   extraThoughts?: string
   sources?: Array<{ url: string; title?: string; label?: string; kind?: string }>
   ensureSourceFolder?: boolean
+  hashtags?: string[]
 }
 
 export type CampagnePreviewCreateResponse = CampagnePreviewDetail & {
@@ -321,6 +323,8 @@ export function patchCampagnePreview(
     calendarColor?: number
     extraThoughts?: string
     sources?: Array<{ url: string; title?: string; label?: string; kind?: string }>
+    hashtags?: string[]
+    geoQuestionIds?: string[]
   },
 ): Promise<CampagnePreviewDetail> {
   return apiFetch(`/campagne-preview/${id}`, {

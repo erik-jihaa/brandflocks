@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
 import { FieldSingle } from '../components/ui/Field'
 import { Pulldown } from '../components/ui/Pulldown'
@@ -7,17 +7,19 @@ import { PillButton, pillActionsRowClass } from '../components/PillButton'
 import { CampagneListRow } from '../components/StatusRow'
 import { ActionSep } from '../components/ui/ActionLink'
 import { CampagneBankEditor, type CampagneBankRow } from '../components/CampagneBankEditor'
-import { CommaWordsField, feitRowsWithCommaWords } from '../components/CommaWordsField'
 import { CheckboxOption } from '../components/ui/RadioOption'
 import { StrategySection } from '../components/ui/Field'
 import { GRID2_REVIEW_MAIN_WIDTH, LIST_SECTION } from '../layout/grid.constants'
 import { campagnePhaseLabel, groupCampagnesByStartWeek } from '../utils/campagneActions'
 import {
+  borderedSectionClass,
   borderedSectionStackClass,
   designStackClass,
   pageNavLinkClass,
   pillActionsRowWithNavLinkClass,
 } from '../design/identity.constants'
+import { fetchLlmQuestions } from '../api/llmQuestions'
+import { ARTICLE_START_MERK_LABELS } from '../articleStart/articleStartMerk'
 import { scheduleAgendaSlot } from '../api/agenda'
 import { PlanReview, type PlanReviewSectionKey } from './CampagnePlanReview'
 import { PeriodAgendaOverview } from '../components/PeriodAgendaOverview'
@@ -66,9 +68,9 @@ const STEP_COPY: { title: string; question: string; hint: string }[] = [
     hint: '',
   },
   {
-    title: 'Vragen en feiten',
+    title: 'Welke vragen en feiten gaan mee?',
     question: 'Welke vragen en feiten gaan mee?',
-    hint: 'Merkonderdelen, vragen en feiten. Woorden vul je komma-gescheiden in — die komen in de feitenbank.',
+    hint: '',
   },
   {
     title: 'Periode',
@@ -142,6 +144,7 @@ type FormState = {
   calendarColor: number | null
   extraThoughts: string
   sources: CampagneSourceDto[]
+  hashtags: string[]
 }
 
 function isoDate(d: Date): string {
@@ -178,6 +181,7 @@ function emptyForm(geoQuestionIds: string[] = [], vraagIds: string[] = [], feitI
     calendarColor: null,
     extraThoughts: '',
     sources: [],
+    hashtags: [],
   }
 }
 
@@ -380,12 +384,15 @@ export function CampagnePage() {
   const [removedBankFeitIds, setRemovedBankFeitIds] = useState<string[]>([])
   const [editingPhaseKey, setEditingPhaseKey] = useState<string | null>(null)
   const [busyCampaignId, setBusyCampaignId] = useState<string | null>(null)
-  const [missingWordsInput, setMissingWordsInput] = useState('')
   const [sourceMode, setSourceMode] = useState<'link' | 'bestand'>('link')
   const [sourceDraft, setSourceDraft] = useState('')
   const [sourceDraftOk, setSourceDraftOk] = useState(false)
   const [sourceNotice, setSourceNotice] = useState<string | null>(null)
   const [pendingFiles, setPendingFiles] = useState<{ id: string; name: string; file: File }[]>([])
+  const [seoPreview, setSeoPreview] = useState('')
+  const [geoPreview, setGeoPreview] = useState('')
+  const [hashtagInput, setHashtagInput] = useState('')
+  const [showHashtagField, setShowHashtagField] = useState(false)
   const colorTouched = useRef(false)
 
   const loadCatalog = useCallback(async () => {
@@ -496,6 +503,7 @@ export function CampagnePage() {
         calendarColor: typeof campaign.calendarColor === 'number' ? campaign.calendarColor : null,
         extraThoughts: campaign.extraThoughts ?? '',
         sources: campaign.sources ?? [],
+        hashtags: campaign.hashtags ?? [],
       })
       colorTouched.current = typeof campaign.calendarColor === 'number'
     } catch (err) {
@@ -552,6 +560,31 @@ export function CampagnePage() {
     if (form.calendarColor === next) return
     setForm((prev) => ({ ...prev, calendarColor: next }))
   }, [campaigns, form.calendarColor, isOverview, activeCampaignId])
+
+  useEffect(() => {
+    if (step !== 3 || !isApiConfigured()) return
+    let cancelled = false
+    void (async () => {
+      try {
+        const llm = await fetchLlmQuestions()
+        if (cancelled) return
+        const seo = (llm.seoQuestions ?? []).map((q) => q.question?.trim() ?? '').find(Boolean) ?? ''
+        const geo = (llm.geoQuestions ?? []).map((q) => q.question?.trim() ?? '').find(Boolean) ?? ''
+        setSeoPreview(seo)
+        setGeoPreview(geo)
+        const geoIds = (llm.geoQuestions ?? []).map((q) => q.id).filter(Boolean)
+        setForm((prev) => {
+          if (prev.geoQuestionIds.length > 0 || geoIds.length === 0) return prev
+          return { ...prev, geoQuestionIds: geoIds }
+        })
+      } catch {
+        if (!cancelled) setError('SEO/GEO kon niet geladen worden.')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [step])
   const planReady = activeCampaignId != null && slots.length > 0
 
   function trackRemovedBankId(kind: 'vraag' | 'feit', id: string) {
@@ -625,9 +658,18 @@ export function CampagnePage() {
   async function syncCampaignAnkers(vraagIds: string[], feitIds: string[]): Promise<boolean> {
     if (!activeCampaignId || !canEditWizard) return true
     try {
-      const detail = await patchCampagnePreview(activeCampaignId, { vraagIds, feitIds })
+      const detail = await patchCampagnePreview(activeCampaignId, {
+        vraagIds,
+        feitIds,
+        merkOnderdelen: form.merkOnderdelen,
+        hashtags: form.hashtags,
+        geoQuestionIds: form.geoQuestionIds,
+      })
       setSlots(detail.slots ?? [])
       if (detail.campaign?.planCheck) setPlanCheck(detail.campaign.planCheck)
+      if (detail.campaign?.hashtags) {
+        setForm((prev) => ({ ...prev, hashtags: detail.campaign?.hashtags ?? prev.hashtags }))
+      }
       return true
     } catch (err) {
       setError(errorMessage(err))
@@ -688,13 +730,8 @@ export function CampagnePage() {
       if (!metaOk) return
     }
     if (step === 3) {
-      const mergedFeiten = feitRowsWithCommaWords(missingWordsInput, draftFeitRows)
-      if (missingWordsInput.trim() !== '') {
-        setMissingWordsInput('')
-        setDraftFeitRows(mergedFeiten)
-      }
       setBusy(true)
-      const bankResult = await persistBank(mergedFeiten)
+      const bankResult = await persistBank()
       if (!bankResult.ok) {
         setBusy(false)
         return
@@ -770,7 +807,8 @@ export function CampagnePage() {
     resetWizardPlanState()
     setError(null)
     setEditingPhaseKey(null)
-    setMissingWordsInput('')
+    setHashtagInput('')
+    setShowHashtagField(false)
     navigate('/campagnes/nieuw/stap/1')
   }
 
@@ -798,15 +836,7 @@ export function CampagnePage() {
   function canContinue(current: number): boolean {
     if (current === 1) return form.calendarColor !== null
     if (current === 2) return form.title.trim() !== ''
-    if (current === 3) {
-      const filledVragen = draftVraagRows.filter((r) => r.text.trim() !== '')
-      const filledFeiten = draftFeitRows.filter((r) => r.text.trim() !== '')
-      const vragenOk =
-        form.vraagIds.length <= 3 && (filledVragen.length === 0 || form.vraagIds.length >= 1)
-      const feitenOk =
-        form.feitIds.length <= 3 && (filledFeiten.length === 0 || form.feitIds.length >= 1)
-      return vragenOk && feitenOk && form.merkOnderdelen.length > 0
-    }
+    if (current === 3) return form.merkOnderdelen.length > 0
     if (current === 4) return form.startDate !== '' && form.endDate !== '' && form.startDate <= form.endDate
     if (current === 5) return totalPosts > 0 && channelProblem() === null
     if (current === 6) return activePhases.length > 0
@@ -820,12 +850,24 @@ export function CampagnePage() {
     return [...list, id]
   }
 
-  function toggleVraag(id: string) {
-    setForm((prev) => ({ ...prev, vraagIds: toggleId(prev.vraagIds, id, 3) }))
+  function toggleFeit(id: string) {
+    setForm((prev) => ({ ...prev, feitIds: toggleId(prev.feitIds, id, 20) }))
   }
 
-  function toggleFeit(id: string) {
-    setForm((prev) => ({ ...prev, feitIds: toggleId(prev.feitIds, id, 3) }))
+  function addHashtag() {
+    const raw = hashtagInput.trim().replace(/^#/, '')
+    if (!raw) return
+    const tag = `#${raw}`
+    setForm((prev) => ({
+      ...prev,
+      hashtags: prev.hashtags.includes(tag) ? prev.hashtags : [...prev.hashtags, tag],
+    }))
+    setHashtagInput('')
+    setShowHashtagField(false)
+  }
+
+  function removeHashtag(tag: string) {
+    setForm((prev) => ({ ...prev, hashtags: prev.hashtags.filter((item) => item !== tag) }))
   }
 
   function toggleOnderdeel(key: string) {
@@ -955,8 +997,10 @@ export function CampagnePage() {
         vraagIds: form.vraagIds,
         feitIds: form.feitIds,
         merkOnderdelen: form.merkOnderdelen,
+        geoQuestionIds: form.geoQuestionIds,
         calendarColor: form.calendarColor ?? 0,
         extraThoughts: form.extraThoughts,
+        hashtags: form.hashtags,
         sources: form.sources
           .filter((item) => item.kind === 'link' && item.url)
           .map((item) => ({ url: item.url ?? '', title: item.label, kind: 'link' })),
@@ -1086,11 +1130,6 @@ export function CampagnePage() {
           </p>
           <h2 className={stepQuestionClass}>{copy?.question}</h2>
           {copy?.hint ? <p className={stepLeadClass}>{copy.hint}</p> : null}
-          {step === 3 ? (
-            <p className={stepLeadClass}>
-              Merkonderdelen — de fases stellen voor, click cirkels aan om te selecteren.
-            </p>
-          ) : null}
         </div>
 
         {step === 1 && (
@@ -1271,67 +1310,123 @@ export function CampagnePage() {
         )}
 
         {step === 3 && (
-          <>
-            <div className="-mt-[8px] flex flex-col gap-[10px]">
-              {CAMPAGNE_MERK_ONDERDELEN.map((key) => (
-                <CheckboxOption
-                  key={key}
-                  checked={form.merkOnderdelen.includes(key)}
-                  onChange={() => toggleOnderdeel(key)}
-                  label={merkOnderdeelLabel(key) ?? key}
-                />
-              ))}
-            </div>
-            <div className={borderedSectionStackClass}>
-              <StrategySection
-                title="Vragen"
-                hint="Kies 1 tot 3 vragen voor ankers in de campagne. Bewerk of voeg toe — het wordt opgeslagen in je merkbank."
-                hintTone="black"
-                filled={draftVraagRows.some((r) => r.text.trim() !== '')}
-              >
-                <CampagneBankEditor
-                  kind="vraag"
-                  rows={draftVraagRows}
-                  selectedIds={form.vraagIds}
-                  maxSelected={3}
-                  onChange={setDraftVraagRows}
-                  onToggleSelect={toggleVraag}
-                  onRemoveRow={(id) => trackRemovedBankId('vraag', id)}
-                  disabled={busy}
-                />
-              </StrategySection>
-              <StrategySection
-                title="Feiten"
-                hint="Kies 1 tot 3 feiten. Bewerk of voeg toe — het wordt opgeslagen in je merkbank."
-                hintTone="black"
-                filled={draftFeitRows.some((r) => r.text.trim() !== '')}
-              >
-                <CampagneBankEditor
-                  kind="feit"
-                  rows={draftFeitRows}
-                  selectedIds={form.feitIds}
-                  maxSelected={3}
-                  onChange={setDraftFeitRows}
-                  onToggleSelect={toggleFeit}
-                  onRemoveRow={(id) => trackRemovedBankId('feit', id)}
-                  disabled={busy}
-                />
-              </StrategySection>
-              <StrategySection
-                title="Woorden"
-                hint="Woorden of korte zinnen voor je feitenbank. Gescheiden door komma's — bij Verder worden ze opgeslagen als feiten."
-                hintTone="black"
-                filled={missingWordsInput.trim() !== ''}
-              >
-                <CommaWordsField
-                  id="campagne-missing-words"
-                  value={missingWordsInput}
-                  onChange={setMissingWordsInput}
-                  disabled={busy}
-                />
-              </StrategySection>
-            </div>
-          </>
+          <div className={borderedSectionStackClass}>
+            <section className={borderedSectionClass}>
+              <h2 className="m-0 text-[18px] leading-[22px] font-semibold text-ce-black">Merkonderdelen</h2>
+              <div className="mt-[12px] flex flex-col gap-[10px]">
+                {CAMPAGNE_MERK_ONDERDELEN.map((key) => (
+                  <CheckboxOption
+                    key={key}
+                    align="start"
+                    checked={form.merkOnderdelen.includes(key)}
+                    onChange={() => toggleOnderdeel(key)}
+                  >
+                    <span className="block font-semibold">
+                      {ARTICLE_START_MERK_LABELS[key] ?? merkOnderdeelLabel(key) ?? key}
+                    </span>
+                  </CheckboxOption>
+                ))}
+              </div>
+            </section>
+
+            <StrategySection
+              title="Feiten"
+              hint="Harde feiten en cijfers die in deze campagne gebruikt mogen worden. Vink aan wat je wilt meenemen, of voeg een eigen feit toe."
+              hintTone="black"
+              filled={form.feitIds.length > 0}
+            >
+              <CampagneBankEditor
+                kind="feit"
+                rows={draftFeitRows}
+                selectedIds={form.feitIds}
+                maxSelected={20}
+                onChange={setDraftFeitRows}
+                onToggleSelect={toggleFeit}
+                onRemoveRow={(id) => trackRemovedBankId('feit', id)}
+                disabled={busy}
+              />
+            </StrategySection>
+
+            <section className={borderedSectionClass}>
+              <h2 className="m-0 text-[18px] leading-[22px] font-semibold text-ce-black">SEO- en GEO-vragen</h2>
+              {seoPreview || geoPreview ? (
+                <div className="mt-[10px] text-[14px] leading-[21px] text-ce-black">
+                  {seoPreview ? (
+                    <>
+                      <p className="m-0 text-[13px] font-semibold text-ce-black">SEO</p>
+                      <p className="m-0 mt-[4px] text-ce-black">{seoPreview}</p>
+                    </>
+                  ) : null}
+                  {geoPreview ? (
+                    <>
+                      <p className="m-0 mt-[14px] text-[13px] font-semibold text-ce-black">GEO</p>
+                      <p className="m-0 mt-[4px] text-ce-black">{geoPreview}</p>
+                    </>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="m-0 mt-[10px] text-[14px] leading-[21px] text-ce-beige">Nog geen vragen ingesteld.</p>
+              )}
+              <p className="m-0 mt-[10px] text-[14px] leading-[21px] text-ce-beige">
+                Nog geen vragen? Je kunt ze toevoegen bij{' '}
+                <Link to="/search" className={pageNavLinkClass}>
+                  SEO/GEO
+                </Link>
+                , of deze stap overslaan.
+              </p>
+            </section>
+
+            <section className={borderedSectionClass}>
+              <h2 className="m-0 text-[18px] leading-[22px] font-semibold text-ce-black">Hashtags</h2>
+              <p className="m-0 mt-[8px] text-[14px] leading-[21px] text-ce-beige">
+                Gaan standaard mee met elke post uit deze campagne — je kunt ze per post nog aanpassen.
+              </p>
+              <div className="mt-[10px] flex flex-wrap items-center gap-[8px] text-[12px] text-ce-beige">
+                {form.hashtags.map((tag) => (
+                  <span key={tag} className="inline-flex items-center gap-[4px]">
+                    {tag}
+                    <button
+                      type="button"
+                      className="cursor-pointer border-0 bg-transparent p-0 text-ce-beige"
+                      aria-label={`Verwijder ${tag}`}
+                      onClick={() => removeHashtag(tag)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {!showHashtagField ? (
+                  <PillButton
+                    variant="second"
+                    className="mb-0 h-[32px] px-[16px] text-[12px]"
+                    onClick={() => setShowHashtagField(true)}
+                  >
+                    + hashtag toevoegen
+                  </PillButton>
+                ) : null}
+              </div>
+              {showHashtagField ? (
+                <div className="mt-[10px] flex flex-wrap items-center gap-[8px]">
+                  <input
+                    type="text"
+                    value={hashtagInput}
+                    onChange={(event) => setHashtagInput(event.target.value)}
+                    placeholder="eigenhashtag"
+                    className="w-[180px] border border-ce-beige bg-ce-offwhite px-[10px] py-[8px] text-[14px] text-ce-black outline-none"
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        addHashtag()
+                      }
+                    }}
+                  />
+                  <PillButton variant="second" className="mb-0" onClick={addHashtag}>
+                    Toevoegen
+                  </PillButton>
+                </div>
+              ) : null}
+            </section>
+          </div>
         )}
 
         {step === 4 && (
