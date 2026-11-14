@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { GridShell } from '../layout/GridShell'
 import { BREADCRUMB_PUBLICATION_ARTICLE, NavBreadcrumb } from '../components/NavBreadcrumb'
 import { ThemeReviewRow, normalizeThemeFeedback, type ThemeReviewFeedback } from '../components/ThemeReviewRow'
 import { ThemeCustomCard } from '../components/ThemeCustomCard'
 import { ThemeGenerationTips } from '../components/ThemeGenerationTips'
-import { PillButton } from '../components/PillButton'
+import { PillButton, pillActionsRowClass } from '../components/PillButton'
 import { LoadingDots } from '../components/LoadingDots'
 import { createTheme, fetchThemes, generateThemes, patchTheme, submitTheme, type ThemeListMeta } from '../api/onboarding'
 import { isApiConfigured } from '../api/client'
@@ -22,8 +22,10 @@ import {
   themeVerdictConflictsWithArchetype,
   themeVerdictToelichtingForDisplay,
 } from '../utils/themeVerdict'
+import { THEME_THIN_WARNING } from '../utils/themeOnderbouwing'
+import { pageNavLinkClass } from '../design/identity.constants'
 
-const MAX_CANDIDATES = 3
+const MAX_CANDIDATES = 6
 
 type ThemeDraft = {
   title: string
@@ -421,7 +423,7 @@ export function ThemePage() {
     return false
   }
 
-  async function handleGenerateThemes() {
+  async function handleGenerateThemes(forceThin = false) {
     setGenerating(true)
     setError(null)
     showActionInfo('Thema-voorstellen worden gegenereerd…')
@@ -435,7 +437,9 @@ export function ThemePage() {
       }
 
       const weekKey = weekParam ?? meta?.activeWeekKey ?? ''
-      const result = await generateThemes(weekKey !== '' ? weekKey : undefined)
+      const result = await generateThemes(weekKey !== '' ? weekKey : undefined, {
+        forceThin: forceThin || undefined,
+      })
       keepGenerating = applyGenerateResult(result)
     } catch (err) {
       // Proxy kan alsnog knippen; poll als fallback voor het geval CE-01 wél doordraaide.
@@ -758,14 +762,42 @@ export function ThemePage() {
 
           {needsThemeGeneration && !usingMock && !weekComplete && visibleThemes.length === 0 && !awaitingThemePoll && (
             <div className="pt-[16px]">
-              <PillButton
-                variant="main"
-                onClick={() => void handleGenerateThemes()}
-                disabled={busy}
-                loading={generating}
-              >
-                Genereer thema-voorstellen
-              </PillButton>
+              {meta?.thinSourceWarning ? (
+                <div className="flex flex-col gap-[12px]">
+                  <p className="m-0 text-[14px] leading-[21px] text-ce-black">
+                    {THEME_THIN_WARNING}{' '}
+                    <Link to="/sources" className={pageNavLinkClass}>
+                      Bronnen
+                    </Link>
+                  </p>
+                  <div className={pillActionsRowClass}>
+                    <PillButton
+                      variant="main"
+                      onClick={() => navigate('/sources')}
+                      disabled={busy}
+                    >
+                      Bronnen toevoegen
+                    </PillButton>
+                    <PillButton
+                      variant="second"
+                      onClick={() => void handleGenerateThemes(true)}
+                      disabled={busy}
+                      loading={generating}
+                    >
+                      Toch doorgaan
+                    </PillButton>
+                  </div>
+                </div>
+              ) : (
+                <PillButton
+                  variant="main"
+                  onClick={() => void handleGenerateThemes()}
+                  disabled={busy}
+                  loading={generating}
+                >
+                  Genereer thema-voorstellen
+                </PillButton>
+              )}
             </div>
           )}
 

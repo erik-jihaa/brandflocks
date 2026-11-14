@@ -44,6 +44,7 @@ import {
   themeVerdictConflictsWithArchetype,
   themeVerdictToelichtingForDisplay,
 } from '../utils/themeVerdict'
+import { lichtOnderbouwdLabel as lichtOnderbouwdLabelFromCount } from '../utils/themeOnderbouwing'
 
 const RESEARCH_SUBMIT_NAV_DELAY_MS = 1200
 const MAX_ITEMS = 10
@@ -186,6 +187,7 @@ export function ResearchPage() {
   const [themeGroups, setThemeGroups] = useState<ResearchThemeGroup[]>([])
   const [activeThemeIndex, setActiveThemeIndex] = useState(0)
   const [weekLabel, setWeekLabel] = useState('')
+  const [lichtOnderbouwdLabel, setLichtOnderbouwdLabel] = useState<string | null>(null)
   const [expectsArticleWrite, setExpectsArticleWrite] = useState(false)
   const [draftFeedback, setDraftFeedback] = useState<Record<string, ResearchFeedback>>({})
   const [loading, setLoading] = useState(false)
@@ -270,6 +272,8 @@ export function ResearchPage() {
         themeGroups?: ResearchThemeGroup[]
         note?: string
         slotStatus?: string
+        usableResearchCount?: number
+        lichtOnderbouwdLabel?: string | null
       },
       options?: { allowResearchDoneRedirect?: boolean },
     ) => {
@@ -292,6 +296,13 @@ export function ResearchPage() {
       const anchorIdx = groups.findIndex((group) => group.slotId === data.slotId)
       setActiveThemeIndex(anchorIdx >= 0 ? anchorIdx : 0)
       setWeekLabel(data.weekLabel?.trim() ?? '')
+      const usable =
+        typeof data.usableResearchCount === 'number'
+          ? data.usableResearchCount
+          : limitedItems.length
+      setLichtOnderbouwdLabel(
+        data.lichtOnderbouwdLabel ?? lichtOnderbouwdLabelFromCount(usable),
+      )
       setExpectsArticleWrite(groups.some((group) => group.expectsArticleWrite === true))
       setDraftFeedback((prev) => {
         const fromServer = draftFromItems(limitedItems)
@@ -597,7 +608,7 @@ export function ResearchPage() {
         setAwaitingResearchPoll(false)
         if (visibleItemsCountRef.current === 0) {
           setError(
-            'Onderzoek leverde nog geen bruikbare bronnen op. Klik opnieuw op Onderzoek starten of voeg bronnen toe onder Sources.',
+            'Onderzoek leverde nog geen bruikbare bronnen op. Klik opnieuw op Onderzoek starten of voeg bronnen toe onder Bronnen.',
           )
         }
         window.clearInterval(interval)
@@ -941,6 +952,11 @@ export function ResearchPage() {
                 : weekLabel}
             </p>
           )}
+          {lichtOnderbouwdLabel ? (
+            <p className="m-0 mt-[6px] text-[14px] leading-[18px] text-ce-beige" role="status">
+              {lichtOnderbouwdLabel}
+            </p>
+          ) : null}
           {note && <p className="mt-[12px] mb-0 text-[14px] leading-[18px] text-ce-black">{note}</p>}
           {error && <p className="mt-[12px] mb-0 text-[14px] leading-[18px] text-ce-red">{error}</p>}
           {imageUploadWarning && (

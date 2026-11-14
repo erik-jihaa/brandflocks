@@ -23,9 +23,9 @@ function ce_hba_open_koppelpunten_catalog(): array
         'architectuur_signaal_waarschuwing' => null,
         'architectuur_signaal_kritiek' => null,
 
-        // OPEN KOPPELPUNT — thema-onderbouwing (drempels-thema-onderbouwing.md)
-        'thema_min_bruikbare_bronnen' => null,
-        'thema_licht_onderbouwd_bronnen' => null,
+        // Uit drempels-thema-onderbouwing.md (§1–3): min. 2 fragmenten = normaal onderbouwd.
+        'thema_min_bruikbare_bronnen' => 2,
+        'thema_licht_onderbouwd_bronnen' => 2,
 
         // OPEN KOPPELPUNT — voorrangsregel copy-modus vs kanaaltabel bij CTA (besluit B7)
         'cta_voorrang_copy_modus_vs_kanaal' => null,

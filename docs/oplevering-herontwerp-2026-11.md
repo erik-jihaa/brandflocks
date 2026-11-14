@@ -126,7 +126,14 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 - LLM-voorstellen invalshoeken + Onderzoek-kaarten (klikmodel `p-onderzoek`) nog niet; lokale seed.
 - Multi-kanaal: één slot per artikel op primair kanaal (geen fan-out per kanaal/offsets).
 - Systeemcheck ritme/plan-check nog niet live.
-- Drempels thema-onderbouwing; artikel-detail zijbalk-typen + CTA-blok.
+- Artikel-detail zijbalk-typen + CTA-blok.
+- **Stap 5 branche-koppeling** wacht op branchebibliotheek-ZIP in de fork (geen importscript tot die data er is).
+
+### Follow-up Claude-feedback (14 nov) — klanttaal + drempels
+
+- Rapport: “Rapport/SEO/GEO-rapport opgeslagen bij Alle artikelen” (geen Report/Findability/archief).
+- Alle artikelen-bevestiging: “Geen concept gevonden.”
+- Drempels thema-onderbouwing: `theme-onderbouwing.php` + UI-waarschuwing Bronnen toevoegen / Toch doorgaan; label “licht onderbouwd” bovenaan Onderzoek; test `tests/php/theme-onderbouwing.php`.
 
 ## Pilot-fixes leesronde (14 nov)
 
