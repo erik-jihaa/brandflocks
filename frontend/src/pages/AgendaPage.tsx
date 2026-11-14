@@ -1,65 +1,30 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { AgendaCalendar } from '../components/AgendaCalendar'
 import { AgendaCampaignList } from '../components/AgendaCampaignList'
+import { AgendaDateList } from '../components/AgendaDateList'
 import { AgendaPortfolioSignals } from '../components/AgendaPortfolioSignals'
 import { AgendaViewFilters } from '../components/AgendaViewFilters'
 import { ActionNotice } from '../components/ui/ActionNotice'
 import { useActionNotice } from '../hooks/useActionNotice'
 import { GridShell } from '../layout/GridShell'
-import { AGENDA_MAIN_WIDTH, LIST_SECTION } from '../layout/grid.constants'
-import { statusRowActionClass } from '../components/ui/ActionLink'
-import { AgendaRow } from '../components/StatusRow'
+import { AGENDA_MAIN_WIDTH } from '../layout/grid.constants'
 import { deleteAgendaSlot, scheduleAgendaSlot } from '../api/agenda'
 import { ApiError } from '../api/client'
 import { useAgenda } from '../hooks/useAgenda'
-import {
-  agendaCampaignTitles,
-  agendaRowDisplayTitle,
-  buildAgendaActions,
-  resolveAgendaPhase,
-  agendaPhaseLabel,
-} from '../utils/agendaActions'
-import {
-  formatTodayAgendaLabel,
-  formatWeekRange,
-  getAgendaDateMeta,
-  isPastAgendaWeek,
-  parseWeekNumber,
-  todayIso,
-} from '../utils/agendaDates'
+import { formatTodayAgendaLabel, getAgendaDateMeta, todayIso } from '../utils/agendaDates'
 import { flattenAgendaRows, listAgendaGroups, mondayOfIso, upcomingMondaysFrom } from '../utils/agendaCalendarGrid'
 import {
   AGENDA_CHANNEL_ALL,
+  AGENDA_EMPTY_MONTH_MESSAGE,
   AGENDA_MONTH_ALL,
   agendaChannelOptions,
   agendaMonthOptions,
   filterAgendaWeekGroups,
+  rowsForAgendaGroupMode,
   type AgendaGroupMode,
 } from '../utils/agendaFilters'
 import type { AgendaRowDto } from '../types/api'
-
-type AgendaWeekHeaderProps = {
-  week: string
-  weekNumber?: number | null
-  weekRange?: string | null
-  dimmed?: boolean
-}
-
-function AgendaWeekHeader({ week, weekNumber, weekRange, dimmed = false }: AgendaWeekHeaderProps) {
-  const parsedNumber = weekNumber ?? parseWeekNumber(week)
-  const range =
-    parsedNumber != null ? formatWeekRange(parsedNumber) : weekRange?.trim() ? weekRange : null
-
-  return (
-    <h2 className={`${LIST_SECTION.headerClass} whitespace-normal break-words ${dimmed ? 'text-ce-beige' : 'text-ce-black'}`}>
-      {week}
-      {range && (
-        <span className="text-[14px] leading-[18px] font-normal"> _ {range}</span>
-      )}
-    </h2>
-  )
-}
 
 function AgendaPageTitle({ todayLabel }: { todayLabel: string }) {
   return (
@@ -109,7 +74,6 @@ export function AgendaPage() {
 
   const dateMeta = getAgendaDateMeta()
   const todayLabel = dateMeta.todayLabel
-  const currentWeek = agenda?.currentWeek ?? dateMeta.currentWeek
   const postsPerWeek = agenda?.postsPerWeek ?? 2
   const planningHorizonWeeks = agenda?.planningHorizonWeeks ?? 4
   const currentMonday = mondayOfIso(todayIso()) ?? todayIso()
@@ -139,6 +103,25 @@ export function AgendaPage() {
     [listGroups],
   )
   const monthOptions = useMemo(() => agendaMonthOptions(listGroups), [listGroups])
+
+  // Kanaalfilter kan verdwijnen als data/tenant wisselt — val terug op Alle kanalen.
+  useEffect(() => {
+    if (channel === AGENDA_CHANNEL_ALL) return
+    if (channelOptions.some((option) => option.key === channel)) return
+    setChannel(AGENDA_CHANNEL_ALL)
+  }, [channel, channelOptions])
+
+  const rowsForList = useMemo(
+    () => rowsForAgendaGroupMode(filteredListRows, groupMode),
+    [filteredListRows, groupMode],
+  )
+  const listEmptyMessage = useMemo(() => {
+    if (rowsForList.length > 0) return null
+    return monthKey !== AGENDA_MONTH_ALL ? AGENDA_EMPTY_MONTH_MESSAGE : 'Geen posts voor deze filters.'
+  }, [rowsForList.length, monthKey])
+  // Overzicht: lege maand op alle posts (niet op Lijst “Op campagne”-subset).
+  const calendarEmptyMonth =
+    view === 'calendar' && monthKey !== AGENDA_MONTH_ALL && filteredListRows.length === 0
 
   async function handleAction(
     slotId: string,
@@ -253,7 +236,7 @@ export function AgendaPage() {
               className={toggleClass(view === 'calendar')}
               onClick={() => setView('calendar')}
             >
-              Kalender
+              Overzicht
             </button>
             <span className="px-[8px] text-[14px] font-semibold leading-[18px] text-ce-black">|</span>
             <button
@@ -266,6 +249,7 @@ export function AgendaPage() {
           </div>
 
           <AgendaViewFilters
+            showGroupToggles={view === 'list'}
             groupMode={groupMode}
             onGroupMode={setGroupMode}
             channel={channel}
@@ -276,7 +260,11 @@ export function AgendaPage() {
             months={monthOptions}
           />
 
-          {view === 'calendar' ? (
+          {calendarEmptyMonth ? (
+            <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{AGENDA_EMPTY_MONTH_MESSAGE}</p>
+          ) : null}
+
+          {view === 'calendar' && !calendarEmptyMonth ? (
             <>
               <AgendaPortfolioSignals signals={agenda.portfolioSignals ?? []} />
               <AgendaCalendar
@@ -285,7 +273,6 @@ export function AgendaPage() {
                 horizonWeeks={planningHorizonWeeks}
                 today={todayIso()}
                 busySlotId={busySlotId}
-                groupMode={groupMode}
                 channel={channel}
                 monthKey={monthKey}
                 onSchedule={handleSchedule}
@@ -295,9 +282,14 @@ export function AgendaPage() {
             </>
           ) : null}
 
-          {view === 'list' && groupMode === 'campaign' ? (
+          {view === 'list' && listEmptyMessage ? (
+            <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{listEmptyMessage}</p>
+          ) : null}
+
+          {view === 'list' && groupMode === 'campaign' && !listEmptyMessage ? (
             <AgendaCampaignList
-              rows={filteredListRows}
+              rows={rowsForList}
+              monthKey={monthKey}
               busySlotId={busySlotId}
               onAction={(row, action) => {
                 void handleAction(row.slotId, row.title, action, row.articleId)
@@ -305,73 +297,16 @@ export function AgendaPage() {
             />
           ) : null}
 
-          {view === 'list' && groupMode === 'date' && filteredListGroups.length === 0 ? (
-            <p className="m-0 text-[14px] leading-[18px] text-ce-beige">Geen posts voor deze filters.</p>
+          {view === 'list' && groupMode === 'date' && !listEmptyMessage ? (
+            <AgendaDateList
+              rows={rowsForList}
+              allRowsForColors={filteredListRows}
+              busySlotId={busySlotId}
+              onAction={(row, action) => {
+                void handleAction(row.slotId, row.title, action, row.articleId)
+              }}
+            />
           ) : null}
-
-          {view === 'list' && groupMode === 'date' && filteredListGroups.map((group) => {
-            const weekNumber = group.weekNumber ?? parseWeekNumber(group.week)
-            const dimmed = isPastAgendaWeek(weekNumber, currentWeek)
-            const weekCampaigns = agendaCampaignTitles(group.rows)
-
-            return (
-              <section key={group.week} className={LIST_SECTION.sectionClass}>
-                <AgendaWeekHeader
-                  week={group.week}
-                  weekNumber={weekNumber}
-                  weekRange={group.weekRange}
-                  dimmed={dimmed}
-                />
-                <div className={LIST_SECTION.bodyClass}>
-                  <div className={LIST_SECTION.bodyStackClass}>
-                    {weekCampaigns.length > 0 ? (
-                      <p className="m-0 text-[14px] leading-[18px] text-ce-beige">
-                        {weekCampaigns.join(' · ')}
-                      </p>
-                    ) : null}
-                    {group.rows.length === 0 && group.themeOnly ? (
-                      <p className="m-0 text-[14px] leading-[18px] text-ce-beige">
-                        Nog geen artikel —{' '}
-                        <Link
-                          to={
-                            group.cycleWeek
-                              ? `/theme?week=${encodeURIComponent(group.cycleWeek)}`
-                              : '/theme'
-                          }
-                          className={statusRowActionClass}
-                        >
-                          kies een thema
-                        </Link>
-                        .
-                      </p>
-                    ) : null}
-                    {group.rows.map((row) => (
-                      <AgendaRow
-                        key={row.slotId}
-                        title={agendaRowDisplayTitle(row)}
-                        phaseLabel={
-                          row.phaseLabel ??
-                          agendaPhaseLabel(resolveAgendaPhase(row), row.editorFirstName)
-                        }
-                        actions={buildAgendaActions(row, { pastWeek: dimmed })}
-                        dimmed={dimmed}
-                        busy={busySlotId === row.slotId}
-                        onAction={(nextAction) => {
-                          if (busySlotId === row.slotId) return
-                          void handleAction(
-                            row.slotId,
-                            row.title,
-                            nextAction,
-                            row.articleId,
-                          )
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )
-          })}
         </>
       }
     />

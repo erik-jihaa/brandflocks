@@ -46,7 +46,44 @@ Nav-item verwijderd. **`/targets` en API `/objectives` blijven.** `source-folder
 
 - **Merktaal of Merkelementen:** klikmodel = Merktaal; voorstel 31 okt. / weekplan = Merkelementen. Gebouwd als **Merktaal**.
 
-## Eerdere opdrachten (andere branches)
+## Opdracht 3 — Kalender, deel A (branch `herontwerp-kalender-help`)
 
-- **Stap 3 §9 kanaalfilters:** `main`, commit `070903f` (gedeployed).
-- **Opdracht 1 §3 kanaaleisen:** branch `addendum-s3-kanaaleisen`, PR #1 (niet gemerged).
+### Gebouwd / aangescherpt
+
+- Weergave **Overzicht | Lijst** (klikmodel-label Overzicht i.p.v. dubbele “Kalender”).
+- **Kanaal- en maandfilter** in beide weergaven; tenant-kanalen uit agenda-data (niet hardcoded LI/IG).
+- Lijst **Op campagne**: inklapbare campagne/thema-groepen (bestaand, `AgendaCampaignList`).
+- Lijst **Op datum**: nieuw `AgendaDateList` — per dag, reeksnaam + post (één bron, zelfde filters).
+- **Lege maand:** `Geen posts gepland in deze maand.` (klikmodel, zonder demo-zin).
+- **Op campagne / Op datum** alleen in Lijst (zoals klikmodel).
+
+### Vastlopers groepering/API (follow-up 3A)
+
+- **Overzicht** negeert Lijst-`groupMode`: toont altijd alle posts + campagnalegenda (niet meer “Op campagne”-subset na toggle).
+- Lege-maand op Overzicht telt **alle** gefilterde posts, niet alleen campagne.
+- Kanaalknoppen = alleen platforms die in `/api/agenda` voorkomen; ongeldige selectie valt terug op Alle kanalen.
+
+### Niet gebouwd (opdracht)
+
+- **Campagnekleuren uit DB:** geen `color`-veld op `campaigns` — legenda gebruikt vaste palette-rotatie (`colorIndex`), zoals al in UI.
+- **Kanaalverschuiving addendum §5** — alleen datamodelnotitie hieronder.
+
+### Datamodel — één artikel, meerdere kanalen (voor §5)
+
+Elk kanaal is een **eigen `content_slots`-rij** met eigen `platform` / `publish_date` (en vaak eigen `article_id` per slot). Er is geen gedeeld slot met meerdere kanalen op één datum in het huidige schema; campagneplanning maakt meerdere slots (zie campagne-repositories).
+
+### Deel B — Help (Sonnet-extract, 14 nov)
+
+Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
+
+- `frontend/src/data/helpFaq.klikmodel.ts` — voor UI-wiring (Composer)
+- `docs/help-faq-klikmodel-extract-2026-11-14.json` —zelfde data
+- `docs/help-faq-mismatches-extract-2026-11-14.md` — antwoorden die de app (nog) niet doet / verouderde producten; **tekst niet aangepast**
+
+**Help UI (14 nov):** `SupportPage` — onderwerp-pills + accordion (`HelpFaqSection`, data uit `HELP_FAQ`), los blok **Stel hier jouw vraag** (`HelpOwnQuestionForm`, escalate/mailto); oude Engelstalige bullet-FAQ verwijderd; kostenregel dichter bij klikmodel.
+
+## Eerdere opdrachten
+
+- **Stap 3 §9 kanaalfilters:** `main`, commit `070903f` (prod).
+- **Opdracht 2 navigatie:** gemerged op `main` (PR #2).
+- **Opdracht 1 §3 kanaaleisen:** PR #1 open.

@@ -6,6 +6,8 @@ import { borderedSectionClass, designStackClass } from '../design/identity.const
 import { fetchSupportInfo, type SupportInfo } from '../api/home'
 import { isApiConfigured } from '../api/client'
 import { SupportChatBox } from '../components/SupportChatBox'
+import { HelpFaqSection } from '../components/HelpFaqSection'
+import { HelpOwnQuestionForm } from '../components/HelpOwnQuestionForm'
 import { DEFAULT_DOCS_URL, DEFAULT_SUPPORT_EMAIL } from '../config/installContact'
 
 const SECTION_CLASS = borderedSectionClass
@@ -52,6 +54,24 @@ export function SupportPage() {
             </a>
           </section>
 
+          <section className={SECTION_CLASS}>
+            <p className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">
+              Veelgestelde vragen
+            </p>
+            <div className="pt-[12px]">
+              <HelpFaqSection />
+            </div>
+          </section>
+
+          <section className={SECTION_CLASS}>
+            <p className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">
+              Stel hier jouw vraag
+            </p>
+            <div className="pt-[12px]">
+              <HelpOwnQuestionForm supportEmail={email} />
+            </div>
+          </section>
+
           <section id="support-chat" className={SECTION_CLASS}>
             <p className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">
               Onboarding-assistent
@@ -62,33 +82,9 @@ export function SupportPage() {
           </section>
 
           <section className={SECTION_CLASS}>
-            <p className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">
-              Veelgestelde onderwerpen
-            </p>
-            <ul className="m-0 list-disc space-y-[8px] pl-[20px] pt-[12px] text-[14px] leading-[21px] text-ce-black">
-              <li>
-                <strong>BrandElements & Sources</strong> — eenmalig bij onboarding; daarna sporadisch
-                aanpassen.
-              </li>
-              <li>
-                <strong>Theme → Research → Agenda</strong> — wekelijkse cyclus; CE-01/02 vullen
-                thema&apos;s en research automatisch aan.
-              </li>
-              <li>
-                <strong>Submit vs AI-review</strong> — Submit stuurt naar hoofdredacteur (human review);
-                AI-review vraagt Claude-commentaar in de app.
-              </li>
-              <li>
-                <strong>Review-link</strong> — na human submit krijg je een <code>reviewUrl</code> in
-                de API-response (ook zonder mail).
-              </li>
-            </ul>
-          </section>
-
-          <section className={SECTION_CLASS}>
             <p className="m-0 text-[24px] leading-[28px] font-semibold text-ce-blue">Kosten & verbruik</p>
             <p className="m-0 pt-[12px] text-[14px] leading-[21px] text-ce-black">
-              Per tenant: Claude, n8n, Apify, dataverkeer en overige diensten (Yoast, hosting, …).
+              Per account: AI-gebruik, dataverkeer en overige diensten.
             </p>
             <Link
               to="/support/costs"

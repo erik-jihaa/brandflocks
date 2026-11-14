@@ -11,10 +11,26 @@ export type AgendaGroupMode = 'campaign' | 'date'
 export const AGENDA_CHANNEL_ALL = 'all'
 export const AGENDA_MONTH_ALL = 'all'
 
-const FIXED_CHANNEL_KEYS = ['linkedin', 'instagram'] as const
+/** Klikmodel p-agenda — zonder de demo-toevoeging over november. */
+export const AGENDA_EMPTY_MONTH_MESSAGE = 'Geen posts gepland in deze maand.'
+
+/** UI-labels voor bekende platform-keys (API levert o.a. "Linkedin"). */
+const PLATFORM_LABELS: Record<string, string> = {
+  linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  x: 'X',
+  facebook: 'Facebook',
+  blog: 'Blog',
+}
 
 export function agendaPlatformKey(platform: string | null | undefined): string {
   return (platform ?? '').trim().toLowerCase()
+}
+
+export function agendaPlatformLabel(platform: string | null | undefined): string {
+  const key = agendaPlatformKey(platform)
+  if (key === '') return ''
+  return PLATFORM_LABELS[key] ?? (platform ?? key).trim()
 }
 
 export function agendaMonthKeyFromIso(iso: string | null | undefined): string | null {
@@ -132,22 +148,21 @@ export function agendaRowsInIsoRange(
     .sort((a, b) => rowPublishSortKey(a).localeCompare(rowPublishSortKey(b)))
 }
 
+/**
+ * Kanaalknoppen voor de Kalender: alleen kanalen die in de agenda-data zitten
+ * (tenant-gebruik), plus "Alle kanalen". Geen vaste LinkedIn/Instagram.
+ */
 export function agendaChannelOptions(rows: AgendaRowDto[]): AgendaChannelOption[] {
   const seen = new Set<string>()
-  const extras: AgendaChannelOption[] = []
+  const options: AgendaChannelOption[] = []
   for (const row of rows) {
     const key = agendaPlatformKey(row.platform)
     if (key === '' || seen.has(key)) continue
     seen.add(key)
-    extras.push({ key, label: (row.platform ?? key).trim() })
+    options.push({ key, label: agendaPlatformLabel(row.platform) })
   }
-  const fixed: AgendaChannelOption[] = FIXED_CHANNEL_KEYS.map((key) => ({
-    key,
-    label: key === 'linkedin' ? 'LinkedIn' : 'Instagram',
-  }))
-  const extraOnly = extras.filter((item) => !FIXED_CHANNEL_KEYS.includes(item.key as (typeof FIXED_CHANNEL_KEYS)[number]))
-  extraOnly.sort((a, b) => a.label.localeCompare(b.label, 'nl'))
-  return [{ key: AGENDA_CHANNEL_ALL, label: 'Alle kanalen' }, ...fixed, ...extraOnly]
+  options.sort((a, b) => a.label.localeCompare(b.label, 'nl'))
+  return [{ key: AGENDA_CHANNEL_ALL, label: 'Alle kanalen' }, ...options]
 }
 
 export type AgendaMonthOption = { key: string; label: string }
@@ -258,5 +273,56 @@ export function campaignColorDotClass(colorIndex: number): string {
   if (colorIndex < 0) return 'bg-ce-beige'
   const palette = ['bg-ce-green', 'bg-ce-orange', 'bg-ce-blue'] as const
   return palette[colorIndex % palette.length] ?? 'bg-ce-green'
+}
+
+export type AgendaDateListGroup = {
+  key: string
+  dateIso: string
+  dateLabel: string
+  rows: AgendaRowDto[]
+  postCountLabel: string
+}
+
+export function groupAgendaRowsByDate(rows: AgendaRowDto[]): AgendaDateListGroup[] {
+  const buckets = new Map<string, AgendaRowDto[]>()
+  for (const row of rows) {
+    const iso = (row.publishDate ?? '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) continue
+    const bucket = buckets.get(iso) ?? []
+    bucket.push(row)
+    buckets.set(iso, bucket)
+  }
+  return [...buckets.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dateIso, grouped]) => {
+      const sorted = [...grouped].sort((a, b) => rowSortTime(a).localeCompare(rowSortTime(b)))
+      const date = parseIsoDate(dateIso)
+      const dateLabel = date
+        ? date.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })
+        : dateIso
+      const count = sorted.length
+      return {
+        key: dateIso,
+        dateIso,
+        dateLabel,
+        rows: sorted,
+        postCountLabel: `${count} ${count === 1 ? 'post' : 'posts'}`,
+      }
+    })
+}
+
+export function agendaSeriesLabel(row: AgendaRowDto): string {
+  const campaign = (row.campaignTitle ?? '').trim()
+  return campaign !== '' ? campaign : 'Losse artikelen'
+}
+
+export function agendaColorIndexForCampaign(
+  rows: AgendaRowDto[],
+  campaignId: string | null | undefined,
+): number {
+  if (!campaignId || (campaignId ?? '').trim() === '') return -1
+  const campaigns = groupAgendaRowsByCampaign(rows)
+  const match = campaigns.find((g) => g.campaignId === campaignId)
+  return match?.colorIndex ?? 0
 }
 
