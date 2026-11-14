@@ -1082,7 +1082,8 @@ export function ResearchPage() {
                       snippet={item.snippet || ''}
                       articleUrl={resolveResearchArticleUrl(item.url)}
                       invalshoek={item.invalshoek}
-                      rationale={
+                      waarom={item.itemRationale || undefined}
+                      getoetstAan={
                         themeVerdictToelichtingForDisplay(
                           verdict?.toelichting,
                           positioningArchetype,
@@ -1103,8 +1104,8 @@ export function ResearchPage() {
 
           {activeThemeItems.some((item) => verdicts[item.id]) ? (
             <p className="m-0 pt-[20px] text-[14px] leading-[18px] text-ce-beige">
-              Je kiest zelf welke bronnen je liket — dit is advies, geen verplichting. Alleen indienen
-              zet het artikel door naar schrijven.
+              Je kiest zelf welke bronnen je meeneemt — dit is advies, geen verplichting. Alleen
+              indienen zet het artikel door naar schrijven.
             </p>
           ) : null}
 

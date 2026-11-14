@@ -169,6 +169,9 @@ export type ArticleDto = {
     merkBeweringen?: { citaat: string; bron: 'merkarchitectuur' | 'bewijsveld' | 'research' | 'geen_bron' }[]
     ce03SelfReviewError?: string
   } | null
+  /** Zelf gekozen CTA — niet afgeleid uit de tekst. null = nog niet gekozen. */
+  hasCta?: boolean | null
+  ctaText?: string
 }
 
 export type ArticleSavePayload = {
@@ -183,6 +186,8 @@ export type ArticleSavePayload = {
   contentTextvorm?: string
   objective?: string | null
   hbaContentrolOverride?: string | null
+  hasCta?: boolean | null
+  ctaText?: string
 }
 
 export type ReviewMode = 'human' | 'ai'

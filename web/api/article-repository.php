@@ -67,6 +67,36 @@ function ce_ensure_self_review_column(PDO $pdo): void
     }
 }
 
+/** CTA-keuze (klikmodel p-artikeldetail) — niet afleiden uit de tekst. */
+function ce_ensure_article_cta_columns(PDO $pdo): void
+{
+    static $checked = false;
+    if ($checked) {
+        return;
+    }
+    $checked = true;
+
+    if (!ce_table_exists($pdo, 'articles')) {
+        return;
+    }
+
+    $columns = [
+        'has_cta' => 'TINYINT(1) NULL',
+        'cta_text' => 'TEXT NULL',
+    ];
+    foreach ($columns as $column => $definition) {
+        if (ce_table_has_column($pdo, 'articles', $column)) {
+            continue;
+        }
+        try {
+            $pdo->exec("ALTER TABLE articles ADD COLUMN {$column} {$definition}");
+            unset($GLOBALS['ce_table_columns']['articles']);
+        } catch (Throwable) {
+            // Kolom bestaat al of geen ALTER-rechten.
+        }
+    }
+}
+
 /** Herstel AI-baseline die per ongeluk overschreven was (test-titel in headline-kolom). */
 function ce_repair_corrupted_headlines(PDO $pdo): void
 {
@@ -298,6 +328,7 @@ function ce_fetch_primary_article_row_for_slot(PDO $pdo, string $slotId): ?array
     ce_ensure_headline_human_column($pdo);
     ce_ensure_content_human_column($pdo);
     ce_ensure_self_review_column($pdo);
+    ce_ensure_article_cta_columns($pdo);
     ce_consolidate_slot_articles($pdo, $slotId);
     $order = ce_article_order_sql($pdo);
     $contentPref = ce_table_has_column($pdo, 'articles', 'content_ai')
@@ -360,6 +391,7 @@ function ce_fetch_hydrated_article_by_id(PDO $pdo, string $articleId, ?string $c
     ce_ensure_headline_human_column($pdo);
     ce_ensure_content_human_column($pdo);
     ce_ensure_self_review_column($pdo);
+    ce_ensure_article_cta_columns($pdo);
 
     $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = :id LIMIT 1');
     $stmt->execute(['id' => $articleId]);
@@ -524,10 +556,12 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
     ce_ensure_headline_human_column($pdo);
     ce_ensure_content_human_column($pdo);
     ce_ensure_article_editor_columns($pdo);
+    ce_ensure_article_cta_columns($pdo);
     require_once __DIR__ . '/channel-copy-constraints.php';
     ce_ensure_article_textvorm_column($pdo);
     require_once __DIR__ . '/hba-repository.php';
     ce_ensure_hba_schema($pdo);
+    require_once __DIR__ . '/mappers.php';
 
     // Body niet overschrijven zolang er open review-edits zijn (feedback-flow).
     if (array_key_exists('content', $body)) {
@@ -599,6 +633,20 @@ function ce_apply_article_patch(PDO $pdo, string $articleId, array $body): array
 
         $fields[] = "{$spec['column']} = :$param";
         $params[$param] = $value;
+    }
+
+    $ctaPatch = ce_article_cta_patch_from_body($body);
+    if (array_key_exists('has_cta', $ctaPatch) && ce_table_has_column($pdo, 'articles', 'has_cta')) {
+        if ($ctaPatch['has_cta'] === null) {
+            $fields[] = 'has_cta = NULL';
+        } else {
+            $fields[] = 'has_cta = :has_cta';
+            $params['has_cta'] = $ctaPatch['has_cta'];
+        }
+    }
+    if (array_key_exists('cta_text', $ctaPatch) && ce_table_has_column($pdo, 'articles', 'cta_text')) {
+        $fields[] = 'cta_text = :cta_text';
+        $params['cta_text'] = $ctaPatch['cta_text'];
     }
 
     if ($fields !== []) {

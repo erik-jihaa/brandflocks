@@ -15,6 +15,7 @@ import { toneDisplayLabel } from '../utils/toneStyles'
 import { ArticleSelfReviewSection, type ArticleSelfReviewDto } from './ArticleSelfReviewSection'
 import { ArticleHbaHintSection } from './ArticleHbaHintSection'
 import { ArticleHbaSection } from './ArticleHbaSection'
+import { ArticleCtaBlock } from './ArticleCtaBlock'
 import { PillButton } from './PillButton'
 import type { HbaArticleHint } from '../api/hbaV2'
 import type { HbaScoreDto } from '../types/api'
@@ -115,6 +116,9 @@ type ArticleMetaSidebarProps = {
   positioningArchetype?: string | null
   positioningBrandGoal?: string | null
   hideHbaContentrol?: boolean
+  hasCta?: boolean | null
+  ctaText?: string
+  onCtaChange?: (next: { hasCta: boolean; ctaText: string }) => void
 }
 
 export function ArticleMetaSidebar({
@@ -171,6 +175,9 @@ export function ArticleMetaSidebar({
   positioningArchetype = null,
   positioningBrandGoal = null,
   hideHbaContentrol = false,
+  hasCta = null,
+  ctaText = '',
+  onCtaChange,
 }: ArticleMetaSidebarProps) {
   const [searchParams] = useSearchParams()
   const { constraints: channelConstraints } = useChannelConstraints()
@@ -402,6 +409,9 @@ export function ArticleMetaSidebar({
     <>
       {feedbackSlot && <div className="mb-[16px] flex flex-col gap-[16px]">{feedbackSlot}</div>}
 
+      {hbaHintLoading || (hbaHintError && !hbaHint?.aanwijzing) || hbaHint?.aanwijzing ? (
+        <h3 className="m-0 mb-[8px] text-[14px] font-semibold leading-[18px] text-ce-black">Advies</h3>
+      ) : null}
       <ArticleHbaHintSection
         hint={hbaHint}
         loading={hbaHintLoading}
@@ -413,22 +423,25 @@ export function ArticleMetaSidebar({
       />
 
       {onContentrolOverrideChange && onHbaRescore ? (
-        <ArticleHbaSection
-          hbaScore={hbaScore}
-          scoreDisplayMode={hbaScoreDisplayMode}
-          contentrolOverride={hbaContentrolOverride}
-          narrativeCompleteness={brandNarrativeCompleteness}
-          readonly={readonly}
-          onContentrolOverrideChange={onContentrolOverrideChange}
-          onRescore={onHbaRescore}
-          narrativeScoreBlockers={hbaNarrativeScoreBlockers}
-          scoreAutoWaiting={hbaScoreAutoWaiting}
-          rescoring={hbaRescoring}
-          positioningArchetype={positioningArchetype}
-          positioningBrandGoal={positioningBrandGoal}
-          clientHoofdoordeelPreview={clientHoofdoordeelPreview}
-          hideHbaContentrol={hideHbaContentrol}
-        />
+        <>
+          <h3 className="m-0 mb-[8px] text-[14px] font-semibold leading-[18px] text-ce-black">Score</h3>
+          <ArticleHbaSection
+            hbaScore={hbaScore}
+            scoreDisplayMode={hbaScoreDisplayMode}
+            contentrolOverride={hbaContentrolOverride}
+            narrativeCompleteness={brandNarrativeCompleteness}
+            readonly={readonly}
+            onContentrolOverrideChange={onContentrolOverrideChange}
+            onRescore={onHbaRescore}
+            narrativeScoreBlockers={hbaNarrativeScoreBlockers}
+            scoreAutoWaiting={hbaScoreAutoWaiting}
+            rescoring={hbaRescoring}
+            positioningArchetype={positioningArchetype}
+            positioningBrandGoal={positioningBrandGoal}
+            clientHoofdoordeelPreview={clientHoofdoordeelPreview}
+            hideHbaContentrol={hideHbaContentrol}
+          />
+        </>
       ) : null}
 
       {!hideSelfReview && (
@@ -442,7 +455,17 @@ export function ArticleMetaSidebar({
         />
       )}
 
-      <MetaSection label="Opties" open={detailsOpen} onToggle={() => setDetailsOpen((v) => !v)}>
+      {onCtaChange || readonly ? (
+        <ArticleCtaBlock
+          hasCta={hasCta}
+          ctaText={ctaText}
+          readonly={readonly || !onCtaChange}
+          onChange={onCtaChange ?? (() => undefined)}
+        />
+      ) : null}
+
+      <h3 className="m-0 mb-[8px] text-[14px] font-semibold leading-[18px] text-ce-black">Instellingen</h3>
+      <MetaSection label="Toon en kanaal" open={detailsOpen} onToggle={() => setDetailsOpen((v) => !v)}>
         {detailsOpen ? metaDetails : null}
       </MetaSection>
     </>

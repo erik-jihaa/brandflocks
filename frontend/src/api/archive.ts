@@ -46,6 +46,8 @@ export type ArchiveDetailDto = ArchiveItemDto & {
   imageUrlLandscape?: string | null
   reports: ArchiveReportDto[]
   hasArticle?: boolean
+  hasCta?: boolean | null
+  ctaText?: string
 }
 
 export type ArchiveDraftPayload = {
