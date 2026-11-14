@@ -106,6 +106,16 @@ export type BrancheOption = {
   bronnenKwaliteit?: string
 }
 
+export type BrancheCatalogEntry = {
+  listNr: number
+  brancheLabel: string
+  afbakening: string
+  markt: string
+  csvStatus: string
+  isGecureerd: boolean
+  brancheCode: string | null
+}
+
 export type DeriveArchitectureResult = {
   ok: boolean
   derivation?: {
@@ -136,6 +146,11 @@ export type HbaWizardDocumentUploadResult = {
 
 export function fetchHbaBranches(): Promise<{ branches: BrancheOption[] }> {
   return apiFetch('/hba/branches')
+}
+
+export function fetchHbaBrancheCatalog(query?: string): Promise<{ items: BrancheCatalogEntry[]; total: number }> {
+  const qs = query?.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''
+  return apiFetch(`/hba/branche-catalog${qs}`)
 }
 
 export function deriveHbaArchitecture(body: Record<string, unknown>): Promise<DeriveArchitectureResult> {

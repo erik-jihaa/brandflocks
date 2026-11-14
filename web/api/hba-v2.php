@@ -5,11 +5,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/hba-v2-repository.php';
 require_once __DIR__ . '/hba-architectuur-check-repository.php';
+require_once __DIR__ . '/branche-bibliotheek-repository.php';
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if (!isset($path) || !is_string($path)) {
     $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $path = preg_replace('#^/api#', '', $path) ?: '/';
+}
+
+if ($path === '/hba/branche-catalog' && $method === 'GET') {
+    $pdo = ce_db();
+    $q = isset($_GET['q']) ? (string) $_GET['q'] : null;
+    $rows = ce_branche_bibliotheek_fetch_catalog($pdo, $q);
+    $items = array_map(static fn (array $row): array => ce_branche_bibliotheek_catalog_dto($row), $rows);
+    ce_json_response(['items' => $items, 'total' => count($items)]);
 }
 
 if ($path === '/hba/branches' && $method === 'GET') {
