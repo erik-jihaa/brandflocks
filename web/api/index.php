@@ -21,7 +21,7 @@ $path = preg_replace('#^/api#', '', $path) ?: '/';
 require_once __DIR__ . '/auth-guard.php';
 require_once __DIR__ . '/content-reset.php';
 
-$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/mail-test' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/create-client' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/delete-asana-sources' || $path === '/admin/wp-diagnose' || $path === '/admin/debug-research' || $path === '/admin/campagne-slot-titles-repair' || $path === '/admin/campagne-archive' || $path === '/admin/hygiene' || $path === '/admin/list-slots' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
+$skipAuth = ($path === '/admin/reset-content' || $path === '/admin/set-password' || $path === '/admin/set-platform-password' || $path === '/admin/mail-test' || $path === '/admin/agenda-repair' || $path === '/admin/mailbox-sync' || $path === '/admin/scraper-sync' || $path === '/admin/ce02-trigger' || $path === '/admin/theme-refill' || $path === '/admin/llm-visibility-sync' || $path === '/admin/create-client' || $path === '/admin/hba-article-hint-slot' || $path === '/admin/create-platform-user' || $path === '/admin/update-client' || $path === '/admin/export-tenant' || $path === '/admin/import-tenant' || $path === '/admin/reset-client-content' || $path === '/admin/delete-client' || $path === '/admin/delete-asana-sources' || $path === '/admin/wp-diagnose' || $path === '/admin/debug-research' || $path === '/admin/campagne-slot-titles-repair' || $path === '/admin/campagne-archive' || $path === '/admin/hygiene' || $path === '/admin/list-slots' || $path === '/admin/schema-export' || $path === '/admin/schema-migrations-init' || $path === '/admin/run-migration' || $path === '/admin/events' || $path === '/admin/prune-support-service' || $path === '/admin/import-support-emails' || $path === '/admin/import-branchebibliotheek' || $path === '/admin/poll-n8n-failures' || $path === '/admin/db-dump' || $path === '/admin/analytics-sync' || $path === '/admin/wordpress-db' || ($path === '/hba/score' && $method === 'POST' && ce_reset_token_valid()) || ($path === '/ce03/slot-meta' && $method === 'POST' && ce_reset_token_valid()))
     && in_array($method, ['GET', 'POST'], true)
     && ce_reset_token_valid();
 
@@ -1024,6 +1024,11 @@ if ($path === '/admin/prune-support-service' && $method === 'POST') {
 
 if ($path === '/admin/import-support-emails' && $method === 'POST') {
     require_once __DIR__ . '/admin-import-support-emails.php';
+    exit;
+}
+
+if ($path === '/admin/import-branchebibliotheek' && $method === 'POST') {
+    require_once __DIR__ . '/admin-import-branchebibliotheek.php';
     exit;
 }
 

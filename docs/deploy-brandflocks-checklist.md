@@ -78,6 +78,14 @@ php scripts/import-branchebibliotheek.php --dry-run   # controle zonder writes
 
 Bronmap: `docs/Branchebibliotheek-voor-Erik-2nov/` of `--dir=...`. Catalogus-CSV staat ook in `web/data/branchelijst.csv` (102 labels, fallback als de tabel nog leeg is). JSON-hygiëne voor de 20 gecureerde branches komt pas ná deze import in `branche_library`.
 
+**Op de server** (zonder SSH), na deploy van `web/data/Branches/`:
+
+```bash
+curl -sS -X POST -H "X-CE-Reset-Token: $CE_RESET_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{}' "$CE_PUBLIC_BASE_URL/api/admin/import-branchebibliotheek"
+```
+
 ## 6. Rooktest (handmatig)
 
 - Inloggen op `CE_PUBLIC_BASE_URL`

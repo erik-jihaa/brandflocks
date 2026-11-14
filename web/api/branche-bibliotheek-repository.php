@@ -256,9 +256,9 @@ function ce_branche_bibliotheek_resolve_dir(?string $override = null): string
 
     $root = dirname(__DIR__, 2);
     $candidates = [
+        $root . '/web/data',
         $root . '/docs/Branchebibliotheek-voor-Erik-2nov',
         $root . '/briefing/spec/hba-input/Branchebibliotheek-voor-Erik-2nov',
-        $root . '/web/data',
     ];
     foreach ($candidates as $dir) {
         if (is_file($dir . '/branchelijst.csv')) {
