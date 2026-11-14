@@ -1,6 +1,30 @@
 # Oplevering herontwerp — november 2026
 
-## Opdracht 2 — Navigatie (branch `herontwerp-navigatie`)
+## Opdracht 1 — addendum §3 (branch `addendum-s3-kanaaleisen`, PR #1)
+
+### Al op `main` vóór deze branch (delta t.o.v. opdrachttekst 14 nov)
+
+| Opdrachtregel | Stand op `main` |
+|---------------|-----------------|
+| Tabel letterlijk in PHP | `ce_channel_copy_constraint_catalog()` 13 rijen ≈ addendum §3 |
+| `content_textvorm` schrijven + UI | PATCH `article-repository.php`; keuze in `ArticleMetaSidebar` |
+| Harde telling tekens/hashtags | `ce_channel_hard_validation_*` + melding op artikel |
+| Lichte check postvoorstel | `ce_channel_soft_hints_for_proposal` + copy-modus CTA-hint |
+| `hba-open-koppelpunten.php` | Bestaat met null-catalogus (≠ kale comment-only uit opdracht) |
+
+### Gebouwd op branch `addendum-s3-kanaaleisen`
+
+- `GET /api/channel-constraints` — tekstvorm-labels/opties en `hardLimits` uit PHP (één bron).
+- Frontend: `useChannelConstraints` + tekstvorm uit API; veld alleen bij >1 keuze per kanaal.
+- `tests/php/kanaaleisen.php` + opname in `scripts/test-all.sh`.
+
+### Open gelaten (bewust)
+
+- Zachte structuur/toon-check (niet telbaar) — niet gebouwd (opdracht).
+- Oproep-tot-actie vs copy-modus — geen voorrangsregel (B7); beide regels blijven in directive.
+- Woord-richtlijnen alleen als soft hints, geen harde telling.
+
+## Opdracht 2 — Navigatie (gemerged op `main`, PR #2)
 
 ### Nieuwe zijbalk (klikmodel stap 6)
 
@@ -42,11 +66,18 @@ Nav-item verwijderd. **`/targets` en API `/objectives` blijven.** `source-folder
 - `NavBreadcrumb.tsx`, optionele `breadcrumb` op `GridShell`.
 - Klanttaal: Merktaal, Kalender, Campagne, Alle artikelen; archief-flow uit Engels naar NL.
 
-### Vragen aan Rogier
+## Vragen aan Rogier
 
 - **Merktaal of Merkelementen:** klikmodel = Merktaal; voorstel 31 okt. / weekplan = Merkelementen. Gebouwd als **Merktaal**.
+- **B7** Voorrang copy-modus vs kanaaltabel bij CTA.
+- **Opdrachtveld `opdracht` per campagnefase** — klantzichtbaar? (leesronde B2-twijfel).
+- **hba-open-koppelpunten** — catalogus met null-keys voldoende of strikt leeg bestand?
 
-## Eerdere opdrachten (andere branches)
+## Test
 
-- **Stap 3 §9 kanaalfilters:** `main`, commit `070903f` (gedeployed).
-- **Opdracht 1 §3 kanaaleisen:** branch `addendum-s3-kanaaleisen`, PR #1 (niet gemerged).
+- `./scripts/test-all.sh` groen vóór merge (lokaal 14 nov 2026).
+
+## Overige opdrachten (nog open)
+
+- **Stap 3 §9 kanaalfilters:** `main`, commit `070903f` (prod).
+- **Opdracht 3** kalender/help — `docs/briefings/opdracht-3-*.md`.

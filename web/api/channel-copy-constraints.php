@@ -456,6 +456,66 @@ function ce_ensure_article_textvorm_column(PDO $pdo): void
   }
 }
 
+/** Korte UI-label (deel na " / " in ce_channel_copy_constraint_labels). */
+function ce_channel_textvorm_ui_label(string $platformDb, string $textvorm): string
+{
+  $platform = strtolower(trim($platformDb));
+  $form = ce_normalize_textvorm($textvorm);
+  $key = $platform . '|' . $form;
+  $full = ce_channel_copy_constraint_labels()[$key] ?? '';
+  if ($full === '') {
+    return $form;
+  }
+  if (str_contains($full, ' / ')) {
+    return trim(substr($full, (int) strpos($full, ' / ') + 3));
+  }
+
+  return $full;
+}
+
+/**
+ * Publieke catalogus voor de app (addendum §3) — één bron in PHP.
+ *
+ * @return array{
+ *   textvormByPlatform: array<string, list<array{value: string, label: string}>>,
+ *   defaultTextvormByPlatform: array<string, string>,
+ *   hardLimits: array<string, array<string, int|null>>
+ * }
+ */
+function ce_channel_constraints_public_payload(): array
+{
+  $platforms = [
+    'blog',
+    'linkedin',
+    'x',
+    'instagram',
+    'facebook',
+    'tiktok',
+    'youtube',
+    'newsletter',
+    'threads',
+    'bluesky',
+  ];
+  $textvormByPlatform = [];
+  $defaultTextvormByPlatform = [];
+  foreach ($platforms as $platform) {
+    $textvormByPlatform[$platform] = array_map(
+      static fn (string $value): array => [
+        'value' => $value,
+        'label' => ce_channel_textvorm_ui_label($platform, $value),
+      ],
+      ce_textvorm_options_for_platform($platform),
+    );
+    $defaultTextvormByPlatform[$platform] = ce_default_textvorm_for_platform($platform);
+  }
+
+  return [
+    'textvormByPlatform' => $textvormByPlatform,
+    'defaultTextvormByPlatform' => $defaultTextvormByPlatform,
+    'hardLimits' => ce_channel_hard_limits_catalog(),
+  ];
+}
+
 function ce_resolve_article_textvorm(PDO $pdo, array $articleRow): string
 {
   ce_ensure_article_textvorm_column($pdo);

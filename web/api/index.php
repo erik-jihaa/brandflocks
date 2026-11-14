@@ -358,6 +358,11 @@ if (!ce_api_path_is_public($path) && !$skipAuth) {
     ce_require_auth(ce_db());
 }
 
+if ($path === '/channel-constraints' && $method === 'GET') {
+    require_once __DIR__ . '/channel-constraints.php';
+    exit;
+}
+
 if ($path === '/health' && $method === 'GET') {
     require_once __DIR__ . '/health.php';
     exit;
