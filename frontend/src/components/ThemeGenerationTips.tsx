@@ -18,17 +18,17 @@ export function ThemeGenerationTips() {
       <div className="mt-[12px] space-y-[12px] text-[14px] leading-[18px] text-ce-black">
         <p className="m-0 text-ce-beige">
           Je krijgt maximaal drie AI-voorstellen per week om uit te kiezen. Kwaliteit hangt vooral af van
-          jullie merkcontext en bronnen.
+          je merkcontext en bronnen.
         </p>
 
         <ul className="m-0 list-disc space-y-[8px] pl-[18px]">
           <li>
-            Scherp Merkelementen en Merkarchitectuur aan:{' '}
+            Scherp Merktaal en Merkarchitectuur aan:{' '}
             <strong className="font-semibold">waar je tegen vecht</strong>, merkdoel en schrijfwijzer (wat
             je wél en niet post).
             <span className="mt-[4px] flex flex-wrap gap-x-[12px] gap-y-[4px]">
               <ActionLink variant="statusRow" onClick={() => navigate('/styleguide')}>
-                Merkelementen →
+                Merktaal →
               </ActionLink>
               <ActionLink variant="statusRow" onClick={() => navigate('/brandarchitecture')}>
                 Merkarchitectuur →

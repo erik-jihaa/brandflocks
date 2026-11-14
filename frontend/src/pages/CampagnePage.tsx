@@ -1282,7 +1282,7 @@ export function CampagnePage() {
 
   return (
     <GridShell
-      pageTitle="Campagnes"
+      pageTitle="Campagne"
       pageSubtitle="Plan over een periode, per kanaal"
       activeNav="campagne"
       mainLayout={isOverview ? 'default' : 'grid2'}
@@ -1292,7 +1292,7 @@ export function CampagnePage() {
       main={main}
       meta={
         <p className="m-0 text-[14px] leading-[18px] text-ce-black">
-          {isOverview ? 'Campagnes horen in de agenda, niet als losse AI-posts.' : copy?.hint}
+          {isOverview ? 'Campagne hoort in de kalender, niet als losse AI-posts.' : copy?.hint}
         </p>
       }
     />

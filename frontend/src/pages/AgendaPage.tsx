@@ -64,7 +64,7 @@ function AgendaWeekHeader({ week, weekNumber, weekRange, dimmed = false }: Agend
 function AgendaPageTitle({ todayLabel }: { todayLabel: string }) {
   return (
     <>
-      Agenda
+      Kalender
       <span className="text-[24px] leading-[32px] font-normal text-ce-black"> — {todayLabel}</span>
     </>
   )

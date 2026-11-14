@@ -144,12 +144,12 @@ export function supportScreenLabel(fromPath: string): string {
   if (path.startsWith('/integrations')) return 'Koppelingen'
   if (path.startsWith('/sources')) return 'Bronnen'
   if (path.startsWith('/account')) return 'Account'
-  if (path.startsWith('/search')) return 'Vindbaarheid'
+  if (path.startsWith('/search')) return 'SEO/GEO'
   if (path.startsWith('/planning')) return 'Planning'
   if (path.startsWith('/report')) return 'Rapport'
   if (path.startsWith('/theme')) return 'Thema\'s'
   if (path.startsWith('/brandarchitecture')) return 'Merkarchitectuur'
-  if (path.startsWith('/styleguide') || path.startsWith('/strategy')) return 'Merkelementen'
+  if (path.startsWith('/styleguide') || path.startsWith('/strategy')) return 'Merktaal'
   return 'de app'
 }
 

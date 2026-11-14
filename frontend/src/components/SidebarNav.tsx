@@ -61,7 +61,7 @@ const NAV_SECTIONS: NavSectionDef[] = [
     label: 'Identiteit',
     items: [
       { key: 'brandArchitecture', label: 'Merkarchitectuur', path: '/brandarchitecture' },
-      { key: 'strategy', label: 'Merkelementen', path: '/styleguide' },
+      { key: 'strategy', label: 'Merktaal', path: '/styleguide' },
     ],
   },
   {
@@ -81,7 +81,7 @@ const NAV_SECTIONS: NavSectionDef[] = [
     items: [
       { key: 'article', label: 'Artikel', path: '/article' },
       { key: 'campagne', label: 'Campagne', path: '/campagnes' },
-      { key: 'agenda', label: 'Agenda', path: '/agenda' },
+      { key: 'agenda', label: 'Kalender', path: '/agenda' },
       { key: 'archive', label: 'Alle artikelen', path: '/archive' },
     ],
   },
@@ -90,9 +90,9 @@ const NAV_SECTIONS: NavSectionDef[] = [
     iconSrc: '/svg/Settings.svg',
     label: 'Instellingen',
     items: [
+      { key: 'planning', label: 'Planning', path: '/planning' },
       { key: 'account', label: 'Mijn account', path: '/account' },
       { key: 'integrations', label: 'Koppelingen', path: '/integrations' },
-      { key: 'planning', label: 'Planning', path: '/planning' },
       { key: 'support', label: 'Help', path: '/support' },
       { key: 'logout', label: 'Uitloggen', action: 'logout' },
     ],
@@ -101,7 +101,8 @@ const NAV_SECTIONS: NavSectionDef[] = [
 
 const OVERVIEW_KEYS = new Set<NavKey>(['home', 'report'])
 const IDENTITY_KEYS = new Set<NavKey>(['brandArchitecture', 'strategy', 'identity'])
-const KNOWLEDGE_KEYS = new Set<NavKey>(['sources', 'search', 'gallery'])
+const KNOWLEDGE_KEYS = new Set<NavKey>(['sources', 'search', 'gallery', 'targets'])
+const CONTENT_KEYS = new Set<NavKey>(['article', 'campagne', 'agenda', 'archive', 'research', 'theme', 'fastlane'])
 const SETTINGS_KEYS = new Set<NavKey>(['account', 'integrations', 'planning', 'support', 'logout'])
 
 export const SETTINGS_NAV_KEYS = new Set<NavKey>(['account', 'integrations', 'planning', 'support', 'logout'])
@@ -118,17 +119,20 @@ export function isAccountChapterNav(active: NavKey): boolean {
 function sectionForActive(active: NavKey, pathname: string): SectionId | null {
   if (OVERVIEW_KEYS.has(active) || pathname === '/') return 'overview'
   if (IDENTITY_KEYS.has(active)) return 'identity'
-  if (KNOWLEDGE_KEYS.has(active)) return 'knowledge'
-  if (SETTINGS_KEYS.has(active)) return 'settings'
+  if (KNOWLEDGE_KEYS.has(active) || pathname.startsWith('/targets')) return 'knowledge'
+  if (SETTINGS_KEYS.has(active) || pathname.startsWith('/planning')) return 'settings'
   if (
+    CONTENT_KEYS.has(active) ||
     pathname.startsWith('/research') ||
     pathname.startsWith('/theme') ||
     pathname.startsWith('/fastlane') ||
-    pathname.startsWith('/targets')
+    pathname.startsWith('/article') ||
+    pathname.startsWith('/campagnes') ||
+    pathname.startsWith('/agenda') ||
+    pathname.startsWith('/archive')
   ) {
     return 'content'
   }
-  if (pathname.startsWith('/article')) return 'content'
   return 'content'
 }
 
@@ -291,7 +295,14 @@ export function SidebarNav({ active }: SidebarNavProps) {
   }
 
   function isItemActive(key: NavKey): boolean {
-    if (key === 'article') return articleActive
+    if (key === 'article') {
+      return (
+        articleActive ||
+        location.pathname.startsWith('/research') ||
+        location.pathname.startsWith('/theme') ||
+        location.pathname.startsWith('/fastlane')
+      )
+    }
     return key === active
   }
 

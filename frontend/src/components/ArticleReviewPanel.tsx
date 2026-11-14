@@ -145,7 +145,7 @@ export function ArticleReviewPanel({
     return (
       <div className="space-y-[10px]">
         <p className="m-0 text-[14px] leading-[18px] text-ce-black">
-          Gepubliceerd op de website (WordPress #{wordpressPostId}) — archiveer later vanuit Archief.
+          Gepubliceerd op de website (WordPress #{wordpressPostId}) — archiveer later via Alle artikelen.
         </p>
         {publishNotice ? (
           <ActionNotice

@@ -88,7 +88,7 @@ export function ArchivePage() {
   }
 
   if (loading) {
-    return <GridShell pageTitle="Archief" activeNav="archive" main={<p>Laden…</p>} />
+    return <GridShell pageTitle="Alle artikelen" activeNav="archive" main={<p>Laden…</p>} />
   }
 
   const resultCount = searchType === 'article' ? articleResults.length : reportResults.length
@@ -97,7 +97,7 @@ export function ArchivePage() {
 
   return (
     <GridShell
-      pageTitle="Archief"
+      pageTitle="Alle artikelen"
       pageSubtitle={searchMode ? 'Search' : 'Scroll or search'}
       activeNav="archive"
       main={
