@@ -30,6 +30,7 @@ run "copy-modus directive" php tests/php/copy-modus-directive.php
 run "channel hard validation" php tests/php/channel-hard-validation.php
 run "kanaaleisen addendum §3" php tests/php/kanaaleisen.php
 run "theme-onderbouwing drempels" php tests/php/theme-onderbouwing.php
+run "branchebibliotheek import" php tests/php/branche-bibliotheek-import.php
 
 if [[ -f scripts/campagne-preview-p2-selftest.php ]]; then
   run "campagne P2 selftest" php scripts/campagne-preview-p2-selftest.php

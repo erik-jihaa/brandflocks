@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { StrategyField, StrategySection, FieldSingle } from './ui/Field'
+import { StrategyField, StrategySection } from './ui/Field'
 import { borderedSectionClass, borderedSectionStackClass, designStackClass } from '../design/identity.constants'
 import { Pulldown } from './ui/Pulldown'
 import { PillButton, pillActionsRowClass, pillActionsRowInnerClass } from './PillButton'
@@ -7,7 +7,8 @@ import { RichTextDisplay } from './RichTextDisplay'
 import { IdentityCalibrationStep } from './IdentityCalibrationStep'
 import { fetchStrategy, patchStrategy } from '../api/onboarding'
 import { clearHomeDashboardCache } from '../api/home'
-import { deriveHbaArchitecture, fetchHbaBranches, fetchHbaWizardDocumentStatus, uploadHbaWizardDocument, resolveHbaBranche, runHbaArchitectureCheck, type BrancheOption, type HbaWizardDocumentSuggestions, type HbaArchitectureCheckResult } from '../api/hbaV2'
+import { deriveHbaArchitecture, fetchHbaBrancheCatalog, fetchHbaBranches, fetchHbaWizardDocumentStatus, uploadHbaWizardDocument, resolveHbaBranche, runHbaArchitectureCheck, type BrancheCatalogEntry, type BrancheOption, type HbaWizardDocumentSuggestions, type HbaArchitectureCheckResult } from '../api/hbaV2'
+import { BranchePickerFields } from './BranchePickerFields'
 import { apiFetch } from '../api/client'
 import {
   brandNarrativeFromDto,
@@ -212,6 +213,7 @@ export function MerkarchitectuurSection() {
   const [draft, setDraft] = useState<WizardDraft>(emptyDraft())
   const [narrative, setNarrative] = useState<BrandNarrativeDto>(emptyBrandNarrative())
   const [branches, setBranches] = useState<BrancheOption[]>([])
+  const [brancheCatalog, setBrancheCatalog] = useState<BrancheCatalogEntry[]>([])
   const [deriving, setDeriving] = useState(false)
   const [deriveError, setDeriveError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -273,9 +275,10 @@ export function MerkarchitectuurSection() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [strategyRes, branchRes, docStatusRes] = await Promise.all([
+    const [strategyRes, branchRes, catalogRes, docStatusRes] = await Promise.all([
       fetchStrategy(),
       fetchHbaBranches(),
+      fetchHbaBrancheCatalog().catch(() => ({ items: [], total: 0 })),
       fetchHbaWizardDocumentStatus().catch(() => ({
         ok: false,
         hasUpload: false,
@@ -288,6 +291,7 @@ export function MerkarchitectuurSection() {
     const bn = strategyRes.strategy?.brandNarrative
     const branchList = branchRes.branches ?? []
     setBranches(branchList)
+    setBrancheCatalog(catalogRes.items ?? [])
     if (bn) {
       const mapped = brandNarrativeFromDto(bn)
       const examples = examplesFromNarrative(mapped.goedeVoorbeelden, mapped.zwakkeVoorbeelden)
@@ -1130,42 +1134,22 @@ export function MerkarchitectuurSection() {
                   minHeight={80}
                 />
                 <StrategySection title="Branche" filled={Boolean(buf.brancheInput.trim())}>
-                  <div className="grid gap-[18px]">
-                    <Pulldown
-                      placeholder="— kies uit lijst —"
-                      value={branches.find((branch) => branch.code === buf.brancheCode)?.label ?? ''}
-                      options={branches.map((branch) => branch.label)}
-                      onChange={(label) => {
-                        setBrancheResolveError(null)
-                        const match = branches.find((branch) => branch.label === label)
-                        patchOverviewBuffer((current) => ({
-                          ...current,
-                          brancheInput: label,
-                          brancheCode: match?.code ?? '',
-                        }))
-                      }}
-                    />
-                    <FieldSingle
-                      id="overview-wie-branche-free"
-                      value={
-                        branches.some((branch) => branch.code === buf.brancheCode)
-                          ? ''
-                          : buf.brancheInput
-                      }
-                      placeholder="Of typ je eigen branche"
-                      onChange={(value) => {
-                        setBrancheResolveError(null)
-                        const match = branches.find(
-                          (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
-                        )
-                        patchOverviewBuffer((current) => ({
-                          ...current,
-                          brancheInput: value,
-                          brancheCode: match?.code ?? '',
-                        }))
-                      }}
-                    />
-                  </div>
+                  <BranchePickerFields
+                    brancheCode={buf.brancheCode}
+                    brancheInput={buf.brancheInput}
+                    branches={branches}
+                    catalog={brancheCatalog}
+                    freeFieldId="overview-wie-branche-free"
+                    showArchetypeLine={false}
+                    onClearError={() => setBrancheResolveError(null)}
+                    onChange={(next) =>
+                      patchOverviewBuffer((current) => ({
+                        ...current,
+                        brancheInput: next.brancheInput,
+                        brancheCode: next.brancheCode,
+                      }))
+                    }
+                  />
                   {editWieBranch?.marktArchetype ? (
                     <p className="m-0 mt-[10px] text-[14px] leading-[18px] text-ce-black">
                       Markt-archetype: {editWieMarktArchetype || '—'}
@@ -1666,53 +1650,24 @@ export function MerkarchitectuurSection() {
               minHeight={100}
             />
             <StrategySection title="In welke markt" filled={Boolean(draft.brancheInput.trim())}>
-              <div className="grid gap-[18px]">
-                <Pulldown
-                  placeholder="— kies uit lijst —"
-                  value={branches.find((branch) => branch.code === draft.brancheCode)?.label ?? ''}
-                  options={branches.map((branch) => branch.label)}
-                  onChange={(label) => {
-                    setBrancheResolveError(null)
-                    const match = branches.find((branch) => branch.label === label)
-                    setDraft((cur) => ({
-                      ...cur,
-                      brancheInput: label,
-                      brancheCode: match?.code ?? '',
-                    }))
-                  }}
-                />
-                <FieldSingle
-                  id="hba-branche-structuur"
-                  value={
-                    branches.some((branch) => branch.code === draft.brancheCode) ? '' : draft.brancheInput
-                  }
-                  placeholder="Of typ je eigen branche"
-                  onChange={(value) => {
-                    setBrancheResolveError(null)
-                    const match = branches.find(
-                      (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
-                    )
-                    setDraft((cur) => ({
-                      ...cur,
-                      brancheInput: value,
-                      brancheCode: match?.code ?? '',
-                    }))
-                  }}
-                />
-              </div>
-              {brancheResolving ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-black">Branche afleiden…</p>
-              ) : null}
-              {brancheResolveError ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-red" role="alert">
-                  {brancheResolveError}
-                </p>
-              ) : null}
-              {selectedBranch?.bron === 'afgeleid' ? (
-                <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-beige">
-                  Deze branche is automatisch afgeleid; een strateeg kan de definitie nog aanscherpen.
-                </p>
-              ) : null}
+              <BranchePickerFields
+                brancheCode={draft.brancheCode}
+                brancheInput={draft.brancheInput}
+                branches={branches}
+                catalog={brancheCatalog}
+                freeFieldId="hba-branche-structuur"
+                resolving={brancheResolving}
+                resolveError={brancheResolveError}
+                showDerivedHint
+                onClearError={() => setBrancheResolveError(null)}
+                onChange={(next) =>
+                  setDraft((cur) => ({
+                    ...cur,
+                    brancheInput: next.brancheInput,
+                    brancheCode: next.brancheCode,
+                  }))
+                }
+              />
             </StrategySection>
             <StrategySection title="Waar staat je merk nu?" filled={Boolean(draft.contextprofiel)}>
               <Pulldown
@@ -1886,53 +1841,24 @@ export function MerkarchitectuurSection() {
             minHeight={100}
           />
           <StrategySection title="In welke markt" filled={Boolean(draft.brancheInput.trim())}>
-            <div className="grid gap-[18px]">
-              <Pulldown
-                placeholder="— kies uit lijst —"
-                value={branches.find((branch) => branch.code === draft.brancheCode)?.label ?? ''}
-                options={branches.map((branch) => branch.label)}
-                onChange={(label) => {
-                  setBrancheResolveError(null)
-                  const match = branches.find((branch) => branch.label === label)
-                  setDraft((current) => ({
-                    ...current,
-                    brancheInput: label,
-                    brancheCode: match?.code ?? '',
-                  }))
-                }}
-              />
-              <FieldSingle
-                id="hba-branche"
-                value={
-                  branches.some((branch) => branch.code === draft.brancheCode) ? '' : draft.brancheInput
-                }
-                placeholder="Of typ je eigen branche"
-                onChange={(value) => {
-                  setBrancheResolveError(null)
-                  const match = branches.find(
-                    (branch) => branch.label.toLowerCase() === value.trim().toLowerCase(),
-                  )
-                  setDraft((current) => ({
-                    ...current,
-                    brancheInput: value,
-                    brancheCode: match?.code ?? '',
-                  }))
-                }}
-              />
-            </div>
-            {brancheResolving ? (
-              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-black">Branche afleiden…</p>
-            ) : null}
-            {brancheResolveError ? (
-              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-red" role="alert">
-                {brancheResolveError}
-              </p>
-            ) : null}
-            {selectedBranch?.bron === 'afgeleid' ? (
-              <p className="m-0 mt-[8px] text-[14px] leading-[18px] text-ce-beige">
-                Deze branche is automatisch afgeleid; een strateeg kan de definitie nog aanscherpen.
-              </p>
-            ) : null}
+            <BranchePickerFields
+              brancheCode={draft.brancheCode}
+              brancheInput={draft.brancheInput}
+              branches={branches}
+              catalog={brancheCatalog}
+              freeFieldId="hba-branche"
+              resolving={brancheResolving}
+              resolveError={brancheResolveError}
+              showDerivedHint
+              onClearError={() => setBrancheResolveError(null)}
+              onChange={(next) =>
+                setDraft((current) => ({
+                  ...current,
+                  brancheInput: next.brancheInput,
+                  brancheCode: next.brancheCode,
+                }))
+              }
+            />
           </StrategySection>
           <StrategySection title="Waar staat je merk nu?" filled={Boolean(draft.contextprofiel)}>
             <Pulldown

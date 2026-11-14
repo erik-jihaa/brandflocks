@@ -458,6 +458,7 @@ if ($path === '/ce03/slot-meta' && $method === 'POST') {
 
 if (
     $path === '/hba/branches'
+    || $path === '/hba/branche-catalog'
     || $path === '/hba/derive-architecture'
     || $path === '/hba/derive-branche'
     || $path === '/hba/architecture-check'

@@ -209,6 +209,29 @@ SQL
             }
         }
     }
+
+    if (!ce_table_exists($pdo, 'branche_catalog')) {
+        try {
+            $pdo->exec(
+                <<<'SQL'
+CREATE TABLE IF NOT EXISTS branche_catalog (
+    list_nr INT NOT NULL PRIMARY KEY,
+    branche_label VARCHAR(255) NOT NULL,
+    afbakening TEXT NULL,
+    markt VARCHAR(16) NULL,
+    csv_status VARCHAR(32) NOT NULL DEFAULT 'open',
+    json_filename VARCHAR(128) NULL,
+    is_gecureerd TINYINT(1) NOT NULL DEFAULT 0,
+    branche_code VARCHAR(64) NULL,
+    KEY idx_branche_catalog_label (branche_label),
+    KEY idx_branche_catalog_code (branche_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL
+            );
+        } catch (Throwable) {
+            // Geen CREATE-rechten.
+        }
+    }
 }
 
 /** @return array{usable: bool, indicative: bool, blocked: bool, reason: string|null} */
