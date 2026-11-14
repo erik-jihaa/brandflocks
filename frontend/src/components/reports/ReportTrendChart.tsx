@@ -20,7 +20,7 @@ export function ReportTrendChart({ points }: { points: ReportTrendPoint[] }) {
         Verschilpercentage op-strategie vs. generiek — laatste {points.length} rapportperiodes
       </p>
       <p className="m-0 text-[14px] leading-[18px] text-ce-black">
-        Positief betekent: posts die op jullie merkstrategie scoren presteren gemiddeld beter dan
+        Positief betekent: posts die op je merkstrategie scoren presteren gemiddeld beter dan
         generieke posts in dezelfde periode.
       </p>
       <div className="flex items-end gap-[16px] pt-[8px]">

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <title>Nav-review PR #2 vs oud (prod)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f5f0e8; color: #111; }
+    h1 { font-size: 20px; }
+    .cols { display: flex; gap: 24px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 280px; background: #fff; border: 1.5px solid #c4b8a8; padding: 16px; }
+    .col h2 { margin: 0 0 12px; font-size: 16px; }
+    .col p { margin: 0 0 12px; font-size: 13px; color: #444; }
+    nav { font-size: 14px; line-height: 1.6; }
+    .group { margin-bottom: 14px; }
+    .head { font-weight: 700; margin-bottom: 4px; }
+    .item { padding-left: 12px; }
+    .gone { text-decoration: line-through; color: #888; }
+    .new { font-weight: 600; }
+    .note { margin-top: 20px; font-size: 13px; max-width: 720px; }
+  </style>
+</head>
+<body>
+  <h1>Review navigatie — PR #2 (<code>herontwerp-navigatie</code>)</h1>
+  <p class="note">
+    Visuele vergelijking voor review. Prod (<code>app.brandflocks.nl</code>) heeft nog de oude zijbalk tot merge+deploy van PR #2.
+    PR #2 bevat ook commit <code>070903f</code> (§9 filters) omdat <code>origin/main</code> die commit nog niet heeft — zie README.
+  </p>
+  <div class="cols">
+    <div class="col">
+      <h2>Prod nu (ongeveer)</h2>
+      <p>Oude CE-structuur — labels niet volgens klikmodel v271.</p>
+      <nav>
+        <div class="group"><div class="head">Identiteit</div>
+          <div class="item">Merkarchitectuur</div>
+          <div class="item">Merkelementen</div>
+          <div class="item gone">Doelen</div>
+        </div>
+        <div class="group"><div class="head">Kennis</div>
+          <div class="item">Bronnen</div>
+          <div class="item gone">Thema's</div>
+          <div class="item gone">Onderzoek</div>
+          <div class="item">SEO/GEO (was Vindbaarheid)</div>
+          <div class="item gone">Planning</div>
+        </div>
+        <div class="group"><div class="head">Publicatie</div>
+          <div class="item gone">Snel artikel</div>
+          <div class="item">Campagnes</div>
+          <div class="item">Artikel</div>
+          <div class="item">Agenda</div>
+          <div class="item">Beeldbank</div>
+          <div class="item">Archief</div>
+          <div class="item gone">Rapport</div>
+        </div>
+        <div class="group"><div class="head">Instellingen</div>
+          <div class="item">Mijn account</div>
+          <div class="item">Koppelingen</div>
+          <div class="item">Help</div>
+        </div>
+      </nav>
+    </div>
+    <div class="col">
+      <h2>Na PR #2 (klikmodel)</h2>
+      <p>Zoals in <code>SidebarNav.tsx</code> — vet = hernoemd of verplaatst.</p>
+      <nav>
+        <div class="group"><div class="head">Overzicht</div>
+          <div class="item new">Rapport</div>
+          <div class="item">Te doen</div>
+        </div>
+        <div class="group"><div class="head">Identiteit</div>
+          <div class="item">Merkarchitectuur</div>
+          <div class="item new">Merktaal</div>
+        </div>
+        <div class="group"><div class="head">Kennis</div>
+          <div class="item">Bronnen</div>
+          <div class="item">SEO/GEO</div>
+          <div class="item new">Beeldbank</div>
+        </div>
+        <div class="group"><div class="head">Publicatie</div>
+          <div class="item">Artikel</div>
+          <div class="item new">Campagne</div>
+          <div class="item new">Kalender</div>
+          <div class="item new">Alle artikelen</div>
+        </div>
+        <div class="group"><div class="head">Instellingen</div>
+          <div class="item new">Planning (eerste)</div>
+          <div class="item">Mijn account</div>
+          <div class="item">Koppelingen</div>
+          <div class="item">Help</div>
+          <div class="item">Uitloggen</div>
+        </div>
+      </nav>
+      <p style="font-size:12px;margin-top:12px;">Uit nav, routes blijven: /theme, /research, /fastlane, /targets</p>
+    </div>
+  </div>
+</body>
+</html>

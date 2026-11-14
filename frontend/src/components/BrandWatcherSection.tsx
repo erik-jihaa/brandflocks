@@ -228,7 +228,7 @@ export function BrandWatcherSection({ progress, variant = 'compact' }: BrandWatc
           <ProgressCounters progress={progress} />
         </div>
         <p className="m-0 mt-[12px] text-[14px] leading-[18px] text-ce-black">
-          Tot {targetPosts} gepubliceerde posts leert de tool jullie stem uit architectuur en kern-bronnen — niet alsof er al een vast patroon is.
+          Tot {targetPosts} gepubliceerde posts leert de tool je stem uit architectuur en kern-bronnen — niet alsof er al een vast patroon is.
         </p>
       </section>
     )

@@ -50,7 +50,7 @@ export function IdentityCalibrationStep({
         const strong = usableHbaExample(res.optionA ?? '')
         const weak = usableHbaExample(res.optionB ?? '')
         if (!strong || !weak) {
-          setError('De voorbeelden klonken nog niet als jullie merk. Probeer opnieuw, of typ ze zelf.')
+          setError('De voorbeelden klonken nog niet als je merk. Probeer opnieuw, of typ ze zelf.')
           return
         }
         setOptionA(strong)
@@ -113,7 +113,7 @@ export function IdentityCalibrationStep({
         <p className="m-0 text-[14px] leading-[18px] text-ce-black">
           Typ zelf een sterk en een zwak voorbeeld (ronde {round + 1} van 3).
         </p>
-        <StrategyField id="custom-good" title="Klinkt als jullie" value={customGood} onChange={setCustomGood} minHeight={70} />
+        <StrategyField id="custom-good" title="Klinkt als je merk" value={customGood} onChange={setCustomGood} minHeight={70} />
         <StrategyField id="custom-weak" title="Zit er net naast" value={customWeak} onChange={setCustomWeak} minHeight={70} />
         <div className={pillActionsRowClass}>
           <PillButton
@@ -136,7 +136,7 @@ export function IdentityCalibrationStep({
   return (
     <div className={designStackClass}>
       <p className="m-0 text-[14px] leading-[18px] text-ce-black">
-        Ronde {round + 1} van 3 — welke zin klinkt het meest als jullie?
+        Ronde {round + 1} van 3 — welke zin klinkt het meest als je merk?
       </p>
       {loading ? <p className="m-0 text-[14px] text-ce-beige">Voorbeelden laden…</p> : null}
       {error ? <p className="m-0 text-[14px] text-ce-red">{error}</p> : null}
