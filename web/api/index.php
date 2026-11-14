@@ -519,6 +519,22 @@ if ($path === '/campagne-preview/templates' && $method === 'GET') {
     exit;
 }
 
+if ($path === '/campagne-preview/check-url' && $method === 'POST') {
+    require_once __DIR__ . '/bootstrap.php';
+    require_once __DIR__ . '/sources-repository.php';
+    require_once __DIR__ . '/campagne-preview-repository.php';
+    $body = ce_read_json_body();
+    $url = ce_campagne_normalize_source_url((string) ($body['url'] ?? ''));
+    if ($url === '') {
+        ce_json_error('Plak een link.', 400);
+    }
+    ce_json_response([
+        'ok' => ce_probe_url($url),
+        'url' => $url,
+    ]);
+    exit;
+}
+
 if ($path === '/campagne-preview' && in_array($method, ['GET', 'POST'], true)) {
     require_once __DIR__ . '/campagne-preview.php';
     exit;

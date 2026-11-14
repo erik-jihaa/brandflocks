@@ -92,7 +92,7 @@ Nav-item verwijderd. **`/targets` en API `/objectives` blijven.** `source-folder
 
 ### Niet gebouwd (opdracht)
 
-- **Campagnekleuren uit DB:** geen `color`-veld op `campaigns` — legenda gebruikt vaste palette-rotatie (`colorIndex`), zoals al in UI.
+- **Campagnekleuren uit DB:** gebouwd in stap 8 PR 1. `campaigns.calendar_color` (0–3). Bestaande campagnes krijgen bij de eerste preview-request de kleur die `colorIndex` nu al toont: eerste keer dat de campagne in de agendarijen voorkomt (`phase_key`, `theme`, `id`), index `% 3`. Kleur 3 is alleen een nieuwe keuze. De legenda leest de opgeslagen kleur; zonder kleur blijft de oude rotatie.
 - **Kanaalverschuiving addendum §5** — alleen datamodelnotitie hieronder.
 
 ### Datamodel — één artikel, meerdere kanalen (voor §5)
@@ -123,10 +123,28 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 
 ### Nog open / afwijkingen
 
-- LLM-voorstellen invalshoeken + Onderzoek-kaarten (klikmodel `p-onderzoek`) nog niet; lokale seed.
+- LLM-voorstellen invalshoeken nog niet; lokale seed. Onderzoek-kaarten en artikel-detail zijbalk + CTA staan live (PR #10).
 - Multi-kanaal: één slot per artikel op primair kanaal (geen fan-out per kanaal/offsets).
-- Systeemcheck ritme/plan-check nog niet live.
-- Artikel-detail zijbalk-typen + CTA-blok.
+- Systeemcheck ritme/plan-check nog niet live (placeholders in `ArticleStartStepKlopt`).
+
+## Opdracht — weekplan stap 8, PR 1 (campagne stap 1 en 2)
+
+### Gebouwd
+
+- Stap 1: pulldown Touch/Tell/Sell blijft op de pagina (geen automatische sprong). Letterlijke hint over lancering/reeks. Vier kalenderkleuren; vervaagd = al in gebruik bij concept, bevestigd of loopt. Verder + Ongedaan maken.
+- Stap 2: titel “Waar gaat de campagne over?”, thema + extra gedachten, bronnen (link controleren → toevoegen, PDF/Word). Sell houdt de product-URL en de bestaande sell-fit-hint.
+- Opslag: `calendar_color`, `extra_thoughts`, `source_folder_id`. Links in de campagnemap bij aanmaken of bijwerken. Bestanden uploaden zodra het plan bestaat. Migratie dropt niets.
+
+### Niet in deze PR
+
+- Stap 3 (merk, feiten, SEO/GEO, hashtags), invalshoeken als doorgeefluik, en de gedeelde Systeemcheck zijn latere PR’s.
+- De overstap van posts per kanaal naar artikelen op meerdere kanalen is één aparte slice. Erik (14 nov): ja, een campagne plant artikelen die op meerdere kanalen verschijnen. Gevolg, nog niet gebouwd: fase-aandelen over artikelen (elk artikel één fase, kanaalversies erven die; minimum = aantal fases); een LinkedIn-artikel (`artikel`) krijgt altijd één of meer promotieposts (`promotie`) die de fase erven, niet meetellen in de verdeling, wel in de 100-cap, en op of na de publicatiedag vallen — aantal en timing volgen nog van Erik. `tests/php/campagne-plan-generator.php` wordt dan 12 Instagram-artikelen waarvan 8 ook op LinkedIn. Bestaande campagnes blijven posts per kanaal. Addendum §5 hangt hieraan.
+
+### Vraag aan Rogier
+
+Het fasescherm blijft in de wizard. Tickets 2 en 3 van 30 oktober vragen om merkonderdeel per fase en om fases weg te laten of te verschuiven (`phasePlan.disabledKeys` wordt al opgeslagen). Het klikmodel heeft dat scherm niet. Mag de fase-bewerking uit de wizard, of moet het klikmodel die alsnog krijgen?
+
+Help (`helpFaq.klikmodel.ts`) zet bronnen nog op stap 3 en belooft een verschuivingsvoorstel. Het klikmodel zet bronnen op stap 2; de ritmecheck is een waarschuwing zonder verschuiving. Help is niet herschreven (stap 10).
 
 ## Opdracht — weekplan stap 5 (Branche-koppeling)
 

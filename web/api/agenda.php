@@ -84,9 +84,13 @@ $campaignTemplateSelect = ce_table_exists($pdo, 'campaigns') && ce_table_has_col
     : 'NULL AS campaign_template_key';
 $campaignJoin = '';
 $campaignTitleSelect = 'NULL AS campaign_title';
+$campaignColorSelect = 'NULL AS campaign_calendar_color';
 if (ce_table_exists($pdo, 'campaigns') && ce_table_has_column($pdo, 'content_slots', 'campaign_id')) {
     $campaignJoin = 'LEFT JOIN campaigns camp ON camp.id = s.campaign_id';
     $campaignTitleSelect = 'camp.title AS campaign_title';
+    if (ce_table_has_column($pdo, 'campaigns', 'calendar_color')) {
+        $campaignColorSelect = 'camp.calendar_color AS campaign_calendar_color';
+    }
 }
 $articlePlatformSelect = ce_table_has_column($pdo, 'articles', 'platform_final')
     ? 'a.platform_final AS article_platform'
@@ -114,6 +118,7 @@ SELECT
     {$campaignOpdrachtSelect},
     {$campaignTemplateSelect},
     {$campaignTitleSelect},
+    {$campaignColorSelect},
     a.id AS article_id,
     a.headline,
     a.headline_human,
@@ -240,6 +245,9 @@ foreach ($rows as $row) {
         'publishTime' => ce_agenda_format_publish_time($row['slot_publish_time'] ?? null),
         'campaignId' => trim((string) ($row['slot_campaign_id'] ?? '')) ?: null,
         'campaignTitle' => trim((string) ($row['campaign_title'] ?? '')) ?: null,
+        'campaignColor' => isset($row['campaign_calendar_color']) && $row['campaign_calendar_color'] !== null && $row['campaign_calendar_color'] !== ''
+            ? (int) $row['campaign_calendar_color']
+            : null,
         'platform' => ce_agenda_row_platform_label($row),
         'campaignFaseKey' => trim((string) ($row['slot_campaign_fase'] ?? '')) ?: null,
         'campaignFaseLabel' => ce_campagne_preview_fase_label(
