@@ -26,7 +26,7 @@ const PLACEHOLDER: Record<CampagneBankEditorProps['kind'], string> = {
 
 const ADD_LABEL: Record<CampagneBankEditorProps['kind'], string> = {
   vraag: '+ Vraag toevoegen',
-  feit: '+ Feit toevoegen',
+  feit: '+ eigen feit toevoegen',
 }
 
 /** Campagne stap 3 — bank bewerken (Vindbaarheid-stijl) + keuze via design system radio-indicator. */

@@ -135,9 +135,17 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 - Stap 2: titel “Waar gaat de campagne over?”, thema + extra gedachten, bronnen (link controleren → toevoegen, PDF/Word). Sell houdt de product-URL en de bestaande sell-fit-hint.
 - Opslag: `calendar_color`, `extra_thoughts`, `source_folder_id`. Links in de campagnemap bij aanmaken of bijwerken. Bestanden uploaden zodra het plan bestaat. Migratie dropt niets.
 
+## Opdracht — weekplan stap 8, PR 2 (campagne stap 3)
+
+### Gebouwd
+
+- Stap 3 volgt klikmodel `p-campagne3`: **Merkonderdelen** (labels Rol/Doel/…) → **Feiten** → **SEO- en GEO-vragen** (weergave + link naar SEO/GEO, overslaan mag) → **Hashtags**.
+- Weg: aparte Vragen-sectie en komma-woordenveld op deze stap (zelfde lijn als artikel-stap 3).
+- Opslag: `hashtags_json` op de campagne; GEO-ankers blijven via `geoQuestionIds`. Hashtags gaan nog niet automatisch mee naar gegenereerde slots (alleen bewaard op de campagne).
+
 ### Niet in deze PR
 
-- Stap 3 (merk, feiten, SEO/GEO, hashtags), invalshoeken als doorgeefluik, en de gedeelde Systeemcheck zijn latere PR’s.
+- Invalshoeken als doorgeefluik, en de gedeelde Systeemcheck zijn latere PR’s.
 - De overstap van posts per kanaal naar artikelen op meerdere kanalen is één aparte slice. Erik (14 nov): ja, een campagne plant artikelen die op meerdere kanalen verschijnen. Gevolg, nog niet gebouwd: fase-aandelen over artikelen (elk artikel één fase, kanaalversies erven die; minimum = aantal fases); een LinkedIn-artikel (`artikel`) krijgt altijd één of meer promotieposts (`promotie`) die de fase erven, niet meetellen in de verdeling, wel in de 100-cap, en op of na de publicatiedag vallen — aantal en timing volgen nog van Erik. `tests/php/campagne-plan-generator.php` wordt dan 12 Instagram-artikelen waarvan 8 ook op LinkedIn. Bestaande campagnes blijven posts per kanaal. Addendum §5 hangt hieraan.
 
 ### Vraag aan Rogier
