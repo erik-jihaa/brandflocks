@@ -8,9 +8,7 @@ import {
   campaignColorDotClass,
   filterAgendaRows,
   groupAgendaRowsByCampaign,
-  rowsForAgendaGroupMode,
   weekOverlapsMonth,
-  type AgendaGroupMode,
 } from '../utils/agendaFilters'
 import { DeleteConfirmAction } from './ui/DeleteConfirmAction'
 import { ActionLink, statusRowActionClass } from './ui/ActionLink'
@@ -36,7 +34,6 @@ type AgendaCalendarProps = {
   horizonWeeks?: number
   today?: string
   busySlotId?: string | null
-  groupMode?: AgendaGroupMode
   channel?: string
   monthKey?: string
   onSchedule?: (slotId: string, publishDate: string, publishTime?: string | null, platform?: string | null) => void
@@ -229,7 +226,6 @@ export function AgendaCalendar({
   horizonWeeks = 4,
   today = todayIso(),
   busySlotId = null,
-  groupMode = 'campaign',
   channel = AGENDA_CHANNEL_ALL,
   monthKey = AGENDA_MONTH_ALL,
   onSchedule,
@@ -240,7 +236,6 @@ export function AgendaCalendar({
   const currentMonday = mondayOfIso(today) ?? today
   const [extraWeeks, setExtraWeeks] = useState(0)
   const sentinelRef = useRef<HTMLDivElement>(null)
-  const showCampaignTitle = groupMode === 'campaign'
 
   const calendarGroups = useMemo(() => {
     const built = calendarAgendaGroups(groups, currentMonday, horizonWeeks, extraWeeks)
@@ -251,8 +246,8 @@ export function AgendaCalendar({
   }, [groups, currentMonday, horizonWeeks, extraWeeks, monthKey])
 
   const visibleRows = useMemo(
-    () => rowsForAgendaGroupMode(filterAgendaRows(allRows, channel, monthKey), groupMode),
-    [allRows, channel, monthKey, groupMode],
+    () => filterAgendaRows(allRows, channel, monthKey),
+    [allRows, channel, monthKey],
   )
 
   const legend = useMemo(() => groupAgendaRowsByCampaign(visibleRows), [visibleRows])
@@ -277,7 +272,7 @@ export function AgendaCalendar({
 
   return (
     <div className="flex flex-col">
-      {showCampaignTitle && legend.length > 0 ? (
+      {legend.length > 0 ? (
         <div className="mb-[12px] flex flex-wrap gap-x-[14px] gap-y-[8px]">
           {legend.map((item) => (
             <span
@@ -298,15 +293,10 @@ export function AgendaCalendar({
         const themeHref = monday ? `/theme?week=${encodeURIComponent(monday)}` : '/theme'
         const filteredGroup = {
           ...group,
-          rows: rowsForAgendaGroupMode(
-            filterAgendaRows(group.rows, channel, monthKey, monday),
-            groupMode,
-          ),
+          rows: filterAgendaRows(group.rows, channel, monthKey, monday),
         }
         const cells = buildWeekDayCells(filteredGroup, visibleRows, postsPerWeek)
-        const weekCampaigns = showCampaignTitle
-          ? agendaCampaignTitles(cells.flatMap((cell) => cell.rows))
-          : []
+        const weekCampaigns = agendaCampaignTitles(cells.flatMap((cell) => cell.rows))
 
         return (
           <div
@@ -359,7 +349,7 @@ export function AgendaCalendar({
                             onDelete={onDelete}
                             onSchedule={onSchedule}
                             busy={busySlotId === row.slotId}
-                            showCampaignTitle={showCampaignTitle}
+                            showCampaignTitle
                           />
                         </div>
                       ))

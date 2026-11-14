@@ -14,10 +14,23 @@ export const AGENDA_MONTH_ALL = 'all'
 /** Klikmodel p-agenda — zonder de demo-toevoeging over november. */
 export const AGENDA_EMPTY_MONTH_MESSAGE = 'Geen posts gepland in deze maand.'
 
-const FIXED_CHANNEL_KEYS = ['linkedin', 'instagram'] as const
+/** UI-labels voor bekende platform-keys (API levert o.a. "Linkedin"). */
+const PLATFORM_LABELS: Record<string, string> = {
+  linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  x: 'X',
+  facebook: 'Facebook',
+  blog: 'Blog',
+}
 
 export function agendaPlatformKey(platform: string | null | undefined): string {
   return (platform ?? '').trim().toLowerCase()
+}
+
+export function agendaPlatformLabel(platform: string | null | undefined): string {
+  const key = agendaPlatformKey(platform)
+  if (key === '') return ''
+  return PLATFORM_LABELS[key] ?? (platform ?? key).trim()
 }
 
 export function agendaMonthKeyFromIso(iso: string | null | undefined): string | null {
@@ -135,22 +148,21 @@ export function agendaRowsInIsoRange(
     .sort((a, b) => rowPublishSortKey(a).localeCompare(rowPublishSortKey(b)))
 }
 
+/**
+ * Kanaalknoppen voor de Kalender: alleen kanalen die in de agenda-data zitten
+ * (tenant-gebruik), plus "Alle kanalen". Geen vaste LinkedIn/Instagram.
+ */
 export function agendaChannelOptions(rows: AgendaRowDto[]): AgendaChannelOption[] {
   const seen = new Set<string>()
-  const extras: AgendaChannelOption[] = []
+  const options: AgendaChannelOption[] = []
   for (const row of rows) {
     const key = agendaPlatformKey(row.platform)
     if (key === '' || seen.has(key)) continue
     seen.add(key)
-    extras.push({ key, label: (row.platform ?? key).trim() })
+    options.push({ key, label: agendaPlatformLabel(row.platform) })
   }
-  const fixed: AgendaChannelOption[] = FIXED_CHANNEL_KEYS.map((key) => ({
-    key,
-    label: key === 'linkedin' ? 'LinkedIn' : 'Instagram',
-  }))
-  const extraOnly = extras.filter((item) => !FIXED_CHANNEL_KEYS.includes(item.key as (typeof FIXED_CHANNEL_KEYS)[number]))
-  extraOnly.sort((a, b) => a.label.localeCompare(b.label, 'nl'))
-  return [{ key: AGENDA_CHANNEL_ALL, label: 'Alle kanalen' }, ...fixed, ...extraOnly]
+  options.sort((a, b) => a.label.localeCompare(b.label, 'nl'))
+  return [{ key: AGENDA_CHANNEL_ALL, label: 'Alle kanalen' }, ...options]
 }
 
 export type AgendaMonthOption = { key: string; label: string }

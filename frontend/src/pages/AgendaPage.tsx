@@ -103,14 +103,25 @@ export function AgendaPage() {
     [listGroups],
   )
   const monthOptions = useMemo(() => agendaMonthOptions(listGroups), [listGroups])
-  const rowsForActiveView = useMemo(
+
+  // Kanaalfilter kan verdwijnen als data/tenant wisselt — val terug op Alle kanalen.
+  useEffect(() => {
+    if (channel === AGENDA_CHANNEL_ALL) return
+    if (channelOptions.some((option) => option.key === channel)) return
+    setChannel(AGENDA_CHANNEL_ALL)
+  }, [channel, channelOptions])
+
+  const rowsForList = useMemo(
     () => rowsForAgendaGroupMode(filteredListRows, groupMode),
     [filteredListRows, groupMode],
   )
   const listEmptyMessage = useMemo(() => {
-    if (rowsForActiveView.length > 0) return null
+    if (rowsForList.length > 0) return null
     return monthKey !== AGENDA_MONTH_ALL ? AGENDA_EMPTY_MONTH_MESSAGE : 'Geen posts voor deze filters.'
-  }, [rowsForActiveView.length, monthKey])
+  }, [rowsForList.length, monthKey])
+  // Overzicht: lege maand op alle posts (niet op Lijst “Op campagne”-subset).
+  const calendarEmptyMonth =
+    view === 'calendar' && monthKey !== AGENDA_MONTH_ALL && filteredListRows.length === 0
 
   async function handleAction(
     slotId: string,
@@ -249,13 +260,11 @@ export function AgendaPage() {
             months={monthOptions}
           />
 
-          {view === 'calendar' && monthKey !== AGENDA_MONTH_ALL && rowsForActiveView.length === 0 ? (
-            <p className="mb-[12px] m-0 text-[14px] leading-[18px] text-ce-beige">
-              {AGENDA_EMPTY_MONTH_MESSAGE}
-            </p>
+          {calendarEmptyMonth ? (
+            <p className="m-0 text-[14px] leading-[18px] text-ce-beige">{AGENDA_EMPTY_MONTH_MESSAGE}</p>
           ) : null}
 
-          {view === 'calendar' ? (
+          {view === 'calendar' && !calendarEmptyMonth ? (
             <>
               <AgendaPortfolioSignals signals={agenda.portfolioSignals ?? []} />
               <AgendaCalendar
@@ -264,7 +273,6 @@ export function AgendaPage() {
                 horizonWeeks={planningHorizonWeeks}
                 today={todayIso()}
                 busySlotId={busySlotId}
-                groupMode={groupMode}
                 channel={channel}
                 monthKey={monthKey}
                 onSchedule={handleSchedule}
@@ -280,7 +288,7 @@ export function AgendaPage() {
 
           {view === 'list' && groupMode === 'campaign' && !listEmptyMessage ? (
             <AgendaCampaignList
-              rows={rowsForActiveView}
+              rows={rowsForList}
               monthKey={monthKey}
               busySlotId={busySlotId}
               onAction={(row, action) => {
@@ -291,7 +299,7 @@ export function AgendaPage() {
 
           {view === 'list' && groupMode === 'date' && !listEmptyMessage ? (
             <AgendaDateList
-              rows={rowsForActiveView}
+              rows={rowsForList}
               allRowsForColors={filteredListRows}
               busySlotId={busySlotId}
               onAction={(row, action) => {

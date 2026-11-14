@@ -51,11 +51,17 @@ Nav-item verwijderd. **`/targets` en API `/objectives` blijven.** `source-folder
 ### Gebouwd / aangescherpt
 
 - Weergave **Overzicht | Lijst** (klikmodel-label Overzicht i.p.v. dubbele “Kalender”).
-- **Kanaal- en maandfilter** in beide weergaven; tenant-kanalen uit agenda-data (niet hardcoded).
+- **Kanaal- en maandfilter** in beide weergaven; tenant-kanalen uit agenda-data (niet hardcoded LI/IG).
 - Lijst **Op campagne**: inklapbare campagne/thema-groepen (bestaand, `AgendaCampaignList`).
 - Lijst **Op datum**: nieuw `AgendaDateList` — per dag, reeksnaam + post (één bron, zelfde filters).
 - **Lege maand:** `Geen posts gepland in deze maand.` (klikmodel, zonder demo-zin).
-- **Op campagne / Op datum** alleen in Lijst (zoals klikmodel); kalender gebruikt wel `groupMode` voor campagne-only raster (bestaand gedrag).
+- **Op campagne / Op datum** alleen in Lijst (zoals klikmodel).
+
+### Vastlopers groepering/API (follow-up 3A)
+
+- **Overzicht** negeert Lijst-`groupMode`: toont altijd alle posts + campagnalegenda (niet meer “Op campagne”-subset na toggle).
+- Lege-maand op Overzicht telt **alle** gefilterde posts, niet alleen campagne.
+- Kanaalknoppen = alleen platforms die in `/api/agenda` voorkomen; ongeldige selectie valt terug op Alle kanalen.
 
 ### Niet gebouwd (opdracht)
 
