@@ -109,22 +109,24 @@ Letterlijke FAQ uit klikmodel `faqData` (10 onderwerpen, 102 vragen):
 
 **Help UI (14 nov):** `SupportPage` — onderwerp-pills + accordion (`HelpFaqSection`, data uit `HELP_FAQ`), los blok **Stel hier jouw vraag** (`HelpOwnQuestionForm`, escalate/mailto); oude Engelstalige bullet-FAQ verwijderd; kostenregel dichter bij klikmodel.
 
-## Opdracht — weekplan stap 7 (branch `herontwerp-artikel-stap7`, in uitvoering)
+## Opdracht — weekplan stap 7 (Artikel-wizard)
 
-### Gebouwd (eerste slice)
+### Gebouwd
 
-- Nav **Artikel** → `/article` redirect naar **7-stappen-wizard** (`/article/nieuw/stap/1` … `7`), voortgangsbalk + klikmodel-copy stap 1–2.
-- Stap 1: Eén / Meerdere / Ik heb het artikel al; eigen tekst → doorverwijzing `Fastlane` met vooringevulde tekst.
-- Stap 2: Thema + extra gedachten (draft in `sessionStorage`).
-- Stap 3–4: klikmodel UI (merkonderdelen, feitenbank-selectie, SEO/GEO-leespunt + link `/search`, hashtags; kanalen + LinkedIn posts/artikelen). Draft v2 in `sessionStorage`.
-- Stap 5–7: placeholders; API (thema&apos;s, slots, onderzoek) volgt.
+- Nav **Artikel** → `/article` redirect naar **7-stappen-wizard** (`/article/nieuw/stap/1` … `7`), voortgangsbalk + klikmodel-copy.
+- Stap 1: Eén / Meerdere / Ik heb het artikel al; eigen tekst → `Fastlane` met prefill.
+- Stap 2: Thema + extra gedachten (draft `sessionStorage` v3).
+- Stap 3–4: merkonderdelen, feitenbank, SEO/GEO-leespunt, hashtags; kanalen + LinkedIn posts/artikelen.
+- Stap 5: invalshoeken per artikel (lokaal voorgesteld uit thema).
+- Stap 6: publicatiedatum per artikel + `PeriodAgendaOverview`.
+- Stap 7: planoverzicht + **Artikelen bevestigen** → `POST /fastlane` per artikel (thema+slot); 1 slot → Onderzoek, meerdere → Kalender.
 
-### Nog open (stap 7 weekplan)
+### Nog open / afwijkingen
 
-- Stappen 5–7 inhoudelijk (invalshoeken, periode, klopt het plan) + thema-aanmaak/Onderzoek.
-- Drempels thema-onderbouwing (`drempels-thema-onderbouwing.md`) bij voorstellen.
-- Onderzoek als kaarten; artikel-detail zijbalk-typen + CTA-blok.
-- Snel artikel-route afbouwen zodra eigen-pad volledig in wizard zit.
+- LLM-voorstellen invalshoeken + Onderzoek-kaarten (klikmodel `p-onderzoek`) nog niet; lokale seed.
+- Multi-kanaal: één slot per artikel op primair kanaal (geen fan-out per kanaal/offsets).
+- Systeemcheck ritme/plan-check nog niet live.
+- Drempels thema-onderbouwing; artikel-detail zijbalk-typen + CTA-blok.
 
 ## Pilot-fixes leesronde (14 nov)
 
