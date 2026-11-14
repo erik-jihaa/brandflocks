@@ -10,6 +10,7 @@ import {
   textvormDisplayLabel,
   textvormOptionsForPlatform,
 } from '../constants/contentTextvorm'
+import { useChannelConstraints } from '../hooks/useChannelConstraints'
 import { toneDisplayLabel } from '../utils/toneStyles'
 import { ArticleSelfReviewSection, type ArticleSelfReviewDto } from './ArticleSelfReviewSection'
 import { ArticleHbaHintSection } from './ArticleHbaHintSection'
@@ -172,6 +173,12 @@ export function ArticleMetaSidebar({
   hideHbaContentrol = false,
 }: ArticleMetaSidebarProps) {
   const [searchParams] = useSearchParams()
+  const { constraints: channelConstraints } = useChannelConstraints()
+  const textvormOptions = textvormOptionsForPlatform(platform, channelConstraints?.textvormByPlatform)
+  const resolvedTextvorm = coerceTextvormForPlatform(platform, contentTextvorm)
+  const textvormReadLabel =
+    textvormOptions.find((o) => o.value === resolvedTextvorm)?.label ??
+    textvormDisplayLabel(resolvedTextvorm)
   const [ceEnvironment, setCeEnvironment] = useState<string | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(detailsDefaultOpen)
   const prevHintLoading = useRef(hbaHintLoading)
@@ -328,13 +335,13 @@ export function ArticleMetaSidebar({
         )}
       </MetaSection>
 
-      {textvormOptionsForPlatform(platform).length > 0 ? (
+      {textvormOptions.length > 1 ? (
         <MetaSection label="Tekstvorm" collapsible={false}>
           {readonly ? (
-            contentTextvorm ? <RadioSelected label={textvormDisplayLabel(contentTextvorm)} /> : null
+            contentTextvorm ? <RadioSelected label={textvormReadLabel} /> : null
           ) : onContentTextvormChange ? (
             <fieldset className="m-0 border-0 p-0">
-              {textvormOptionsForPlatform(platform).map((opt) => (
+              {textvormOptions.map((opt) => (
                 <RadioOption
                   key={opt.value}
                   name="content_textvorm"
@@ -346,7 +353,7 @@ export function ArticleMetaSidebar({
               ))}
             </fieldset>
           ) : (
-            <RadioSelected label={textvormDisplayLabel(coerceTextvormForPlatform(platform, contentTextvorm))} />
+            <RadioSelected label={textvormReadLabel} />
           )}
         </MetaSection>
       ) : null}

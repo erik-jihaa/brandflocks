@@ -354,7 +354,7 @@ export function SourcesPage() {
           <ActionNotice message={actionMessage} kind={actionKind} fading={actionFading} />
           {!usingMock && sources.length > 0 && !sources.some((source) => source.sourceTier === 'core') ? (
             <p className="mb-[12px] text-[14px] leading-[18px] text-ce-black">
-              Voeg minstens één kern-bron toe (eigen website of document). Zonder eigen materiaal mist de tool jullie perspectief.
+              Voeg minstens één kern-bron toe (eigen website of document). Zonder eigen materiaal mist de tool je perspectief.
             </p>
           ) : null}
 

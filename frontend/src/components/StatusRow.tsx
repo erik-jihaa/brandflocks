@@ -63,7 +63,7 @@ export function StatusRow({ title, checkStatus, showBudget = true }: StatusRowPr
     <div className={`${LIST_ROW.rowClass} text-ce-black`}>
       <span className="font-semibold">{title}</span>
       <div className={LIST_ROW.actionsClass}>
-        <ActionLink variant="statusRow">Edit</ActionLink>
+        <ActionLink variant="statusRow">Bewerken</ActionLink>
         <ActionSep />
         <CheckDot status={checkStatus} />
         {showBudget && (
@@ -73,7 +73,7 @@ export function StatusRow({ title, checkStatus, showBudget = true }: StatusRowPr
           </>
         )}
         <ActionSep />
-        <ActionLink variant="statusRow">Delete</ActionLink>
+        <ActionLink variant="statusRow">Verwijderen</ActionLink>
       </div>
     </div>
   )

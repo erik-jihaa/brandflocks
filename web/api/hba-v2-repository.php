@@ -1163,7 +1163,19 @@ function ce_hba_v2_run_theme_verdicts(PDO $pdo, string $clientId, ?string $week 
         ce_hba_v2_expand_theme_verdict_ids($pdo, array_values(array_unique(array_merge($themeIds, $themeIdsFilter)))),
     );
 
+    require_once __DIR__ . '/hba-client-output-guard.php';
     $llm = ce_hba_v2_call_json_for(CE_HBA_FN_THEMA_VERDICT, $filled, 'Geef nu de gevraagde JSON-output.');
+    $llm = ce_hba_apply_client_forbidden_guard_to_llm(
+        $pdo,
+        $clientId,
+        'theme_verdict',
+        $llm,
+        static fn (string $suffix): array => ce_hba_v2_call_json_for(
+            CE_HBA_FN_THEMA_VERDICT,
+            $filled,
+            'Geef nu de gevraagde JSON-output.' . $suffix,
+        ),
+    );
     if (!$llm['ok']) {
         if (($cached['verdicts'] ?? []) !== []) {
             return array_merge(
@@ -1182,7 +1194,7 @@ function ce_hba_v2_run_theme_verdicts(PDO $pdo, string $clientId, ?string $week 
     }
 
     $data = is_array($llm['data'] ?? null) ? $llm['data'] : [];
-    $watOntbreekt = trim((string) ($data['wat_ontbreekt'] ?? ''));
+    $watOntbreekt = ce_hba_sanitize_client_visible_string(trim((string) ($data['wat_ontbreekt'] ?? '')));
     $oordelen = is_array($data['thema_oordelen'] ?? null) ? $data['thema_oordelen'] : [];
     $saved = [];
     $canPersist = ce_table_exists($pdo, 'hba_theme_verdicts');
@@ -1207,12 +1219,12 @@ function ce_hba_v2_run_theme_verdicts(PDO $pdo, string $clientId, ?string $week 
         if ($themeId === '' || !in_array($label, ['versterkt', 'neutraal', 'verwatert'], true)) {
             continue;
         }
-        $toelichting = ce_hba_v2_compose_theme_fit_toelichting(
+        $toelichting = ce_hba_sanitize_client_visible_string(ce_hba_v2_compose_theme_fit_toelichting(
             trim((string) ($item['toelichting'] ?? '')),
             $regelBotsing,
             trim((string) ($item['regel'] ?? '')),
             trim((string) ($item['invalshoek'] ?? '')),
-        );
+        ));
         $id = ce_uuid();
         if ($canPersist) {
             try {
@@ -1574,7 +1586,19 @@ function ce_hba_v2_run_research_verdicts(PDO $pdo, string $clientId, string $slo
         'items' => ce_hba_v2_format_research_for_prompt($items),
     ]);
 
+    require_once __DIR__ . '/hba-client-output-guard.php';
     $llm = ce_hba_v2_call_json_for(CE_HBA_FN_THEMA_VERDICT, $filled, 'Geef nu de gevraagde JSON-output.');
+    $llm = ce_hba_apply_client_forbidden_guard_to_llm(
+        $pdo,
+        $clientId,
+        'research_verdict',
+        $llm,
+        static fn (string $suffix): array => ce_hba_v2_call_json_for(
+            CE_HBA_FN_THEMA_VERDICT,
+            $filled,
+            'Geef nu de gevraagde JSON-output.' . $suffix,
+        ),
+    );
     if (!$llm['ok']) {
         if (($cached['verdicts'] ?? []) !== []) {
             return array_merge(
@@ -1593,7 +1617,7 @@ function ce_hba_v2_run_research_verdicts(PDO $pdo, string $clientId, string $slo
     }
 
     $data = is_array($llm['data'] ?? null) ? $llm['data'] : [];
-    $watOntbreekt = trim((string) ($data['wat_ontbreekt'] ?? ''));
+    $watOntbreekt = ce_hba_sanitize_client_visible_string(trim((string) ($data['wat_ontbreekt'] ?? '')));
     $oordelen = is_array($data['research_oordelen'] ?? null) ? $data['research_oordelen'] : [];
     if ($oordelen === [] && is_array($data['thema_oordelen'] ?? null)) {
         $oordelen = $data['thema_oordelen'];
@@ -1617,7 +1641,7 @@ function ce_hba_v2_run_research_verdicts(PDO $pdo, string $clientId, string $slo
         if ($itemId === '' || !in_array($label, ['versterkt', 'neutraal', 'verwatert'], true)) {
             continue;
         }
-        $toelichting = trim((string) ($item['toelichting'] ?? ''));
+        $toelichting = ce_hba_sanitize_client_visible_string(trim((string) ($item['toelichting'] ?? '')));
         $id = ce_uuid();
         if ($canPersist) {
             try {
@@ -1876,7 +1900,19 @@ function ce_hba_v2_run_article_hint(PDO $pdo, string $clientId, string $articleI
         'concept' => $concept,
     ]);
 
+    require_once __DIR__ . '/hba-client-output-guard.php';
     $llm = ce_hba_v2_call_json_for(CE_HBA_FN_ARTICLE_HINT, $filled, 'Geef nu de gevraagde JSON-output.');
+    $llm = ce_hba_apply_client_forbidden_guard_to_llm(
+        $pdo,
+        $clientId,
+        'article_hint',
+        $llm,
+        static fn (string $suffix): array => ce_hba_v2_call_json_for(
+            CE_HBA_FN_ARTICLE_HINT,
+            $filled,
+            'Geef nu de gevraagde JSON-output.' . $suffix,
+        ),
+    );
     if (!$llm['ok']) {
         return ['ok' => false, 'error' => $llm['error'] ?? 'Aanwijzing mislukt'];
     }
@@ -1904,11 +1940,16 @@ function ce_hba_v2_run_article_hint(PDO $pdo, string $clientId, string $articleI
         }
     }
     $data = $prepared['data'];
-    $aanwijzing = trim((string) ($data['aanwijzing'] ?? ''));
+    $aanwijzing = ce_hba_sanitize_client_visible_string(trim((string) ($data['aanwijzing'] ?? '')));
     if ($aanwijzing === '') {
         return ['ok' => false, 'error' => 'Geen aanwijzing ontvangen — probeer opnieuw'];
     }
     $data['aanwijzing'] = $aanwijzing;
+    foreach (['passage_voor', 'passage_na', 'headline_voor', 'headline_na', 'cta_voor', 'cta_na', 'regel_overtreden'] as $hintField) {
+        if (array_key_exists($hintField, $data) && is_string($data[$hintField])) {
+            $data[$hintField] = ce_hba_sanitize_client_visible_string($data[$hintField]) ?: null;
+        }
+    }
     $hintId = ce_uuid();
     $modelUsed = trim((string) ($llm['model'] ?? ce_hba_model_for(CE_HBA_FN_ARTICLE_HINT)));
     $logModel = ce_hba_table_has_model_column($pdo, 'hba_article_hints') ? $modelUsed : null;

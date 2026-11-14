@@ -1826,6 +1826,20 @@ function ce_campagne_preview_run_plan_check(PDO $pdo, string $campaignId, ?strin
         0.1,
         4096,
     );
+    require_once __DIR__ . '/hba-client-output-guard.php';
+    $llm = ce_hba_apply_client_forbidden_guard_to_llm(
+        $pdo,
+        $clientId,
+        'campagne_plan_check',
+        $llm,
+        static fn (string $suffix): array => ce_hba_v2_call_json_for(
+            CE_HBA_FN_CAMPAGNE_PLAN_CHECK,
+            $filled,
+            'Geef nu de gevraagde JSON-output.' . $suffix,
+            0.1,
+            4096,
+        ),
+    );
     if (($llm['ok'] ?? false) === true && is_array($llm['data'] ?? null)) {
         $llmNormalized = ce_campagne_plan_check_normalize_llm($llm['data'], $slots);
         $llmOk = true;

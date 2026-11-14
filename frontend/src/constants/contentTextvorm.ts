@@ -18,7 +18,7 @@ export const TEXTVORM_OPTIONS_BY_PLATFORM: Record<string, readonly string[]> = {
 
 export const TEXTVORM_LABELS: Record<string, string> = {
   artikel: 'Artikel',
-  post: 'Post',
+  post: 'Zelfstandige post',
   promotie: 'Promotiepost bij artikel',
   bijschrift: 'Bijschrift',
   carrousel: 'Carrouseltekst',
@@ -37,8 +37,15 @@ export function defaultTextvormForPlatform(platform: string): string {
   return 'post'
 }
 
-export function textvormOptionsForPlatform(platform: string): Array<{ value: string; label: string }> {
+export function textvormOptionsForPlatform(
+  platform: string,
+  fromApi?: Record<string, Array<{ value: string; label: string }>> | null,
+): Array<{ value: string; label: string }> {
   const db = platformUiToDb(platform)
+  const apiRow = fromApi?.[db]
+  if (apiRow && apiRow.length > 0) {
+    return apiRow
+  }
   const keys = TEXTVORM_OPTIONS_BY_PLATFORM[db] ?? ['post']
 
   return keys.map((value) => ({

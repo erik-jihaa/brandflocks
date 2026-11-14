@@ -306,7 +306,7 @@ export type StrategyFieldProps = {
 }
 
 function formatDocumentSuggestionLabel(text: string): string {
-  return `Uit je document: "${text}". Schrijf hieronder in je eigen woorden wat dit voor jullie merk betekent.`
+  return `Uit je document: "${text}". Schrijf hieronder in je eigen woorden wat dit voor je merk betekent.`
 }
 
 /** Strategy Grid #1 — blauwe header, beige hint, zwarte invultekst, lijn eronder (Account-kolombreedte). */
